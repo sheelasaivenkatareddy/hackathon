@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Diagnosis } from "../lib/diagnose";
 import { useI18n } from "../lib/i18n";
 import { confidenceWord } from "../lib/model";
+import FertilizerCard from "./FertilizerCard";
 import { AnswerBadge, CountUp, DemoBanner, ModelStatusChip, Toggle } from "./ui";
 import { OverlayCanvas, Viewfinder } from "./viz";
 
@@ -75,6 +76,8 @@ export default function DiagnosisResult({ url, diagnosis, lowReliability, hideMo
         </ol>
         <p className="small mt-3 font-semibold">{t("result.noAdvice")}</p>
       </div>
+
+      {level !== "RETAKE" && <FertilizerCard name={top?.name} level={level} />}
     </div>
   );
 }

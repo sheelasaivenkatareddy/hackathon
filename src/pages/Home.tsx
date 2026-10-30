@@ -1,6 +1,6 @@
 // The story for the jury. Text is word for word from the build spec, section 4.
-import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
-import { Aperture, Camera, ChevronDown, CloudSun, HeartPulse, ImageOff, Languages, Microscope, RadioTower, ScanLine, Sprout, TriangleAlert, UserCheck } from "lucide-react";
+import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { Aperture, Camera, ChevronDown, CloudSun, HeartPulse, ImageOff, Languages, Microscope, RadioTower, ScanLine, Sprout, TriangleAlert, UserCheck, Wheat } from "lucide-react";
 import { ReactNode, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, Chip, CountUp, Reveal } from "../components/ui";
@@ -27,6 +27,7 @@ const FEATURES = [
   { icon: Sprout, title: "Leaf Watch", text: "Same leaves, every few days. New spots, holes and feeding marks are flagged.", to: "/watch" },
   { icon: Aperture, title: "Photo Coach", text: "Checks blur, light and leaf size before any answer.", to: "/scan" },
   { icon: Microscope, title: "Honest Diagnosis", text: "Top 3 answers with confidence, or 'not sure'.", to: "/scan" },
+  { icon: Wheat, title: "Fertilizer suggestions", text: "After a diagnosis, see which fertilizer types may help, what to avoid, and the source.", to: "/scan" },
   { icon: HeartPulse, title: "Recovery Tracker", text: "After treatment, see whether the plant is improving.", to: "/watch" },
   { icon: CloudSun, title: "Risk Score", text: "Weather and nearby reports show when to check more often.", to: "/risk" },
   { icon: RadioTower, title: "Disease Radar", text: "A sudden rise in nearby confirmed cases triggers an early alert.", to: "/radar" },
@@ -55,6 +56,7 @@ const ROADMAP = [
 ];
 const FAQ = [
   ["Does Patra Lens tell me which pesticide to use?", "No. It suggests what to check and who to ask. Treatment decisions stay with the farmer and local experts."],
+  ["Does it suggest fertilizer?", "Yes. After a diagnosis it shows which fertilizer types may help and what to avoid, with the source where we have one. It never gives amounts, because those depend on your soil. Get them from a soil test or your KVK. Fertilizer does not cure disease."],
   ["How accurate is it?", `On ${CONFIG.measured.fieldTestPhotos} public field photos it had never seen, the top answer was right ${pct(CONFIG.measured.fieldAccuracy)} of the time, and the right answer was in the top 3 ${pct(CONFIG.measured.fieldTop3)} of the time. Tomato alone was lower, at ${pct(CONFIG.measured.tomatoFieldAccuracy)}. These are not local farm photos yet, so always confirm with an expert.`],
   ["Does it need internet?", "Photo checks, spot comparison and the on-device model run in the browser. Weather and the shared radar need internet."],
   ["What happens to my location?", "It is shared only if you turn it on, and only as an approximate 1 km area. Exact locations are never stored."],
@@ -62,7 +64,7 @@ const FAQ = [
 ];
 
 const Section = ({ id, tint, children }: { id?: string; tint?: boolean; children: ReactNode }) => (
-  <section id={id} className={`section ${tint ? "bg-surface" : "bg-white"}`}><div className="wrap">{children}</div></section>
+  <section id={id} className={`section ${tint ? "bg-surface" : "bg-white"}`}><Reveal className="wrap">{children}</Reveal></section>
 );
 const IconBox = ({ children }: { children: ReactNode }) => <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-green-tint text-green-dark">{children}</span>;
 
@@ -245,6 +247,9 @@ function MeasuredValues() {
 
 export default function Home() {
   const { setSheetOpen } = useI18n();
+  const reduce = useReducedMotion();
+  const { scrollY } = useScroll();
+  const phoneY = useTransform(scrollY, [0, 700], [0, reduce ? 0 : -70]);
   return (
     <>
       <section className="hero-mesh text-white lg:min-h-[calc(100vh-4rem)]">
@@ -265,8 +270,10 @@ export default function Home() {
             <p className="mt-6 text-sm text-white/75">Runs on your phone · No app to install · Free to use</p>
           </div>
           <div className="relative text-center">
-            <HeroLeaf />
-            <p className="mt-3 text-xs text-white/70">Illustration</p>
+            <motion.div style={{ y: phoneY }}>
+              <HeroLeaf />
+              <p className="mt-3 text-xs text-white/70">Illustration</p>
+            </motion.div>
             <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7, type: "spring", stiffness: 90, damping: 16 }} className="absolute left-0 top-[18%] hidden xl:block">
               <div className="glass float-soft px-4 py-3 text-left"><div className="font-heading text-xl font-extrabold text-lime">{pct(CONFIG.measured.fieldTop3)}</div><div className="text-xs text-white/85">Right answer in top 3</div></div>
             </motion.div>
@@ -315,9 +322,9 @@ export default function Home() {
       <Section tint>
         <p className="eyebrow mb-2">The product</p>
         <h2 className="h2">Everything from first spot to early warning</h2>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f, i) => (
-            <Reveal key={f.title} delay={i % 4}>
+            <Reveal key={f.title} delay={i % 3}>
               <Link to={f.to} className="lift-card block h-full rounded-card border border-line bg-white p-5 shadow-soft">
                 <IconBox><f.icon className="h-6 w-6" aria-hidden /></IconBox>
                 <h3 className="h3">{f.title}</h3><p className="mt-1 text-base text-muted">{f.text}</p>

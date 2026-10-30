@@ -41,7 +41,7 @@ export function Button({ variant = "primary", loading, to, className, children, 
 
 // ------------------------------------------------------------------ Card, Chip
 export const Card = ({ className, children }: { className?: string; children: ReactNode }) => (
-  <div className={cx("rounded-card border border-line bg-surface p-4 shadow-soft md:p-6", className)}>{children}</div>
+  <motion.div className={cx("rounded-card border border-line bg-surface p-4 shadow-soft md:p-6", className)} initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-20px" }} transition={{ duration: 0.35, ease: "easeOut" }}>{children}</motion.div>
 );
 
 type Tone = "green" | "tomato" | "amber" | "muted" | "forest" | "lime";

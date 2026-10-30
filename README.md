@@ -22,6 +22,17 @@ Limits to state plainly: these are public photos, not local farms. Tomato alone 
 
 Recreate the layer with `ml/field-head/` (`unpack_plantdoc.py`, then `extract.py`, then `train_head.py`). Python needs `onnxruntime`, `scikit-learn`, `numpy` and `pillow`. Credits are in `public/model/FIELD_MODEL_CREDITS.txt`.
 
+## Fertilizer suggestions
+
+`src/lib/nutrition.ts` holds the guidance shown after a diagnosis. Keep to these rules when editing it:
+
+- Fertilizer types only, never amounts. Amounts depend on the soil.
+- Specific advice appears only for a CLEAR answer. CHECK and EXPERT answers get general soil care.
+- A disease gets specific advice only when a source supports it. For example, late blight stays general, because we could not confirm the common claim that extra nitrogen worsens it.
+- No pesticide names, doses or spray schedules.
+
+Have a local agriculture expert review this file before real farmers use it.
+
 ## Run it
 
 You need Node 18 or newer.
