@@ -1,9 +1,11 @@
 // Expert queue: unsure scans and visits. Expert labels confirm a case and feed retraining.
-import { Download, Lock } from "lucide-react";
+import { Download, Lock, LogOut } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { BottomSheet, Button, Card, Chip, EmptyState, SampleChip, Skeleton, StatusChip, useToast } from "../components/ui";
 import { LeafIllustration } from "../components/viz";
 import { CONFIG } from "../config";
+import GoogleAdminSignIn from "../components/GoogleAdminSignIn";
+import { GOOGLE_CLIENT_ID, clearSession, restoreSession } from "../lib/auth";
 import { getFieldHead } from "../lib/diagnose";
 import { Scan, Visit, db, useBlobUrl, useLive } from "../lib/db";
 import { useI18n } from "../lib/i18n";
@@ -47,6 +49,7 @@ export default function Expert() {
   const scans = useLive(() => db.scans.toArray(), []);
   const visits = useLive(() => db.visits.toArray(), []);
   const [unlocked, setUnlocked] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [wrong, setWrong] = useState(false);
   const [labels, setLabels] = useState<Label[]>([]);
@@ -59,6 +62,16 @@ export default function Expert() {
   useEffect(() => {
     getFieldHead().then(async (head) => setLabels(head?.labels ?? await fetch("/model/labels.json").then((r) => r.json()).catch(() => []))).catch(() => setLabels([]));
   }, []);
+
+  useEffect(() => {
+    if (GOOGLE_CLIENT_ID) restoreSession().then((email) => { if (email) { setAdminEmail(email); setUnlocked(true); } });
+  }, []);
+
+  const signOut = () => {
+    clearSession();
+    (window as any).google?.accounts?.id?.disableAutoSelect();
+    setAdminEmail(null); setUnlocked(false);
+  };
 
   const queue = useMemo<Item[]>(() => {
     if (!scans || !visits) return [];
@@ -108,7 +121,20 @@ export default function Expert() {
       <h1 className="page-title">Expert queue</h1>
       <p className="small mt-1">Scans and visits with an unsure answer, or sent with “Ask an expert”.</p>
 
-      {!unlocked && (
+      {adminEmail && (
+        <Card className="mt-5 !bg-white">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="font-semibold text-forest" data-testid="admin-signed-in">Signed in as admin: {adminEmail}</p>
+            <Button variant="secondary" onClick={signOut} className="!text-sm"><LogOut className="h-4 w-4" aria-hidden />Sign out</Button>
+          </div>
+        </Card>
+      )}
+
+      {!unlocked && GOOGLE_CLIENT_ID && (
+        <Card className="mt-5 !bg-white"><GoogleAdminSignIn onAdmin={(email) => { setAdminEmail(email); setUnlocked(true); }} /></Card>
+      )}
+
+      {!unlocked && !GOOGLE_CLIENT_ID && (
         <Card className="mt-5 !bg-white">
           <form className="flex flex-wrap items-end gap-3" onSubmit={(e) => { e.preventDefault(); if (code === CONFIG.expert.passcode) { setUnlocked(true); setWrong(false); } else setWrong(true); }}>
             <label className="min-w-[200px] flex-1"><span className="field-label"><Lock className="mr-1 inline h-4 w-4" aria-hidden />Expert mode passcode</span>
@@ -130,7 +156,7 @@ export default function Expert() {
               {unlocked && <Button variant="secondary" loading={zipping} disabled={!labelled} onClick={download} className="!text-sm"><Download className="h-4 w-4" aria-hidden />Download labelled data</Button>}
             </div>
             <ul className="mt-3">
-              {queue.map((it) => <QueueRow key={it.row.id} item={it} scans={scans ?? []} onOpen={() => (unlocked ? review(it) : toast("Enter the passcode to review."))} />)}
+              {queue.map((it) => <QueueRow key={it.row.id} item={it} scans={scans ?? []} onOpen={() => (unlocked ? review(it) : toast(GOOGLE_CLIENT_ID ? "Sign in as admin to review." : "Enter the passcode to review."))} />)}
             </ul>
           </Card>
         )}

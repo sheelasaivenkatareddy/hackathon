@@ -73,7 +73,11 @@ export const CONFIG = {
     defaultCentre: [12.97, 77.59] as [number, number], // Bengaluru
   },
 
-  expert: { passcode: "iihr2026" }, // change before the demo
+  expert: {
+    passcode: "iihr2026", // only used while VITE_GOOGLE_CLIENT_ID is not set
+    // SHA-256 of the admin's lower-case Gmail address, so the address itself is not in the public code.
+    adminEmailSha256: "eb7eaf3062ace00d4c20375ca2e4513fb6de37f8d637e88bf6e518db584194f8",
+  },
 
   // Real numbers only. Field values: field-tuned model on the 236 PlantDoc test photos (ml/field-head/train_head.py).
   // If you replace the model, replace these too. Anything still null shows "To be measured".
