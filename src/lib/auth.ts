@@ -57,6 +57,17 @@ export async function restoreSession(): Promise<string | null> {
   return null;
 }
 
+// ------------------------------------------------------------------ demo login (email + password, no Google setup)
+const DEMO_KEY = "patra-admin-demo";
+
+export async function checkDemoLogin(email: string, password: string): Promise<boolean> {
+  const ok = (await sha256Hex(`${email.trim().toLowerCase()}:${password}`)) === CONFIG.expert.adminLoginSha256;
+  if (ok) { try { sessionStorage.setItem(DEMO_KEY, email.trim()); } catch { /* the login still works until reload */ } }
+  return ok;
+}
+export const demoSession = () => { try { return sessionStorage.getItem(DEMO_KEY); } catch { return null; } };
+export const clearDemoSession = () => { try { sessionStorage.removeItem(DEMO_KEY); } catch { /* nothing stored */ } };
+
 let gis: Promise<any> | null = null;
 export function loadGoogle(): Promise<any> {
   if (!gis) {

@@ -39,23 +39,25 @@ The live camera needs HTTPS or localhost. Upload and sample photos work everywhe
 
 ## Before the demo
 
-1. Turn on admin sign-in (see below), so the Expert screen needs the admin's Google account instead of the passcode.
+1. Check you can log in to the Expert screen as admin (see below).
 2. Open **Settings > Prepare for offline** on Wi-Fi, so the comparison engine and samples are saved.
 3. Add real timeline photos if you have them (see below). Until then, **Load test pair** on Leaf Watch shows the compare feature, with a "Synthetic" chip.
 
 The full script is in `03_DEMO_SCRIPT.md` in the Developer Kit.
 
-## Admin sign-in
+## Admin login
 
-The Expert screen uses free Google sign-in. Only the Gmail address whose SHA-256 hash is in `expert.adminEmailSha256` in `src/config.ts` gets in.
+By default, the Expert screen asks for the admin's Gmail and a password. Only a SHA-256 hash of the two is in the code (`expert.adminLoginSha256` in `src/config.ts`, which also shows how to change it). This is a login for the demo: it does not contact Gmail or Google.
+
+### Optional: real Google sign-in
+
+Only the Gmail address whose SHA-256 hash is in `expert.adminEmailSha256` gets in.
 
 1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), create a project, then an OAuth client ID of type "Web application".
 2. Under "Authorized JavaScript origins", add the site's address and `http://localhost:5173`.
 3. Set `VITE_GOOGLE_CLIENT_ID` to the client ID in Vercel, and in a `.env.local` file for local use, then rebuild. The client ID is not a secret.
 
-Without that variable, the Expert screen falls back to `expert.passcode`.
-
-The site has no server, so this check runs in the browser. It verifies Google's signature, but someone able to edit the page's code in their own browser could get past it. That only affects their own device, because all data stays on each device. If you add a shared database, enforce the admin check on the server too.
+The site has no server, so both logins run in the browser. Google sign-in verifies Google's signature, but someone able to edit the page's code in their own browser could get past either one. That only affects their own device, because all data stays on each device. If you add a shared database, enforce the admin check on the server too.
 
 ## Deploy
 

@@ -3,9 +3,8 @@ import { Download, Lock, LogOut } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { BottomSheet, Button, Card, Chip, EmptyState, SampleChip, Skeleton, StatusChip, useToast } from "../components/ui";
 import { LeafIllustration } from "../components/viz";
-import { CONFIG } from "../config";
 import GoogleAdminSignIn from "../components/GoogleAdminSignIn";
-import { GOOGLE_CLIENT_ID, clearSession, restoreSession } from "../lib/auth";
+import { GOOGLE_CLIENT_ID, checkDemoLogin, clearDemoSession, clearSession, demoSession, restoreSession } from "../lib/auth";
 import { getFieldHead } from "../lib/diagnose";
 import { Scan, Visit, db, useBlobUrl, useLive } from "../lib/db";
 import { useI18n } from "../lib/i18n";
@@ -50,6 +49,7 @@ export default function Expert() {
   const visits = useLive(() => db.visits.toArray(), []);
   const [unlocked, setUnlocked] = useState(false);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
+  const [loginEmail, setLoginEmail] = useState("");
   const [code, setCode] = useState("");
   const [wrong, setWrong] = useState(false);
   const [labels, setLabels] = useState<Label[]>([]);
@@ -65,10 +65,12 @@ export default function Expert() {
 
   useEffect(() => {
     if (GOOGLE_CLIENT_ID) restoreSession().then((email) => { if (email) { setAdminEmail(email); setUnlocked(true); } });
+    else { const email = demoSession(); if (email) { setAdminEmail(email); setUnlocked(true); } }
   }, []);
 
   const signOut = () => {
     clearSession();
+    clearDemoSession();
     (window as any).google?.accounts?.id?.disableAutoSelect();
     setAdminEmail(null); setUnlocked(false);
   };
@@ -136,13 +138,20 @@ export default function Expert() {
 
       {!unlocked && !GOOGLE_CLIENT_ID && (
         <Card className="mt-5 !bg-white">
-          <form className="flex flex-wrap items-end gap-3" onSubmit={(e) => { e.preventDefault(); if (code === CONFIG.expert.passcode) { setUnlocked(true); setWrong(false); } else setWrong(true); }}>
-            <label className="min-w-[200px] flex-1"><span className="field-label"><Lock className="mr-1 inline h-4 w-4" aria-hidden />Expert mode passcode</span>
-              <input type="password" autoComplete="off" className="field-input" value={code} onChange={(e) => setCode(e.target.value)} aria-invalid={wrong} />
+          <h2 className="h3 flex items-center gap-2"><Lock className="h-5 w-5" aria-hidden />Admin login</h2>
+          <form className="mt-3 flex flex-wrap items-end gap-3" onSubmit={async (e) => {
+            e.preventDefault();
+            if (await checkDemoLogin(loginEmail, code)) { setAdminEmail(loginEmail.trim()); setUnlocked(true); setWrong(false); setCode(""); } else setWrong(true);
+          }}>
+            <label className="min-w-[200px] flex-1"><span className="field-label">Gmail</span>
+              <input type="email" autoComplete="username" required className="field-input" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} aria-invalid={wrong} />
             </label>
-            <Button type="submit">Open expert mode</Button>
+            <label className="min-w-[200px] flex-1"><span className="field-label">Password</span>
+              <input type="password" autoComplete="current-password" required className="field-input" value={code} onChange={(e) => setCode(e.target.value)} aria-invalid={wrong} />
+            </label>
+            <Button type="submit">Log in</Button>
           </form>
-          {wrong && <p role="alert" className="mt-2 text-sm font-semibold text-tomato-dark">That passcode is not right.</p>}
+          {wrong && <p role="alert" className="mt-2 text-sm font-semibold text-tomato-dark">That Gmail or password is not right.</p>}
         </Card>
       )}
 
@@ -156,7 +165,7 @@ export default function Expert() {
               {unlocked && <Button variant="secondary" loading={zipping} disabled={!labelled} onClick={download} className="!text-sm"><Download className="h-4 w-4" aria-hidden />Download labelled data</Button>}
             </div>
             <ul className="mt-3">
-              {queue.map((it) => <QueueRow key={it.row.id} item={it} scans={scans ?? []} onOpen={() => (unlocked ? review(it) : toast(GOOGLE_CLIENT_ID ? "Sign in as admin to review." : "Enter the passcode to review."))} />)}
+              {queue.map((it) => <QueueRow key={it.row.id} item={it} scans={scans ?? []} onOpen={() => (unlocked ? review(it) : toast("Log in as admin to review."))} />)}
             </ul>
           </Card>
         )}

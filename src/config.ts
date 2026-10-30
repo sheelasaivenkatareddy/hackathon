@@ -74,7 +74,9 @@ export const CONFIG = {
   },
 
   expert: {
-    passcode: "iihr2026", // only used while VITE_GOOGLE_CLIENT_ID is not set
+    // Demo login, used while VITE_GOOGLE_CLIENT_ID is not set. SHA-256 of "<lower-case email>:<password>".
+    // To change it: node -e "console.log(require('crypto').createHash('sha256').update('EMAIL:PASSWORD').digest('hex'))"
+    adminLoginSha256: "0693c056fd830607527e2505d8dc6888efcf0614e7f8dbfb256341ae288c61a4",
     // SHA-256 of the admin's lower-case Gmail address, so the address itself is not in the public code.
     adminEmailSha256: "eb7eaf3062ace00d4c20375ca2e4513fb6de37f8d637e88bf6e518db584194f8",
   },
