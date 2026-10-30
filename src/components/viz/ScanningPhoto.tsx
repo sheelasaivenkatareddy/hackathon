@@ -18,7 +18,7 @@ export default function ScanningPhoto({ url, steps }: { url: string; steps: stri
           <img src={url} alt="Your leaf, being checked" className="block w-full" />
           <div className="scan-grid absolute inset-0 bg-forest/25" aria-hidden />
           {!reduce && (
-            <motion.div aria-hidden className="absolute inset-x-0 h-16 bg-gradient-to-b from-transparent to-lime/50" style={{ borderBottom: "2px solid #9BCB3C", boxShadow: "0 6px 18px #9BCB3C" }}
+            <motion.div aria-hidden className="absolute inset-x-0 h-16 bg-gradient-to-b from-transparent to-lime/50" style={{ borderBottom: "2px solid #FBBF24", boxShadow: "0 6px 18px #FBBF24" }}
               initial={{ top: "-15%" }} animate={{ top: "100%" }} transition={{ duration: 1.7, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }} />
           )}
         </div>

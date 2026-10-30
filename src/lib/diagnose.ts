@@ -119,7 +119,7 @@ export async function diagnose(photo: Blob, work: RGBAImage, coach: CoachResult,
   }
   if (!prediction) prediction = predictDemo(sampleFile);
   if (!prediction) prediction = { mode: "none", top3: [] };
-  if (!heatmap) heatmap = { kind: "colour", overlay: maskToOverlay(leafMasks(work).spot, [198, 75, 34], 0.4) };
+  if (!heatmap) heatmap = { kind: "colour", overlay: maskToOverlay(leafMasks(work).spot, [225, 29, 72], 0.4) };
 
   return { prediction, level: answerLevel(prediction.top3, coach.pass, usedAnyway), heatmap };
 }

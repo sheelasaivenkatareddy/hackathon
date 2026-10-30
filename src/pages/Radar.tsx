@@ -13,7 +13,7 @@ import { Report, area, cellBounds, cellCentre, cellId, displayCount, unusualRise
 import { loadReports } from "../lib/weather";
 
 const sweepIcon = L.divIcon({ className: "", html: '<div class="radar-sweep"></div>', iconSize: [0, 0] });
-const shade = (n: number) => (n >= 5 ? "#C64B22" : n >= 3 ? "#D9970F" : "#9BCB3C");
+const shade = (n: number) => (n >= 5 ? "#E11D48" : n >= 3 ? "#D97706" : "#FBBF24");
 const WEEKS = ["This week", "1 week ago", "2 weeks ago", "3 weeks ago"];
 
 export default function Radar() {
@@ -92,10 +92,10 @@ export default function Radar() {
             <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
             <Marker position={centre} icon={sweepIcon} interactive={false} keyboard={false} />
             {[...alertCells].map((c) => (
-              <Rectangle key={`alert-${c}`} bounds={cellBounds(c)} pathOptions={{ color: "#C64B22", weight: 1, fillColor: "#C64B22", fillOpacity: 0.2, className: "cell-pulse" }} />
+              <Rectangle key={`alert-${c}`} bounds={cellBounds(c)} pathOptions={{ color: "#E11D48", weight: 1, fillColor: "#E11D48", fillOpacity: 0.2, className: "cell-pulse" }} />
             ))}
             {[...counts.entries()].map(([c, n]) => (
-              <Rectangle key={`${c}-${n}`} bounds={cellBounds(c)} pathOptions={{ color: "#12372A", weight: 1, fillColor: shade(n), fillOpacity: 0.55 }}>
+              <Rectangle key={`${c}-${n}`} bounds={cellBounds(c)} pathOptions={{ color: "#0B2B33", weight: 1, fillColor: shade(n), fillOpacity: 0.55 }}>
                 <Tooltip>{label(n)}</Tooltip>
               </Rectangle>
             ))}

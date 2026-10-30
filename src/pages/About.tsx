@@ -1,4 +1,4 @@
-import Footer, { PHOTO_CREDIT, REFERENCES } from "../components/Footer";
+import { PHOTO_CREDIT, REFERENCES } from "../components/Footer";
 import { Card } from "../components/ui";
 import { CONFIG } from "../config";
 
@@ -31,7 +31,6 @@ const METRICS: [string, string | number | null][] = [
 
 export default function About() {
   return (
-    <>
       <div className="wrap max-w-3xl space-y-6 py-8 md:py-12">
         <h1 className="page-title">About Patra Lens</h1>
         <p>Patra Lens is a prototype for Chip to Crop 2026 by Team Smart Revolution. “Patra” means leaf.</p>
@@ -62,7 +61,5 @@ export default function About() {
           <p className="mt-2 text-sm">AI model: <a className="text-green-dark underline" href="https://huggingface.co/rodynaemad/plant-disease-dinov2-small" target="_blank" rel="noreferrer">plant-disease-dinov2-small</a> by rodynaemad (CC BY-SA 4.0), built on DINOv2 by Meta. Its last layer was retrained by Team Smart Revolution on the PlantDoc dataset. The retrained layer is shared under the same licence.</p>
         </Card>
       </div>
-      <Footer />
-    </>
   );
 }

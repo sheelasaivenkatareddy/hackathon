@@ -12,7 +12,7 @@ export const PhoneFrame = ({ children, className }: { children: ReactNode; class
 );
 
 /** The four corners from the logo, around any photo or focus element. */
-export const Viewfinder = ({ children, className, color = "#9BCB3C" }: { children?: ReactNode; className?: string; color?: string }) => (
+export const Viewfinder = ({ children, className, color = "#FBBF24" }: { children?: ReactNode; className?: string; color?: string }) => (
   <div className={`relative ${className ?? ""}`}>
     {children}
     <svg className="pointer-events-none absolute inset-2 h-[calc(100%-16px)] w-[calc(100%-16px)]" aria-hidden>
@@ -80,7 +80,7 @@ export function SpotRings({ components, width, height, onRing }: { components: N
       {components.map((c, i) => {
         const r = Math.max(10, c.r * 1.8);
         return (
-          <motion.circle key={`${c.x}-${c.y}`} cx={c.x} cy={c.y} r={r} fill="transparent" stroke="#C64B22" strokeWidth={Math.max(2.5, width / 170)}
+          <motion.circle key={`${c.x}-${c.y}`} cx={c.x} cy={c.y} r={r} fill="transparent" stroke="#E11D48" strokeWidth={Math.max(2.5, width / 170)}
             style={{ transformOrigin: `${c.x}px ${c.y}px`, cursor: onRing ? "zoom-in" : undefined }}
             initial={{ scale: 0, opacity: 0 }} animate={{ scale: [0, 1.25, 1, 1.25, 1], opacity: 1 }} transition={{ duration: 1.3, delay: 0.15 * i, ease: "easeOut" }}
             onClick={onRing && (() => onRing(c))} role={onRing ? "button" : undefined} tabIndex={onRing ? 0 : undefined}
@@ -102,11 +102,11 @@ export function WPattern({ count = 5 }: { count?: number }) {
   const dots = Array.from({ length: count }, (_, i) => at(count === 1 ? 0 : i / (count - 1)));
   return (
     <svg viewBox="0 0 320 180" className="w-full max-w-md rounded-card bg-green-tint" role="img" aria-label={`Field with ${count} sentinel plants placed along a W pattern`}>
-      <rect x="10" y="10" width="300" height="160" rx="12" fill="none" stroke="#3E9B4B" strokeWidth="2" strokeDasharray="6 6" />
-      <motion.polyline key={count} points={W.map((p) => p.join(",")).join(" ")} fill="none" stroke="#2F7D32" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round"
+      <rect x="10" y="10" width="300" height="160" rx="12" fill="none" stroke="#14B8A6" strokeWidth="2" strokeDasharray="6 6" />
+      <motion.polyline key={count} points={W.map((p) => p.join(",")).join(" ")} fill="none" stroke="#0F766E" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round"
         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.1, ease: "easeInOut" }} />
       {dots.map(([x, y], i) => (
-        <motion.circle key={`${count}-${i}`} cx={x} cy={y} r="8" fill="#C64B22" stroke="#fff" strokeWidth="2" style={{ transformOrigin: `${x}px ${y}px` }}
+        <motion.circle key={`${count}-${i}`} cx={x} cy={y} r="8" fill="#E11D48" stroke="#fff" strokeWidth="2" style={{ transformOrigin: `${x}px ${y}px` }}
           initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.3 + (i * 0.9) / count }} />
       ))}
     </svg>
@@ -137,13 +137,13 @@ export function HeroLeaf() {
   }, [cycle, reduce]);
   return (
     <PhoneFrame>
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1b4a39] to-forest" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#123F4A] to-forest" />
       <AnimatePresence mode="popLayout">
         <motion.span key={phase.day} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }} className="absolute left-3 top-4 z-10 rounded-full bg-lime px-3 py-1 text-xs font-bold text-forest">{phase.day}</motion.span>
       </AnimatePresence>
       <LeafIllustration key={cycle} spots={phase.spots} showFinder className="absolute inset-x-0 top-10 h-[78%] w-full" title="Illustration: a tomato leaf developing its first spots over five days" />
       {phase.scan && !reduce && (
-        <motion.div className="absolute inset-x-6 h-0.5 bg-lime shadow-[0_0_12px_#9BCB3C]" initial={{ top: "12%" }} animate={{ top: "84%" }} transition={{ duration: 1.8, ease: "linear" }} />
+        <motion.div className="absolute inset-x-6 h-0.5 bg-lime shadow-[0_0_12px_#FBBF24]" initial={{ top: "12%" }} animate={{ top: "84%" }} transition={{ duration: 1.8, ease: "linear" }} />
       )}
       <AnimatePresence>
         {phase.toast && (

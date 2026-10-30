@@ -24,16 +24,16 @@ export default function TrendChart({ visits, treatments }: { visits: Visit[]; tr
       <div className="h-64 w-full" role="img" aria-label={`Chart of affected area by date. Latest value ${base.length ? base[base.length - 1].y : 0} percent.`}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 16, right: 16, bottom: 0, left: 0 }}>
-            <CartesianGrid stroke="#D5E0CF" strokeDasharray="3 3" />
-            <XAxis dataKey="t" type="number" scale="time" domain={["dataMin", "dataMax"]} tickFormatter={(t) => fmtShort(new Date(t))} tick={{ fontSize: 12, fill: "#5B6B61" }} />
-            <YAxis width={52} tick={{ fontSize: 12, fill: "#5B6B61" }} unit="%" />
+            <CartesianGrid stroke="#E2E8F0" strokeDasharray="3 3" />
+            <XAxis dataKey="t" type="number" scale="time" domain={["dataMin", "dataMax"]} tickFormatter={(t) => fmtShort(new Date(t))} tick={{ fontSize: 12, fill: "#475569" }} />
+            <YAxis width={52} tick={{ fontSize: 12, fill: "#475569" }} unit="%" />
             <Tooltip labelFormatter={(t) => fmtShort(new Date(t as number))} formatter={(v, n) => [`${v}%`, n === "y" ? "Affected" : "Trend line"]} />
-            {start !== undefined && start < lastT && <ReferenceArea x1={Math.max(start, base[0]?.t ?? start)} x2={lastT} fill="#E2EEDC" fillOpacity={0.8} label={{ value: "Recovery window", position: "insideTop", fontSize: 12, fill: "#1F5F24" }} />}
-            {start !== undefined && <ReferenceLine x={start} stroke="#2F7D32" strokeDasharray="2 2" />}
-            <Line dataKey="y" stroke="#2F7D32" strokeWidth={3} isAnimationActive animationDuration={900} dot={(p: any) => (
-              <circle key={p.payload.t} cx={p.cx} cy={p.cy} r={p.payload.alert ? 6 : 4} fill={p.payload.alert ? "#C64B22" : "#2F7D32"} stroke="#fff" strokeWidth={1.5} />
+            {start !== undefined && start < lastT && <ReferenceArea x1={Math.max(start, base[0]?.t ?? start)} x2={lastT} fill="#DDF5F0" fillOpacity={0.8} label={{ value: "Recovery window", position: "insideTop", fontSize: 12, fill: "#115E59" }} />}
+            {start !== undefined && <ReferenceLine x={start} stroke="#0F766E" strokeDasharray="2 2" />}
+            <Line dataKey="y" stroke="#0F766E" strokeWidth={3} isAnimationActive animationDuration={900} dot={(p: any) => (
+              <circle key={p.payload.t} cx={p.cx} cy={p.cy} r={p.payload.alert ? 6 : 4} fill={p.payload.alert ? "#E11D48" : "#0F766E"} stroke="#fff" strokeWidth={1.5} />
             )} />
-            <Line dataKey="trend" stroke="#5B6B61" strokeWidth={2} strokeDasharray="6 5" dot={false} connectNulls={false} isAnimationActive={false} />
+            <Line dataKey="trend" stroke="#475569" strokeWidth={2} strokeDasharray="6 5" dot={false} connectNulls={false} isAnimationActive={false} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>

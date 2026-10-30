@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Patra Lens logo">
-  <g fill="none" stroke="#2F7D32" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="none" stroke="#0F766E" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round">
     <path d="M8 30V8h22"/><path d="M70 8h22v22"/><path d="M92 70v22H70"/><path d="M30 92H8V70"/>
   </g>
-  <path d="M26 74C24 47 43 28 74 26C76 55 57 74 26 74Z" fill="#3E9B4B"/>
-  <path d="M29.5 70.5L69 31" stroke="#12372A" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M26 74C24 47 43 28 74 26C76 55 57 74 26 74Z" fill="#14B8A6"/>
+  <path d="M29.5 70.5L69 31" stroke="#0B2B33" stroke-width="2.8" stroke-linecap="round"/>
   <circle cx="40" cy="49" r="4.4" fill="#8B5A2B"/><circle cx="58" cy="53" r="3.4" fill="#8B5A2B"/>
 </svg>

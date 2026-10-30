@@ -1,13 +1,13 @@
 // The story for the jury. Text is word for word from the build spec, section 4.
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
-import { Camera, ChevronDown, CloudSun, ImageOff, Microscope, RadioTower, ScanLine, TriangleAlert } from "lucide-react";
+import { Aperture, Camera, ChevronDown, CloudSun, HeartPulse, ImageOff, Languages, Microscope, RadioTower, ScanLine, Sprout, TriangleAlert, UserCheck } from "lucide-react";
 import { ReactNode, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import Footer from "../components/Footer";
 import { Button, Card, Chip, CountUp, Reveal } from "../components/ui";
 import { CompareSlider, HeroLeaf, LeafIllustration, Viewfinder } from "../components/viz";
 import type { SpotState } from "../components/viz/LeafIllustration";
 import { CONFIG } from "../config";
+import { PLANTS } from "../lib/diagnose";
 import { useI18n } from "../lib/i18n";
 
 const pct = (v: number | null) => (v === null ? null : `${Math.round(v * 100)}%`);
@@ -24,13 +24,13 @@ const STEPS = [
   { icon: RadioTower, title: "Warn", text: "Confirmed cases alert nearby farms, with consent." },
 ];
 const FEATURES = [
-  { title: "Leaf Watch", text: "Same leaves, every few days. New spots, holes and feeding marks are flagged.", to: "/watch" },
-  { title: "Photo Coach", text: "Checks blur, light and leaf size before any answer.", to: "/scan" },
-  { title: "Honest Diagnosis", text: "Top 3 answers with confidence, or 'not sure'.", to: "/scan" },
-  { title: "Recovery Tracker", text: "After treatment, see whether the plant is improving.", to: "/watch" },
-  { title: "Risk Score", text: "Weather and nearby reports show when to check more often.", to: "/risk" },
-  { title: "Disease Radar", text: "A sudden rise in nearby confirmed cases triggers an early alert.", to: "/radar" },
-  { title: "Expert in the loop", text: "Unsure cases go to an expert. Their labels improve the model.", to: "/expert" },
+  { icon: Sprout, title: "Leaf Watch", text: "Same leaves, every few days. New spots, holes and feeding marks are flagged.", to: "/watch" },
+  { icon: Aperture, title: "Photo Coach", text: "Checks blur, light and leaf size before any answer.", to: "/scan" },
+  { icon: Microscope, title: "Honest Diagnosis", text: "Top 3 answers with confidence, or 'not sure'.", to: "/scan" },
+  { icon: HeartPulse, title: "Recovery Tracker", text: "After treatment, see whether the plant is improving.", to: "/watch" },
+  { icon: CloudSun, title: "Risk Score", text: "Weather and nearby reports show when to check more often.", to: "/risk" },
+  { icon: RadioTower, title: "Disease Radar", text: "A sudden rise in nearby confirmed cases triggers an early alert.", to: "/radar" },
+  { icon: UserCheck, title: "Expert in the loop", text: "Unsure cases go to an expert. Their labels improve the model.", to: "/expert" },
 ];
 const COMPARE = [
   ["Change over time", "Not tracked", "New spots flagged between visits"],
@@ -53,13 +53,6 @@ const ROADMAP = [
   { title: "Next", items: ["Offline install", "More Indian crops", "Voice guidance in Telugu and Kannada"] },
   { title: "Later", items: ["Field validation with local experts", "Extension-officer dashboard", "Pest trap photos"] },
 ];
-const TEAM = [
-  { name: "Korru Ramya Sree", role: "Team Lead · AI/ML" },
-  { name: "Dharani Y", role: "Vision & Backend" },
-  { name: "Nallapati Spurthi Chathurya", role: "Data Analyst" },
-  { name: "Sheela Saivenkata Reddy", role: "Frontend" },
-  { name: "K. Mohan Krishna", role: "Testing & Integration" },
-];
 const FAQ = [
   ["Does Patra Lens tell me which pesticide to use?", "No. It suggests what to check and who to ask. Treatment decisions stay with the farmer and local experts."],
   ["How accurate is it?", `On ${CONFIG.measured.fieldTestPhotos} public field photos it had never seen, the top answer was right ${pct(CONFIG.measured.fieldAccuracy)} of the time, and the right answer was in the top 3 ${pct(CONFIG.measured.fieldTop3)} of the time. Tomato alone was lower, at ${pct(CONFIG.measured.tomatoFieldAccuracy)}. These are not local farm photos yet, so always confirm with an expert.`],
@@ -67,7 +60,6 @@ const FAQ = [
   ["What happens to my location?", "It is shared only if you turn it on, and only as an approximate 1 km area. Exact locations are never stored."],
   ["Which crops?", "The AI knows 27 conditions across 13 plants: tomato, apple, bell pepper, blueberry, cherry, corn, grape, peach, potato, raspberry, soybean, squash and strawberry. Any other plant can get a wrong answer."],
 ];
-const initials = (n: string) => n.replace(/\./g, "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]).join("");
 
 const Section = ({ id, tint, children }: { id?: string; tint?: boolean; children: ReactNode }) => (
   <section id={id} className={`section ${tint ? "bg-surface" : "bg-white"}`}><div className="wrap">{children}</div></section>
@@ -78,18 +70,41 @@ const HeroWord = ({ children, delay, className }: { children: ReactNode; delay: 
   <motion.span aria-hidden className={`mr-[0.25em] inline-block ${className ?? ""}`} initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 120, damping: 16, delay }}>{children}</motion.span>
 );
 
-const LEAF_SHAPE = "M12 2C6 7 4 12 5 17c.5 2.500 2 4 4 4.700C9 16 11 11 15 8c-3 4-4.500 8.500-4.500 14C16 21 20 16 20 10c0-3-3-6-8-8Z";
-const FLOATERS = [
-  { left: "6%", top: "14%", size: 34, delay: "0s" }, { left: "44%", top: "8%", size: 22, delay: "1.500s" },
-  { left: "52%", top: "78%", size: 40, delay: "3s" }, { left: "12%", top: "84%", size: 26, delay: "4.500s" }, { left: "90%", top: "60%", size: 30, delay: "2.200s" },
-];
-const FloatingLeaves = () => (
-  <div aria-hidden className="pointer-events-none absolute inset-0 -z-[1]">
-    {FLOATERS.map((f) => (
-      <svg key={f.left} viewBox="0 0 24 24" className="floaty absolute opacity-20" style={{ left: f.left, top: f.top, width: f.size, height: f.size, animationDelay: f.delay }}><path d={LEAF_SHAPE} fill="#9BCB3C" /></svg>
-    ))}
-  </div>
-);
+function StatsBand() {
+  const m = CONFIG.measured;
+  const stats = [
+    { to: Math.round((m.fieldAccuracy ?? 0) * 100), suffix: "%", label: "Top answer right on field photos" },
+    { to: Math.round((m.fieldTop3 ?? 0) * 100), suffix: "%", label: "Right answer in the top 3" },
+    { to: 13, label: "Plants, 27 conditions" },
+    { to: m.secondsPerPhoto ?? 0, prefix: "About ", suffix: " s", label: "Per scan on a laptop" },
+  ];
+  return (
+    <section className="wrap relative z-10 -mt-10 md:-mt-14">
+      <div className="grid grid-cols-2 divide-line overflow-hidden rounded-2xl border border-line bg-white shadow-soft lg:grid-cols-4 lg:divide-x">
+        {stats.map((s) => (
+          <div key={s.label} className="p-5 md:p-6">
+            <div className="font-heading text-2xl font-extrabold text-forest md:text-4xl">{s.prefix && <span className="text-base font-bold md:text-lg">{s.prefix}</span>}<InViewCount to={s.to} suffix={s.suffix} /></div>
+            <p className="mt-1 text-sm text-muted">{s.label}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PlantStrip() {
+  const row = [...PLANTS, ...PLANTS];
+  return (
+    <section className="py-10 md:py-12" aria-label={`Works on ${PLANTS.join(", ")}`}>
+      <p className="eyebrow text-center">Works on 13 plants</p>
+      <div className="marquee mt-4 overflow-hidden" aria-hidden>
+        <div className="marquee-track gap-3 px-2">
+          {row.map((p, i) => <span key={`${p}-${i}`} className="whitespace-nowrap rounded-full border border-line bg-surface px-5 py-2 font-semibold text-forest">{p}</span>)}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function IdeaPanels() {
   const panels: { day: string; spots: Record<number, SpotState>; chip: string | null }[] = [
@@ -101,7 +116,7 @@ function IdeaPanels() {
     <div className="grid gap-4 sm:grid-cols-3">
       {panels.map((p, i) => (
         <Reveal key={p.day} delay={i}>
-          <Viewfinder className="rounded-card bg-forest p-3" color="#9BCB3C">
+          <Viewfinder className="rounded-card bg-forest p-3" color="#FBBF24">
             <div className="flex items-center justify-between px-1 text-sm font-bold text-white">
               <span>{p.day}</span>
               {p.chip && <span className="rounded-full bg-tomato px-2.5 py-0.5 text-xs text-white">{p.chip}</span>}
@@ -233,8 +248,8 @@ export default function Home() {
   return (
     <>
       <section className="hero-mesh text-white lg:min-h-[calc(100vh-4rem)]">
-        <FloatingLeaves />
-        <div className="wrap grid min-h-[640px] items-center gap-10 py-12 lg:min-h-[calc(100vh-4rem)] lg:grid-cols-[1.2fr_1fr]">
+        <div aria-hidden className="hero-dots pointer-events-none absolute inset-0 -z-[1]" />
+        <div className="wrap grid min-h-[640px] items-center gap-10 pb-24 pt-12 md:pb-28 lg:min-h-[calc(100vh-4rem)] lg:grid-cols-[1.2fr_1fr]">
           <div>
             <Chip tone="lime">Chip to Crop 2026 · Problem Statement 2</Chip>
             <h1 className="display mt-5" aria-label="Catch the first spot.">
@@ -247,16 +262,26 @@ export default function Home() {
               <Button to="/watch" variant="lime">Start Leaf Watch</Button>
               <Button to="/scan" variant="outline-light">Scan a leaf</Button>
             </div>
-            <p className="mt-6 text-sm text-white/75">Team Smart Revolution · Prototype · 13 plants, runs on your phone</p>
+            <p className="mt-6 text-sm text-white/75">Runs on your phone · No app to install · Free to use</p>
           </div>
-          <div className="text-center">
+          <div className="relative text-center">
             <HeroLeaf />
             <p className="mt-3 text-xs text-white/70">Illustration</p>
+            <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7, type: "spring", stiffness: 90, damping: 16 }} className="absolute left-0 top-[18%] hidden xl:block">
+              <div className="glass float-soft px-4 py-3 text-left"><div className="font-heading text-xl font-extrabold text-lime">{pct(CONFIG.measured.fieldTop3)}</div><div className="text-xs text-white/85">Right answer in top 3</div></div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.95, type: "spring", stiffness: 90, damping: 16 }} className="absolute bottom-[20%] right-0 hidden xl:block">
+              <div className="glass float-soft px-4 py-3 text-left" style={{ animationDelay: "2s" }}><div className="font-heading text-sm font-bold">AI on the device</div><div className="text-xs text-white/85">Works with no internet</div></div>
+            </motion.div>
           </div>
         </div>
       </section>
 
+      <StatsBand />
+      <PlantStrip />
+
       <Section>
+        <p className="eyebrow mb-2">The problem</p>
         <h2 className="h2 max-w-3xl">By the time a disease is easy to see, it has often spread.</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {PROBLEMS.map((p, i) => (
@@ -270,6 +295,7 @@ export default function Home() {
       </Section>
 
       <Section tint>
+        <p className="eyebrow mb-2">The idea</p>
         <h2 className="h2">A follow-up visit for every plant</h2>
         <p className="mt-4 max-w-3xl text-muted">Like a doctor comparing today's scan with last week's, Patra Lens compares each sentinel leaf with its last photo. New spots, holes and feeding marks stand out, even when they are too small or faint for a one-photo diagnosis.</p>
         <div className="mt-8"><IdeaPanels /></div>
@@ -281,22 +307,26 @@ export default function Home() {
       </Section>
 
       <Section>
+        <p className="eyebrow mb-2">The process</p>
         <h2 className="h2">How it works</h2>
         <HowItWorks />
       </Section>
 
       <Section tint>
-        <h2 className="h2">Features</h2>
+        <p className="eyebrow mb-2">The product</p>
+        <h2 className="h2">Everything from first spot to early warning</h2>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((f, i) => (
             <Reveal key={f.title} delay={i % 4}>
               <Link to={f.to} className="lift-card block h-full rounded-card border border-line bg-white p-5 shadow-soft">
+                <IconBox><f.icon className="h-6 w-6" aria-hidden /></IconBox>
                 <h3 className="h3">{f.title}</h3><p className="mt-1 text-base text-muted">{f.text}</p>
               </Link>
             </Reveal>
           ))}
           <Reveal delay={3}>
             <button onClick={() => setSheetOpen(true)} className="lift-card block h-full w-full rounded-card border border-line bg-white p-5 text-left shadow-soft">
+              <IconBox><Languages className="h-6 w-6" aria-hidden /></IconBox>
               <h3 className="h3">Your language</h3><p className="mt-1 text-base text-muted">English, Telugu and Kannada.</p>
             </button>
           </Reveal>
@@ -304,6 +334,8 @@ export default function Home() {
       </Section>
 
       <Section>
+        <p className="eyebrow mb-2">The difference</p>
+        <h2 className="h2 mb-8">More than a one-photo answer</h2>
         <div className="overflow-x-auto rounded-card border border-line">
           <table className="w-full min-w-[320px] text-left text-sm md:text-base">
             <thead className="bg-forest text-white">
@@ -325,6 +357,7 @@ export default function Home() {
       <FieldResults />
 
       <Section tint>
+        <p className="eyebrow mb-2">Our promise</p>
         <h2 className="h2">Honest by design</h2>
         <div className="mt-8 grid items-stretch gap-6 lg:grid-cols-[1fr_1.4fr]">
           <Viewfinder className="min-h-[240px] overflow-hidden rounded-card">
@@ -341,12 +374,14 @@ export default function Home() {
       </Section>
 
       <Section>
+        <p className="eyebrow mb-2">The technology</p>
         <h2 className="h2">Under the hood</h2>
         <div className="mt-6 flex flex-wrap gap-2">{STACK.map((s) => <Chip key={s} tone="forest">{s}</Chip>)}</div>
         <p className="mt-4 text-muted">Photo checks, spot comparison and the AI model run on the phone, in the browser.</p>
       </Section>
 
       <Section tint>
+        <p className="eyebrow mb-2">What's next</p>
         <h2 className="h2">Roadmap</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {ROADMAP.map((r, i) => (
@@ -358,24 +393,24 @@ export default function Home() {
       </Section>
 
       <Section>
-        <h2 className="h2">Team Smart Revolution</h2>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {TEAM.map((m) => (
-            <li key={m.name} className="rounded-card border border-line bg-surface p-5 text-center">
-              <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-forest font-heading text-lg font-extrabold text-lime" aria-hidden>{initials(m.name)}</span>
-              <p className="mt-3 font-heading font-bold text-forest">{m.name}</p>
-              <p className="small">{m.role}</p>
-            </li>
-          ))}
-        </ul>
+        <div className="grid gap-8 lg:grid-cols-[1fr_2fr]">
+          <div><p className="eyebrow">Questions</p><h2 className="h2 mt-2">Answers, plainly</h2></div>
+          <div>{FAQ.map(([q, a]) => <FaqItem key={q} q={q} a={a} />)}</div>
+        </div>
       </Section>
 
-      <Section tint>
-        <h2 className="h2">FAQ</h2>
-        <div className="mt-6 max-w-3xl">{FAQ.map(([q, a]) => <FaqItem key={q} q={q} a={a} />)}</div>
-      </Section>
-
-      <Footer />
+      <section className="wrap pb-16 md:pb-24">
+        <Reveal>
+          <div className="hero-mesh overflow-hidden rounded-3xl px-6 py-12 text-center text-white md:px-12 md:py-16">
+            <h2 className="font-heading text-[28px] font-extrabold leading-tight tracking-tight md:text-[40px]">See it on a real leaf.</h2>
+            <p className="mx-auto mt-3 max-w-xl text-white/85">Scan a photo now. There is nothing to install and no account to create.</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Button to="/scan" variant="lime">Scan a leaf</Button>
+              <Button to="/watch" variant="outline-light">Start Leaf Watch</Button>
+            </div>
+          </div>
+        </Reveal>
+      </section>
     </>
   );
 }

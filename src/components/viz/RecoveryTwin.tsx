@@ -27,8 +27,8 @@ export default function RecoveryTwin({ visits }: { visits: Visit[] }) {
     <div>
       <div className="flex items-center gap-4">
         <svg viewBox="0 0 200 200" className="h-44 w-44 shrink-0" role="img" aria-label={`Plant illustration at ${health} percent health`}>
-          <path d="M100 195 L100 15" stroke="#2F7D32" strokeWidth="5" strokeLinecap="round" />
-          <ellipse cx="100" cy="195" rx="50" ry="5" fill="#D5E0CF" />
+          <path d="M100 195 L100 15" stroke="#0F766E" strokeWidth="5" strokeLinecap="round" />
+          <ellipse cx="100" cy="195" rx="50" ry="5" fill="#E2E8F0" />
           {LEAVES.map((l) => <motion.path key={l.d} d={l.d} initial={false} animate={{ fill: leafColour(l.w) }} transition={{ duration: 0.6 }} />)}
         </svg>
         <div>
@@ -39,7 +39,7 @@ export default function RecoveryTwin({ visits }: { visits: Visit[] }) {
       {visits.length > 1 && (
         <label className="mt-4 block">
           <span className="field-label">Visit: {v ? fmtShort(v.date) : ""} · {affected}% affected</span>
-          <input type="range" min={0} max={visits.length - 1} value={idx} onChange={(e) => setIdx(Number(e.target.value))} className="h-11 w-full accent-[#2F7D32]" />
+          <input type="range" min={0} max={visits.length - 1} value={idx} onChange={(e) => setIdx(Number(e.target.value))} className="h-11 w-full accent-[#0F766E]" />
         </label>
       )}
       <p className="tiny mt-2">Built only from your photos. No sensors in this prototype.</p>

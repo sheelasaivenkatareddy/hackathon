@@ -11,8 +11,8 @@ export default defineConfig({
         name: "Patra Lens",
         short_name: "Patra Lens",
         description: "Catch the first spot. Early detection of crop pests and diseases on any smartphone.",
-        theme_color: "#12372A",
-        background_color: "#12372A",
+        theme_color: "#0B2B33",
+        background_color: "#0B2B33",
         display: "standalone",
         start_url: "/",
         icons: [

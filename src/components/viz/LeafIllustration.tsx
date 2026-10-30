@@ -33,7 +33,7 @@ export function LeafIllustration({ spots = {}, showFinder = false, className, ti
 }
 
 const Ring = ({ cx, cy, r }: { cx: number; cy: number; r: number }) => (
-  <motion.circle cx={cx} cy={cy} r={r} fill="none" stroke="#C64B22" strokeWidth={4} style={{ transformOrigin: `${cx}px ${cy}px` }}
+  <motion.circle cx={cx} cy={cy} r={r} fill="none" stroke="#E11D48" strokeWidth={4} style={{ transformOrigin: `${cx}px ${cy}px` }}
     initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: [0.6, 1.25, 1, 1.25, 1], opacity: [0, 1, 1, 1, 1] }} transition={{ duration: 1.3, ease: "easeOut" }} />
 );
 
@@ -42,7 +42,7 @@ const CORNERS = [
   { d: "M 358 450 V 484 H 324", x: 30, y: 30 }, { d: "M 128 484 H 94 V 450", x: -30, y: 30 },
 ];
 const Finder = () => (
-  <g fill="none" stroke="#9BCB3C" strokeWidth={6} strokeLinecap="round" strokeLinejoin="round">
+  <g fill="none" stroke="#FBBF24" strokeWidth={6} strokeLinecap="round" strokeLinejoin="round">
     {CORNERS.map((c) => <motion.path key={c.d} d={c.d} initial={{ x: c.x, y: c.y, opacity: 0 }} animate={{ x: 0, y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 240, damping: 16 }} />)}
   </g>
 );
