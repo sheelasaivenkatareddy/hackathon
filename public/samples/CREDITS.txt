@@ -1,0 +1,29 @@
+Sample photos for the Patra Lens prototype
+
+PlantDoc dataset: Singh D., Jain N., Jain P., Kayal P., Kumawat S., Batra N. (2020).
+"PlantDoc: A Dataset for Visual Plant Disease Detection". CoDS-COMAD 2020.
+Licence: CC BY 4.0. https://github.com/pratikkayal/PlantDoc-Dataset
+
+PlantVillage dataset: Hughes D. P., Salathé M. (2015). "An open access repository of images on
+plant health to enable the development of mobile disease diagnostics". arXiv:1511.08060.
+Licence: CC BY-SA 3.0. https://github.com/spMohanty/PlantVillage-Dataset
+
+File                      Source and original file                                                        Edit
+early-blight-closeup.jpg  PlantDoc, Tomato Early blight leaf / early-blight-in-high-tunnel-tomatoes-19tm74h.jpg   cropped, resized
+early-blight-field.jpg    PlantDoc, Tomato Early blight leaf / tomato-early-blight-1.jpg                     resized
+field-row.jpg             PlantDoc, Tomato Early blight leaf / dscn3168.jpg                                   resized
+busy-background.jpg       PlantDoc, Tomato Early blight leaf / Tomato-diseases-prevention-treatment.-Early-blight..jpg  resized
+septoria-closeup.jpg      PlantDoc, Tomato Septoria leaf spot / septoria-leafspot-on-tomato-leaf-rp-c.jpg     resized
+septoria-field.jpg        PlantDoc, Tomato Septoria leaf spot / tomatoseptorialeafspotjpg-788d20798a3c74e7.jpg resized
+late-blight-field.jpg     PlantDoc, Tomato leaf late blight / tomato-late-blight-conn-2015-137c.jpg           resized
+healthy-leaf.jpg          PlantDoc, Tomato leaf (healthy) / tomato-leaves.jpg                                 resized
+early-blight-lab.jpg      PlantVillage, Tomato___Early_blight / 5fef7edb-3b8a-4f74-b980-493366ead004___RS_Erly.B 6476.JPG  enlarged 256 to 512 px
+blurry-photo.jpg          edited copy of septoria-closeup.jpg                                                 Gaussian blur (for the Photo Coach demo)
+dark-photo.jpg            edited copy of septoria-field.jpg                                                   darkened, noise added (for the Photo Coach demo)
+
+Credit line for the website:
+Leaf photos: PlantDoc dataset (Singh et al., 2020, CC BY 4.0) and PlantVillage dataset
+(Hughes & Salathé, 2015, CC BY-SA 3.0). blurry-photo and dark-photo are edited copies.
+test-pair/synthetic-first-spot-*  PlantDoc, Tomato leaf / img_1028.jpg     visit-2 rotated/scaled + spots painted digitally (testing only)
+test-pair/synthetic-spreading-*   PlantDoc, Tomato Septoria leaf spot / septoria-leafspot-on-tomato-leaf-rp-c.jpg   same edits (testing only)
+leaf-first-spot.svg               original illustration drawn for Patra Lens

@@ -1,0 +1,260 @@
+{
+ "note": "SAMPLE DATA for the demo. These are not real farm reports.",
+ "sample": true,
+ "cellSizeDeg": 0.01,
+ "cellId": "floor(lat*100)_floor(lon*100)",
+ "center": [
+  12.97,
+  77.59
+ ],
+ "reports": [
+  {
+   "id": "s001",
+   "cell": "1297_7762",
+   "disease": "Early blight",
+   "weeksAgo": 3,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s002",
+   "cell": "1298_7763",
+   "disease": "Early blight",
+   "weeksAgo": 1,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s003",
+   "cell": "1297_7762",
+   "disease": "Early blight",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s004",
+   "cell": "1297_7762",
+   "disease": "Early blight",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s005",
+   "cell": "1298_7762",
+   "disease": "Early blight",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s006",
+   "cell": "1298_7762",
+   "disease": "Early blight",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s007",
+   "cell": "1297_7763",
+   "disease": "Early blight",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s008",
+   "cell": "1300_7755",
+   "disease": "Late blight",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s009",
+   "cell": "1301_7755",
+   "disease": "Late blight",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s010",
+   "cell": "1300_7755",
+   "disease": "Late blight",
+   "weeksAgo": 1,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s011",
+   "cell": "1301_7755",
+   "disease": "Late blight",
+   "weeksAgo": 1,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s012",
+   "cell": "1300_7755",
+   "disease": "Late blight",
+   "weeksAgo": 2,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s013",
+   "cell": "1301_7755",
+   "disease": "Late blight",
+   "weeksAgo": 2,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s014",
+   "cell": "1300_7755",
+   "disease": "Late blight",
+   "weeksAgo": 3,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s015",
+   "cell": "1301_7755",
+   "disease": "Late blight",
+   "weeksAgo": 3,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s016",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s017",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s018",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s019",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 1,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s020",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 1,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s021",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 1,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s022",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 2,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s023",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 2,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s024",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 3,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s025",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 3,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s026",
+   "cell": "1294_7758",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 3,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s027",
+   "cell": "1303_7761",
+   "disease": "Leaf mold",
+   "weeksAgo": 2,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s028",
+   "cell": "1291_7752",
+   "disease": "Bacterial spot",
+   "weeksAgo": 1,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s029",
+   "cell": "1289_7766",
+   "disease": "Early blight",
+   "weeksAgo": 3,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s030",
+   "cell": "1305_7750",
+   "disease": "Septoria leaf spot",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  },
+  {
+   "id": "s031",
+   "cell": "1296_7769",
+   "disease": "Leaf mold",
+   "weeksAgo": 0,
+   "confirmed": true,
+   "sample": true
+  }
+ ]
+}

@@ -1,0 +1,54 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { Suspense, lazy, useEffect } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
+import { Skeleton } from "../components/ui";
+import Home from "../pages/Home";
+import Layout from "./Layout";
+
+const Watch = lazy(() => import("../pages/Watch"));
+const WatchNew = lazy(() => import("../pages/WatchNew"));
+const PlantDetail = lazy(() => import("../pages/PlantDetail"));
+const AddVisit = lazy(() => import("../pages/AddVisit"));
+const Scan = lazy(() => import("../pages/Scan"));
+const Risk = lazy(() => import("../pages/Risk"));
+const Radar = lazy(() => import("../pages/Radar"));
+const Expert = lazy(() => import("../pages/Expert"));
+const Settings = lazy(() => import("../pages/Settings"));
+const About = lazy(() => import("../pages/About"));
+const NotFound = lazy(() => import("../pages/NotFound"));
+
+const Loading = () => (
+  <div className="wrap space-y-4 py-10" role="status" aria-label="Loading">
+    <Skeleton className="h-10 w-2/3" />
+    <Skeleton className="h-64 w-full" />
+  </div>
+);
+
+export default function App() {
+  const location = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
+  return (
+    <Layout>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div key={location.pathname} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.25 }}>
+          <Suspense fallback={<Loading />}>
+            <Routes location={location}>
+              <Route path="/" element={<Home />} />
+              <Route path="/watch" element={<Watch />} />
+              <Route path="/watch/new" element={<WatchNew />} />
+              <Route path="/watch/:plantId" element={<PlantDetail />} />
+              <Route path="/watch/:plantId/visit" element={<AddVisit />} />
+              <Route path="/scan" element={<Scan />} />
+              <Route path="/risk" element={<Risk />} />
+              <Route path="/radar" element={<Radar />} />
+              <Route path="/expert" element={<Expert />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/about" element={<About />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </motion.div>
+      </AnimatePresence>
+    </Layout>
+  );
+}

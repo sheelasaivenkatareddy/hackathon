@@ -1,0 +1,9 @@
+field-dino-int8.onnx
+  plant-disease-dinov2-small (int8) by rodynaemad, CC BY-SA 4.0
+  https://huggingface.co/rodynaemad/plant-disease-dinov2-small
+  Built on DINOv2 by Meta. Used unchanged, as a feature extractor.
+
+field-head.json
+  A linear layer trained by Team Smart Revolution on the PlantDoc dataset
+  (Singh et al., 2020, CC BY 4.0). Shared under CC BY-SA 4.0.
+  Recreate it with ml/field-head/.
