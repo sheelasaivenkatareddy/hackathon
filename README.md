@@ -22,6 +22,18 @@ Limits to state plainly: these are public photos, not local farms. Tomato alone 
 
 Recreate the layer with `ml/field-head/` (`unpack_plantdoc.py`, then `extract.py`, then `train_head.py`). Python needs `onnxruntime`, `scikit-learn`, `numpy` and `pillow`. Credits are in `public/model/FIELD_MODEL_CREDITS.txt`.
 
+## Free services
+
+| Service | Used for | Key needed |
+|---|---|---|
+| Open-Meteo | Weather, soil moisture and soil temperature | No |
+| SoilGrids (ISRIC) | Soil pH, nitrogen and organic carbon for the wider area. Often down; the page copes | No |
+| BigDataCloud | Place name for the approximate area | No |
+| Wikipedia | Short disease descriptions | No |
+| OpenStreetMap | Map | No |
+
+Only the rounded 1 km area, or Bengaluru by default, is ever sent. Results are saved so they keep working offline.
+
 ## Action plan
 
 `src/lib/nutrition.ts` holds what is shown after a diagnosis. Keep to these rules when editing it:
@@ -36,7 +48,7 @@ Have a local agriculture expert review this file before real farmers use it. The
 
 ## Run it
 
-You need Node 18 or newer.
+On Windows, double-click `START-PATRA-LENS.bat`. Otherwise, you need Node 18 or newer:
 
 ```
 npm install

@@ -1,6 +1,6 @@
 // The story for the jury. Text is word for word from the build spec, section 4.
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { Aperture, Camera, ChevronDown, CloudSun, HeartPulse, ImageOff, Languages, Microscope, RadioTower, ScanLine, Sprout, TriangleAlert, UserCheck, Wheat } from "lucide-react";
+import { Aperture, BookOpen, Camera, ChevronDown, CloudSun, HeartPulse, ImageOff, Languages, Microscope, RadioTower, ScanLine, Sprout, TriangleAlert, UserCheck, Wheat } from "lucide-react";
 import { ReactNode, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, Chip, CountUp, Reveal } from "../components/ui";
@@ -31,6 +31,7 @@ const FEATURES = [
   { icon: HeartPulse, title: "Recovery Tracker", text: "After treatment, see whether the plant is improving.", to: "/watch" },
   { icon: CloudSun, title: "Risk Score", text: "Weather and nearby reports show when to check more often.", to: "/risk" },
   { icon: RadioTower, title: "Disease Radar", text: "A sudden rise in nearby confirmed cases triggers an early alert.", to: "/radar" },
+  { icon: BookOpen, title: "Disease library", text: "Search every condition the AI knows, with its real test results.", to: "/diseases" },
   { icon: UserCheck, title: "Expert in the loop", text: "Unsure cases go to an expert. Their labels improve the model.", to: "/expert" },
 ];
 const COMPARE = [

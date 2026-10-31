@@ -23,6 +23,7 @@ export interface Scan {
   id: string; date: string; photo: Blob; thumb: Blob; coach: CoachResult; usedAnyway: boolean; sampleFile?: string;
   prediction: { mode: Mode; top3: Guess[]; modelVersion?: string }; level: AnswerLevel; confirmed: boolean;
   askedExpert?: boolean; expertLabel?: string; expertNote?: string; fieldId?: string; plantId?: string; cellId?: string;
+  feedback?: "right" | "wrong"; affectedPct?: number; seconds?: number;
 }
 export interface Treatment { id: string; plantId: string; date: string; note: string }
 export interface StoredReport { id: string; cell: string; disease: string; date: string; confirmed: boolean; source: "mine" | "sample" | "shared" }

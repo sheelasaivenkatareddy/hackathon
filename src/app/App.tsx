@@ -15,6 +15,8 @@ const Radar = lazy(() => import("../pages/Radar"));
 const Expert = lazy(() => import("../pages/Expert"));
 const Settings = lazy(() => import("../pages/Settings"));
 const About = lazy(() => import("../pages/About"));
+const History = lazy(() => import("../pages/History"));
+const Diseases = lazy(() => import("../pages/Diseases"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 
 const Loading = () => (
@@ -42,6 +44,8 @@ export default function App() {
               <Route path="/risk" element={<Risk />} />
               <Route path="/radar" element={<Radar />} />
               <Route path="/expert" element={<Expert />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/diseases" element={<Diseases />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/about" element={<About />} />
               <Route path="*" element={<NotFound />} />

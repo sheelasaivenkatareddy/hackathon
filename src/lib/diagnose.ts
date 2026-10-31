@@ -49,6 +49,20 @@ export function getFieldHead(): Promise<FieldHead | null> {
   return headLoad;
 }
 
+export interface FieldReport {
+  testPhotos: number;
+  levels: Record<string, { photos: number; top1: number; top3: number }>;
+  conditions: Record<string, { photos: number; right: number }>;
+}
+export const FIELD_REPORT = "/model/field-report.json";
+let reportLoad: Promise<FieldReport | null> | null = null;
+export function getFieldReport(): Promise<FieldReport | null> {
+  if (!reportLoad) {
+    reportLoad = fetch(FIELD_REPORT).then(async (r) => (r.ok && !(r.headers.get("content-type") ?? "").includes("text/html") ? ((await r.json()) as FieldReport) : null)).catch(() => null);
+  }
+  return reportLoad;
+}
+
 let fieldLoad: Promise<FieldModel | null> | null = null;
 export function getFieldModel(): Promise<FieldModel | null> {
   if (!fieldLoad) {

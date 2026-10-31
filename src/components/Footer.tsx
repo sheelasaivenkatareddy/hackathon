@@ -16,7 +16,7 @@ export const PHOTO_CREDIT = "Leaf photos: PlantDoc dataset (Singh et al., 2020, 
 
 const COLUMNS: { title: string; links: [string, string][] }[] = [
   { title: "Product", links: [["Leaf Watch", "/watch"], ["Scan a leaf", "/scan"], ["Risk Score", "/risk"], ["Disease Radar", "/radar"]] },
-  { title: "More", links: [["About", "/about"], ["Expert", "/expert"], ["Settings", "/settings"]] },
+  { title: "More", links: [["My scans", "/history"], ["Disease library", "/diseases"], ["About", "/about"], ["Expert", "/expert"], ["Settings", "/settings"]] },
 ];
 
 export default function Footer() {

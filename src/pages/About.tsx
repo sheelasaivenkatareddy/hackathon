@@ -57,7 +57,7 @@ export default function About() {
         <Card className="!bg-white">
           <h2 className="h3">Credits</h2>
           <p className="mt-2 text-sm">{PHOTO_CREDIT}</p>
-          <p className="mt-2 text-sm">Weather data by Open-Meteo.com (CC BY 4.0). Map data © OpenStreetMap contributors.</p>
+          <p className="mt-2 text-sm">Weather data by Open-Meteo.com (CC BY 4.0). Map data © OpenStreetMap contributors. Soil data by SoilGrids, ISRIC (CC BY 4.0). Place names by BigDataCloud. Disease descriptions from Wikipedia (CC BY-SA 4.0).</p>
           <p className="mt-2 text-sm">AI model: <a className="text-green-dark underline" href="https://huggingface.co/rodynaemad/plant-disease-dinov2-small" target="_blank" rel="noreferrer">plant-disease-dinov2-small</a> by rodynaemad (CC BY-SA 4.0), built on DINOv2 by Meta. Its last layer was retrained by Team Smart Revolution on the PlantDoc dataset. The retrained layer is shared under the same licence.</p>
         </Card>
       </div>

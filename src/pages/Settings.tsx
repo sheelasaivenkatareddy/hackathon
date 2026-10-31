@@ -5,7 +5,7 @@ import { LanguageSwitch } from "../app/Layout";
 import { SAMPLES } from "../components/PhotoFlow";
 import { BottomSheet, Button, Card, ModelStatusChip, useToast } from "../components/ui";
 import { CONFIG } from "../config";
-import { FIELD_HEAD, FIELD_MODEL, modelStatus } from "../lib/diagnose";
+import { FIELD_HEAD, FIELD_MODEL, FIELD_REPORT, modelStatus } from "../lib/diagnose";
 import { deleteAllData, exportAll, importAll, resetDemoData } from "../lib/db";
 import { downloadBlob } from "../lib/ics";
 import type { Mode } from "../lib/model";
@@ -58,7 +58,7 @@ export default function Settings() {
   };
   const prepareOffline = async () => {
     setOffline("busy");
-    const urls = [FIELD_MODEL, FIELD_HEAD, "/opencv/opencv.js", "/ort/ort-wasm-simd-threaded.mjs", "/ort/ort-wasm-simd-threaded.wasm", "/model/labels.json", "/model/calibration.json", ...SAMPLES.map((s) => `/samples/${s.file}`), "/samples/field-row.jpg", "/samples/busy-background.jpg", "/samples/timeline/manifest.json", ...TEST_PAIR_URLS];
+    const urls = [FIELD_MODEL, FIELD_HEAD, FIELD_REPORT, "/opencv/opencv.js", "/ort/ort-wasm-simd-threaded.mjs", "/ort/ort-wasm-simd-threaded.wasm", "/model/labels.json", "/model/calibration.json", ...SAMPLES.map((s) => `/samples/${s.file}`), "/samples/field-row.jpg", "/samples/busy-background.jpg", "/samples/timeline/manifest.json", ...TEST_PAIR_URLS];
     // Save each file ourselves and check it, so "Ready" is only shown when everything is really stored.
     const cache = await caches.open("patra-runtime");
     await Promise.allSettled(urls.map(async (u) => { if (!(await cache.match(u, { ignoreVary: true }))) await cache.add(u); }));
