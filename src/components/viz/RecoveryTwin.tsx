@@ -42,7 +42,7 @@ export default function RecoveryTwin({ visits }: { visits: Visit[] }) {
           <input type="range" min={0} max={visits.length - 1} value={idx} onChange={(e) => setIdx(Number(e.target.value))} className="h-11 w-full accent-[#0F766E]" />
         </label>
       )}
-      <p className="tiny mt-2">Built only from your photos. No sensors in this prototype.</p>
+      <p className="tiny mt-2">Built only from your photos. No sensors are used.</p>
     </div>
   );
 }

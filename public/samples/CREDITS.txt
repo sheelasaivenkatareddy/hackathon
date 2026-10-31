@@ -1,4 +1,4 @@
-Sample photos for the Patra Lens prototype
+Sample photos for Patra Lens
 
 PlantDoc dataset: Singh D., Jain N., Jain P., Kayal P., Kumawat S., Batra N. (2020).
 "PlantDoc: A Dataset for Visual Plant Disease Detection". CoDS-COMAD 2020.

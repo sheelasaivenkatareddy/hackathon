@@ -2,7 +2,7 @@
 
 Catch the first spot. A phone web app for early detection of crop pests and diseases: it photographs the same leaves every few days and flags new spots as soon as they appear.
 
-Built for Chip to Crop 2026, Problem Statement 2, by Team Smart Revolution. The AI covers 27 conditions on 13 plants. Everything runs in the browser: no backend, no API keys, no paid services.
+Patra Lens helps you catch crop problems early, from a photo on your phone. The AI covers 27 conditions on 13 plants. Everything runs in the browser: no backend, no API keys, no paid services.
 
 ## The AI
 
