@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ScanLine, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import FertilizerCard from "../components/FertilizerCard";
+import { TreatmentCard } from "../components/Guidance";
 import { ScanReport, humanSummary } from "../components/ScanInsights";
 import { BottomSheet, Button, Card, Chip, CountUp, EmptyState, Reveal, SampleChip, Skeleton, useToast } from "../components/ui";
 import { LeafIllustration } from "../components/viz";
@@ -75,8 +76,8 @@ export default function History() {
               <Reveal key={label} delay={i}><li className="rounded-card border border-line bg-white p-4 shadow-soft"><div className="font-heading text-3xl font-extrabold text-forest"><CountUp to={value} /></div><div className="small">{label}</div></li></Reveal>
             ))}
           </ul>
-          <div className="grid gap-5 lg:grid-cols-[1fr_1.6fr]">
-            <Card className="!bg-white">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1.6fr]">
+            <Card className="min-w-0 !bg-white">
               <h2 className="h3">What you've found most</h2>
               <ul className="mt-3 space-y-3">
                 {stats.top.map(([name, n]) => (
@@ -88,7 +89,7 @@ export default function History() {
                 {!stats.top.length && <li className="small">Nothing named yet.</li>}
               </ul>
             </Card>
-            <Card className="!bg-white">
+            <Card className="min-w-0 !bg-white">
               <label className="relative block">
                 <span className="sr-only">Search your scans</span>
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
@@ -111,6 +112,7 @@ export default function History() {
             <p className="font-heading text-lg font-bold text-forest">{humanSummary(open.prediction.top3[0], open.prediction.top3[1], open.level, disease)}</p>
             <ScanReport top={open.prediction.top3[0]} level={open.level} mode={open.prediction.mode} coach={open.coach} affectedPct={open.affectedPct} seconds={open.seconds} />
             {open.level !== "RETAKE" && <FertilizerCard top={open.prediction.top3[0]} level={open.level} />}
+            <TreatmentCard name={open.prediction.top3[0]?.name} level={open.level} />
             <Button variant="danger" onClick={async () => { await db.scans.delete(open.id); setOpen(null); toast("Scan deleted."); }}><Trash2 className="h-4 w-4" aria-hidden />Delete this scan</Button>
           </div>
         )}

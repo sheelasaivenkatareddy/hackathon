@@ -107,7 +107,7 @@ export default function Watch() {
   const loaders = (
     <>
       {manifest && <Button variant="secondary" loading={busy === "demo"} onClick={() => run("demo", () => loadDemoPlant(manifest))}>Load demo plant</Button>}
-      <Button variant="secondary" loading={busy === "pair"} onClick={() => run("pair", loadTestPairs)}>Load test pair</Button>
+      <Button variant="secondary" loading={busy === "pair"} onClick={() => run("pair", loadTestPairs)}>Try an example plant</Button>
     </>
   );
 
@@ -129,7 +129,7 @@ export default function Watch() {
             {loaders}
           </EmptyState>
         )}
-        {fields && !fields.length && <p className="tiny text-center">“Load test pair” is a synthetic test pair, for testing only.</p>}
+        {fields && !fields.length && <p className="tiny text-center">The example plant uses two photos with spots added digitally, to show how Leaf Watch works.</p>}
         {fields?.map((f) => <FieldCard key={f.id} field={f} />)}
         {!!fields?.length && !fields.some((f) => f.synthetic) && <div className="flex flex-wrap gap-2">{loaders}</div>}
       </div>

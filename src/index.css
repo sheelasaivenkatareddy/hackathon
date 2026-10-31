@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --forest: #0B2B33;
-  --green: #0F766E;
-  --leaf: #14B8A6;
-  --lime: #FBBF24;
-  --tomato: #E11D48;
+  --forest: #073B2C;
+  --green: #047857;
+  --leaf: #10B981;
+  --lime: #E3B04B;
+  --tomato: #B94A2C;
   --amber: #D97706;
-  --surface: #F6F8FA;
-  --ink: #0F172A;
-  --muted: #475569;
-  --line: #E2E8F0;
+  --surface: #F6F2EA;
+  --ink: #1C2B24;
+  --muted: #55625B;
+  --line: #E6DFD1;
 }
 
 @layer base {
@@ -56,7 +56,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: linear-gradient(150deg, #071E24 0%, #0B2B33 45%, #0F3D47 100%);
+  background: linear-gradient(150deg, #052B20 0%, #073B2C 45%, #0A5240 100%);
 }
 .hero-mesh::before, .hero-mesh::after {
   content: "";
@@ -69,18 +69,18 @@
 }
 .hero-mesh::before {
   top: -25vmax; right: -15vmax;
-  background: radial-gradient(circle, rgba(251, 191, 36, 0.34), transparent 65%);
+  background: radial-gradient(circle, rgba(227, 176, 75, 0.34), transparent 65%);
   animation: drift 16s ease-in-out infinite alternate;
 }
 .hero-mesh::after {
   bottom: -35vmax; left: -20vmax;
-  background: radial-gradient(circle, rgba(20, 184, 166, 0.4), transparent 65%);
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.4), transparent 65%);
   animation: drift 20s ease-in-out infinite alternate-reverse;
 }
 @keyframes drift { to { transform: translate3d(-6vmax, 5vmax, 0) scale(1.12); } }
 
 .text-glow {
-  background: linear-gradient(95deg, #FDE68A, #FBBF24 55%, #F59E0B);
+  background: linear-gradient(95deg, #F1D58A, #E3B04B 55%, #C99A3C);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -120,13 +120,13 @@
 .lift-card:hover, .lift-card:focus-visible {
   transform: translateY(-4px);
   border-color: var(--lime);
-  box-shadow: 0 16px 36px rgba(11, 43, 51, 0.16);
+  box-shadow: 0 16px 36px rgba(7, 59, 44, 0.16);
 }
 .lift-card::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(110deg, transparent 35%, rgba(251, 191, 36, 0.18) 50%, transparent 65%);
+  background: linear-gradient(110deg, transparent 35%, rgba(227, 176, 75, 0.18) 50%, transparent 65%);
   transform: translateX(-100%);
   transition: transform 0.6s ease;
   pointer-events: none;
@@ -135,7 +135,7 @@
 
 /* Scanning a photo */
 .scan-grid {
-  background-image: linear-gradient(rgba(251, 191, 36, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(251, 191, 36, 0.28) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(227, 176, 75, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(227, 176, 75, 0.28) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -154,16 +154,16 @@
 .radar-sweep {
   width: 220px; height: 220px; border-radius: 50%;
   margin: -110px 0 0 -110px;
-  background: conic-gradient(from 0deg, rgba(15, 118, 110, 0) 0deg, rgba(15, 118, 110, 0) 240deg, rgba(15, 118, 110, 0.7) 360deg);
-  border: 2px solid rgba(11, 43, 51, 0.55);
+  background: conic-gradient(from 0deg, rgba(4, 120, 87, 0) 0deg, rgba(4, 120, 87, 0) 240deg, rgba(4, 120, 87, 0.7) 360deg);
+  border: 2px solid rgba(7, 59, 44, 0.55);
   animation: sweep 4s linear infinite;
   pointer-events: none;
 }
 @keyframes sweep { to { transform: rotate(360deg); } }
 .scan-glow { animation: scanGlow 4s ease-in-out infinite; }
 @keyframes scanGlow {
-  0%, 70%, 100% { box-shadow: 0 6px 16px rgba(11, 43, 51, 0.3), 0 0 0 0 rgba(251, 191, 36, 0); }
-  85% { box-shadow: 0 6px 16px rgba(11, 43, 51, 0.3), 0 0 0 10px rgba(251, 191, 36, 0.45); }
+  0%, 70%, 100% { box-shadow: 0 6px 16px rgba(7, 59, 44, 0.3), 0 0 0 0 rgba(227, 176, 75, 0); }
+  85% { box-shadow: 0 6px 16px rgba(7, 59, 44, 0.3), 0 0 0 10px rgba(227, 176, 75, 0.45); }
 }
 @media (prefers-reduced-motion: reduce) {
   .cell-pulse, .radar-sweep, .scan-glow { animation: none; }

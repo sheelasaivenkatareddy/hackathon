@@ -3,6 +3,7 @@ import { CheckCircle2, Plus, RotateCcw, Save, UserCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DiagnosisResult from "../components/DiagnosisResult";
+import { SymptomChecklist, TreatmentCard } from "../components/Guidance";
 import { LiveConditions, ScanReport, SummaryBar, humanSummary } from "../components/ScanInsights";
 import { AcceptedPhoto, PhotoFlow } from "../components/PhotoFlow";
 import { BottomSheet, Button, Chip, ModelStatusChip, useToast } from "../components/ui";
@@ -133,6 +134,8 @@ export default function Scan() {
           </div>
           <DiagnosisResult url={accepted.url} diagnosis={diag} lowReliability={accepted.usedAnyway} hideModelChip />
           <div className="mt-5 space-y-5">
+            <SymptomChecklist name={diag.prediction.top3[0]?.name} level={diag.level} />
+            <TreatmentCard name={diag.prediction.top3[0]?.name} level={diag.level} />
             <ScanReport top={diag.prediction.top3[0]} level={diag.level} mode={diag.prediction.mode} coach={accepted.coach} affectedPct={scan?.affectedPct} seconds={scan?.seconds} />
             <LiveConditions />
           </div>

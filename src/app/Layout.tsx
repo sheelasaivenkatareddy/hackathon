@@ -1,6 +1,6 @@
 // Top bar (desktop), bottom bar with raised Scan button (mobile), More sheet, language sheet, footer.
 import { motion, useScroll } from "framer-motion";
-import { BookOpen, CloudSun, Globe, History, Home, Info, Menu, RadioTower, ScanLine, Settings, Sprout, UserCheck } from "lucide-react";
+import { BookOpen, CloudSun, Globe, History, LayoutDashboard, Home, Info, Menu, RadioTower, ScanLine, Settings, Sprout, UserCheck } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import Footer from "../components/Footer";
@@ -18,6 +18,7 @@ const ITEMS = [
   { to: "/radar", key: "nav.radar", icon: RadioTower },
 ];
 const MORE = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/history", label: "My scans", icon: History },
   { to: "/diseases", label: "Disease library", icon: BookOpen },
   { to: "/expert", label: "Expert", icon: UserCheck },

@@ -11,8 +11,8 @@ export default defineConfig({
         name: "Patra Lens",
         short_name: "Patra Lens",
         description: "Catch the first spot. Early detection of crop pests and diseases on any smartphone.",
-        theme_color: "#0B2B33",
-        background_color: "#0B2B33",
+        theme_color: "#073B2C",
+        background_color: "#073B2C",
         display: "standalone",
         start_url: "/",
         icons: [
@@ -62,5 +62,8 @@ export default defineConfig({
   optimizeDeps: { exclude: ["onnxruntime-web"] },
   server: { port: 5173, strictPort: true },
   preview: { port: 5173, strictPort: true },
-  build: { chunkSizeWarningLimit: 900 },
+  build: {
+    chunkSizeWarningLimit: 900,
+    rollupOptions: { output: { manualChunks: { react: ["react", "react-dom", "react-router-dom"], motion: ["framer-motion"], data: ["dexie", "zod"] } } },
+  },
 });

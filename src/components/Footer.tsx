@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { CONFIG } from "../config";
 
 declare const __BUILD__: string;
 
@@ -15,14 +16,15 @@ export const REFERENCES: [string, string][] = [
 export const PHOTO_CREDIT = "Leaf photos: PlantDoc dataset (Singh et al., 2020, CC BY 4.0) and PlantVillage dataset (Hughes & Salathé, 2015, CC BY-SA 3.0). blurry-photo, dark-photo and the test pairs are edited copies.";
 
 const COLUMNS: { title: string; links: [string, string][] }[] = [
-  { title: "Product", links: [["Leaf Watch", "/watch"], ["Scan a leaf", "/scan"], ["Risk Score", "/risk"], ["Disease Radar", "/radar"]] },
-  { title: "More", links: [["My scans", "/history"], ["Disease library", "/diseases"], ["About", "/about"], ["Expert", "/expert"], ["Settings", "/settings"]] },
+  { title: "Product", links: [["Dashboard", "/dashboard"], ["Leaf Watch", "/watch"], ["Scan a leaf", "/scan"], ["Risk Score", "/risk"], ["Disease Radar", "/radar"]] },
+  { title: "Learn", links: [["Disease library", "/diseases"], ["How it works", "/how-it-works"], ["My scans", "/history"], ["Expert", "/expert"]] },
+  { title: "Legal", links: [["Privacy", "/privacy"], ["Terms of use", "/terms"], ["Credits and licences", "/about"], ["Settings", "/settings"]] },
 ];
 
 export default function Footer() {
   return (
     <footer className="bg-forest text-white">
-      <div className="wrap grid gap-10 py-12 md:grid-cols-[2fr_1fr_1fr] md:py-16">
+      <div className="wrap grid gap-10 py-12 md:grid-cols-[1.6fr_1fr_1fr_1fr] md:py-16">
         <div>
           <Link to="/" className="inline-flex items-center gap-3 font-heading text-xl font-extrabold">
             <img src="/logo-light.svg" alt="" className="h-9 w-9" />Patra Lens
@@ -43,7 +45,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="wrap flex flex-wrap items-center justify-between gap-2 py-5 text-sm text-white/65">
           <p>© 2026 Patra Lens · <span data-testid="version">Version {__BUILD__}</span></p>
-          <Link to="/about" className="inline-flex min-h-[36px] items-center underline-offset-4 hover:text-white hover:underline">Credits and licences</Link>
+          {CONFIG.site.contactEmail ? <a href={`mailto:${CONFIG.site.contactEmail}`} className="inline-flex min-h-[36px] items-center underline-offset-4 hover:text-white hover:underline">Contact</a> : <span>Guidance only. Confirm with an agriculture expert.</span>}
         </div>
       </div>
     </footer>

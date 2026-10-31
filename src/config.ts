@@ -73,6 +73,12 @@ export const CONFIG = {
     defaultCentre: [12.97, 77.59] as [number, number], // Bengaluru
   },
 
+  // Weather alerts on the dashboard. Plain thresholds on the Open-Meteo forecast, not an official warning.
+  alerts: { heatC: 38, rainMmDay: 20, humidRH: 90, humidHoursDay: 12 },
+
+  // Shown in the footer only when set. Leave empty if you do not want a public contact address.
+  site: { contactEmail: "" },
+
   expert: {
     // Demo login, used while VITE_GOOGLE_CLIENT_ID is not set. SHA-256 of "<lower-case email>:<password>".
     // To change it: node -e "console.log(require('crypto').createHash('sha256').update('EMAIL:PASSWORD').digest('hex'))"

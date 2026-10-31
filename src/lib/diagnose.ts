@@ -1,5 +1,6 @@
 // Diagnosis order: on-device model -> server -> demo values (bundled samples only) -> none. Never invents a result.
 import { CONFIG } from "../config";
+import { FieldHeadSchema, FieldReportSchema } from "./schemas";
 import { Label, Mode, ORT_FILES, OnDeviceModel, Prediction, answerLevel, camFor, loadOnDeviceModel, predictDemo, predictOnDevice, predictServer, preprocess, softmax, topK } from "./model";
 import { loadPixels } from "./vision/browser";
 import type { CoachResult } from "./vision/coach";
@@ -44,7 +45,7 @@ interface FieldModel { session: any; ort: any; head: FieldHead }
 let headLoad: Promise<FieldHead | null> | null = null;
 export function getFieldHead(): Promise<FieldHead | null> {
   if (!headLoad) {
-    headLoad = fetch(FIELD_HEAD).then(async (r) => (r.ok && !(r.headers.get("content-type") ?? "").includes("text/html") ? ((await r.json()) as FieldHead) : null)).catch(() => null);
+    headLoad = fetch(FIELD_HEAD).then(async (r) => (r.ok && !(r.headers.get("content-type") ?? "").includes("text/html") ? (FieldHeadSchema.parse(await r.json()) as FieldHead) : null)).catch((e) => { console.warn("Model head is not valid", e); return null; });
   }
   return headLoad;
 }
@@ -58,7 +59,7 @@ export const FIELD_REPORT = "/model/field-report.json";
 let reportLoad: Promise<FieldReport | null> | null = null;
 export function getFieldReport(): Promise<FieldReport | null> {
   if (!reportLoad) {
-    reportLoad = fetch(FIELD_REPORT).then(async (r) => (r.ok && !(r.headers.get("content-type") ?? "").includes("text/html") ? ((await r.json()) as FieldReport) : null)).catch(() => null);
+    reportLoad = fetch(FIELD_REPORT).then(async (r) => (r.ok && !(r.headers.get("content-type") ?? "").includes("text/html") ? (FieldReportSchema.parse(await r.json()) as FieldReport) : null)).catch(() => null);
   }
   return reportLoad;
 }
@@ -133,7 +134,7 @@ export async function diagnose(photo: Blob, work: RGBAImage, coach: CoachResult,
   }
   if (!prediction) prediction = predictDemo(sampleFile);
   if (!prediction) prediction = { mode: "none", top3: [] };
-  if (!heatmap) heatmap = { kind: "colour", overlay: maskToOverlay(leafMasks(work).spot, [225, 29, 72], 0.4) };
+  if (!heatmap) heatmap = { kind: "colour", overlay: maskToOverlay(leafMasks(work).spot, [185, 74, 44], 0.4) };
 
   return { prediction, level: answerLevel(prediction.top3, coach.pass, usedAnyway), heatmap };
 }

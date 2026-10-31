@@ -4,6 +4,17 @@ Catch the first spot. A phone web app for early detection of crop pests and dise
 
 Patra Lens helps you catch crop problems early, from a photo on your phone. The AI covers 27 conditions on 13 plants. Everything runs in the browser: no backend, no API keys, no paid services.
 
+## What is in it
+
+- **Scan:** upload, drag and drop, or use the camera. Photo checks, then the AI answers with its top 3, a plain-language summary, a symptom checklist, fertilizer and treatment guidance, measured accuracy, live conditions, read aloud and share.
+- **Dashboard:** weather alerts, risk cards, recent scans, plants due for a check, and an advice box with the Kisan Call Centre helpline.
+- **Leaf Watch:** photograph the same leaves every few days and see new spots ringed.
+- **Risk and Radar:** weather rules and a map of confirmed reports. The radar shows real reports only until you ask for an example.
+- **Disease library, My scans, Expert queue, Settings.**
+- **Pages for trust:** Privacy, Terms and How it works.
+
+Data is checked with Zod schemas (`src/lib/schemas.ts`) before it is used. Everything is stored on the device. To move to a hosted database later, replace the calls in `src/lib/db.ts`.
+
 ## The AI
 
 A free model, [plant-disease-dinov2-small](https://huggingface.co/rodynaemad/plant-disease-dinov2-small) (CC BY-SA 4.0), runs on the phone. We retrained its last layer on PlantDoc field photos, because it did poorly on them as downloaded.
@@ -21,6 +32,12 @@ Results on the 236 PlantDoc test photos, scored once, with duplicates removed fr
 Limits to state plainly: these are public photos, not local farms. Tomato alone scores 54%, and only 2 of 8 healthy tomato leaves were recognised. A plant outside the 13 can get a wrong answer. The first scan downloads about 23 MB. About 3 seconds per scan on a laptop; phones are not measured yet.
 
 Recreate the layer with `ml/field-head/` (`unpack_plantdoc.py`, then `extract.py`, then `train_head.py`). Python needs `onnxruntime`, `scikit-learn`, `numpy` and `pillow`. Credits are in `public/model/FIELD_MODEL_CREDITS.txt`.
+
+## Settings you may want to change
+
+- `site.contactEmail` in `src/config.ts`: leave empty to show no public contact address. If you set it, a Contact link appears in the footer.
+- `alerts` in `src/config.ts`: the heat, rain and humidity thresholds for weather alerts.
+- `VITE_GOOGLE_CLIENT_ID`: optional Google sign-in for the admin screen.
 
 ## Free services
 

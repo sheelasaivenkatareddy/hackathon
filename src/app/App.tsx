@@ -17,6 +17,10 @@ const Settings = lazy(() => import("../pages/Settings"));
 const About = lazy(() => import("../pages/About"));
 const History = lazy(() => import("../pages/History"));
 const Diseases = lazy(() => import("../pages/Diseases"));
+const Dashboard = lazy(() => import("../pages/Dashboard"));
+const Privacy = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Privacy })));
+const Terms = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Terms })));
+const Methodology = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Methodology })));
 const NotFound = lazy(() => import("../pages/NotFound"));
 
 const Loading = () => (
@@ -44,6 +48,10 @@ export default function App() {
               <Route path="/risk" element={<Risk />} />
               <Route path="/radar" element={<Radar />} />
               <Route path="/expert" element={<Expert />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/how-it-works" element={<Methodology />} />
               <Route path="/history" element={<History />} />
               <Route path="/diseases" element={<Diseases />} />
               <Route path="/settings" element={<Settings />} />

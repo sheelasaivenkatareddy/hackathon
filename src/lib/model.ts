@@ -3,7 +3,7 @@ import { CONFIG } from "../config";
 import type { RGBAImage } from "./vision/types";
 import type { CropBox } from "./vision/overlay";
 
-export interface Label { index: number; label: string; name: string }
+export interface Label { index: number; label: string; name: string; plant?: string }
 export interface Guess { label: string; name: string; p: number }
 export type AnswerLevel = "CLEAR" | "CHECK" | "RETAKE" | "EXPERT";
 export type Mode = "on-device" | "server" | "demo" | "none";

@@ -5,7 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { TriangleAlert } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Rectangle, TileLayer, Tooltip } from "react-leaflet";
-import { Card, Chip, SampleChip, Skeleton, Toggle, useToast } from "../components/ui";
+import { Button, Card, Chip, SampleChip, Skeleton, Toggle, useToast } from "../components/ui";
 import { CONFIG } from "../config";
 import { getSetting, setSetting } from "../lib/db";
 import { useI18n } from "../lib/i18n";
@@ -13,7 +13,7 @@ import { Report, area, cellBounds, cellCentre, cellId, displayCount, unusualRise
 import { loadReports } from "../lib/weather";
 
 const sweepIcon = L.divIcon({ className: "", html: '<div class="radar-sweep"></div>', iconSize: [0, 0] });
-const shade = (n: number) => (n >= 5 ? "#E11D48" : n >= 3 ? "#D97706" : "#FBBF24");
+const shade = (n: number) => (n >= 5 ? "#B94A2C" : n >= 3 ? "#D97706" : "#E3B04B");
 const WEEKS = ["This week", "1 week ago", "2 weeks ago", "3 weeks ago"];
 
 export default function Radar() {
@@ -21,7 +21,7 @@ export default function Radar() {
   const toast = useToast();
   const [consent, setConsent] = useState(false);
   const [myCell, setMyCell] = useState<string | null>(null);
-  const [showSample, setShowSample] = useState(true);
+  const [showSample, setShowSample] = useState(false);
   const [reports, setReports] = useState<Report[] | null>(null);
   const [filterDisease, setFilterDisease] = useState("all");
   const [week, setWeek] = useState(0);
@@ -30,7 +30,7 @@ export default function Radar() {
     (async () => {
       setConsent(await getSetting("radarConsent", false));
       setMyCell(await getSetting<string | null>("radarCell", null));
-      setShowSample(await getSetting("radarShowSample", true));
+      setShowSample(await getSetting("radarShowSample", false));
     })();
   }, []);
   useEffect(() => { loadReports(showSample).then(setReports); }, [showSample]);
@@ -87,16 +87,25 @@ export default function Radar() {
         ))}
       </AnimatePresence>
 
+      {showSample && <p className="mt-4 flex flex-wrap items-center gap-2 rounded-xl bg-amber-tint px-4 py-3 text-sm font-semibold text-amber-dark" role="note"><SampleChip />You're looking at example data, not real farms.</p>}
+      {reports && !reports.some((r) => r.confirmed) && (
+        <div className="mt-4 rounded-card border border-dashed border-line p-6 text-center" data-testid="radar-empty">
+          <h2 className="h3">No confirmed reports near you yet</h2>
+          <p className="small mx-auto mt-1 max-w-xl">Reports appear here when farmers confirm a scan and share their approximate area. You can add yours by confirming a scan after turning on area sharing.</p>
+          <div className="mt-3 flex flex-wrap justify-center gap-2"><Button to="/scan">Scan a leaf</Button><Button variant="secondary" onClick={() => onSample(true)}>See an example</Button></div>
+        </div>
+      )}
+
       <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_320px]">
         <div className="relative isolate h-[420px] overflow-hidden rounded-card border border-line md:h-[560px]">
           <MapContainer key={myCell ?? "default"} center={centre} zoom={13} className="h-full w-full" scrollWheelZoom={false}>
             <TileLayer url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' />
             <Marker position={centre} icon={sweepIcon} interactive={false} keyboard={false} />
             {[...alertCells].map((c) => (
-              <Rectangle key={`alert-${c}`} bounds={cellBounds(c)} pathOptions={{ color: "#E11D48", weight: 1, fillColor: "#E11D48", fillOpacity: 0.2, className: "cell-pulse" }} />
+              <Rectangle key={`alert-${c}`} bounds={cellBounds(c)} pathOptions={{ color: "#B94A2C", weight: 1, fillColor: "#B94A2C", fillOpacity: 0.2, className: "cell-pulse" }} />
             ))}
             {[...counts.entries()].map(([c, n]) => (
-              <Rectangle key={`${c}-${n}`} bounds={cellBounds(c)} pathOptions={{ color: "#0B2B33", weight: 1, fillColor: shade(n), fillOpacity: 0.55 }}>
+              <Rectangle key={`${c}-${n}`} bounds={cellBounds(c)} pathOptions={{ color: "#073B2C", weight: 1, fillColor: shade(n), fillOpacity: 0.55 }}>
                 <Tooltip>{label(n)}</Tooltip>
               </Rectangle>
             ))}
@@ -108,7 +117,7 @@ export default function Radar() {
             <Toggle checked={consent} onChange={onConsent} label={t("radar.consent")} hint="Off by default. If on, we ask for your location once, round it to a 1 km area and store only that area. Exact coordinates are never stored, sent or shown." />
             {consent && <Chip tone={myCell ? "green" : "muted"} className="mt-2">{myCell ? "Approximate area shared" : "Finding your approximate area…"}</Chip>}
             <div className="mt-3 border-t border-line pt-3">
-              <Toggle checked={showSample} onChange={onSample} label="Show sample data" hint="Made-up reports for the demo. These are not real farm reports." />
+              <Toggle checked={showSample} onChange={onSample} label="Show sample data" hint="Made-up example reports, so you can see how the radar looks. These are not real farm reports." />
               {showSample && <div className="mt-1"><SampleChip /></div>}
             </div>
           </Card>

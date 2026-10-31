@@ -2,6 +2,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ExternalLink, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button, Chip, Skeleton } from "../components/ui";
 import { loadWikiSummary } from "../lib/conditions";
 import { FieldHead, FieldReport, PLANTS, getFieldHead, getFieldReport } from "../lib/diagnose";
@@ -32,7 +33,8 @@ export default function Diseases() {
   const { disease } = useI18n();
   const [head, setHead] = useState<FieldHead | null>(null);
   const [report, setReport] = useState<FieldReport | null>(null);
-  const [query, setQuery] = useState("");
+  const [params] = useSearchParams();
+  const [query, setQuery] = useState(params.get("q") ?? "");
   const [plant, setPlant] = useState("All");
   const [open, setOpen] = useState<string | null>(null);
   useEffect(() => { getFieldHead().then(setHead); getFieldReport().then(setReport); }, []);

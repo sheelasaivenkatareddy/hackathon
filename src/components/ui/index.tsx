@@ -32,7 +32,7 @@ export function Button({ variant = "primary", loading, to, className, children, 
     );
   }
   return (
-    <motion.button whileTap={{ scale: 0.97 }} className={cls} disabled={disabled || loading} onClick={onClick} type={type ?? "button"} aria-label={rest["aria-label"]} aria-busy={loading || undefined}>
+    <motion.button whileTap={{ scale: 0.97 }} className={cls} disabled={disabled || loading} onClick={onClick} type={type ?? "button"} aria-label={rest["aria-label"]} aria-busy={loading || undefined} data-testid={(rest as Record<string, unknown>)["data-testid"] as string | undefined}>
       {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
       {children}
     </motion.button>
@@ -144,7 +144,7 @@ export function Gauge({ score, label }: { score: number; label: string }) {
       <svg viewBox="0 0 220 128" className="w-full">
         <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="var(--line)" strokeWidth="18" strokeLinecap="round" />
         <motion.path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" strokeWidth="18" strokeLinecap="round" strokeDasharray={C}
-          initial={{ strokeDashoffset: C, stroke: "#0F766E" }} animate={{ strokeDashoffset: C * (1 - score / 100), stroke: colour.includes("tomato") ? "#E11D48" : colour.includes("amber") ? "#D97706" : "#0F766E" }} transition={{ duration: 1 }} />
+          initial={{ strokeDashoffset: C, stroke: "#047857" }} animate={{ strokeDashoffset: C * (1 - score / 100), stroke: colour.includes("tomato") ? "#B94A2C" : colour.includes("amber") ? "#D97706" : "#047857" }} transition={{ duration: 1 }} />
         {/* The invisible half centres the group's box on the pivot, because SVG motion rotates around that centre. */}
         <motion.g initial={{ rotate: -90 }} animate={{ rotate: -90 + (score / 100) * 180 }} transition={{ type: "spring", stiffness: 70, damping: 10 }}>
           <line x1="110" y1="184" x2="110" y2="110" stroke="transparent" strokeWidth="4" />

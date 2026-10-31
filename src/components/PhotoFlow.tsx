@@ -29,6 +29,7 @@ export function CameraCapture({ hint, ghostUrl, onPhoto, showSamples = false }: 
   const [live, setLive] = useState(false);
   const [error, setError] = useState("");
   const [ghost, setGhost] = useState(true);
+  const [dragging, setDragging] = useState(false);
 
   const stop = useCallback(() => { stream.current?.getTracks().forEach((tr) => tr.stop()); stream.current = null; setLive(false); }, []);
   useEffect(() => stop, [stop]);
@@ -57,6 +58,11 @@ export function CameraCapture({ hint, ghostUrl, onPhoto, showSamples = false }: 
     e.target.value = "";
     if (f) { stop(); onPhoto(f); }
   };
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault(); setDragging(false);
+    const f = [...e.dataTransfer.files].find((x) => x.type.startsWith("image/"));
+    if (f) { setError(""); stop(); onPhoto(f); } else setError("Please drop a photo (JPG or PNG).");
+  };
   const useSample = async (file: string) => {
     stop();
     const r = await fetch(`/samples/${file}`);
@@ -65,7 +71,7 @@ export function CameraCapture({ hint, ghostUrl, onPhoto, showSamples = false }: 
   };
 
   return (
-    <div>
+    <div onDragOver={(e) => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={onDrop} data-testid="dropzone">
       <Viewfinder className="overflow-hidden rounded-card bg-forest">
         <div className="relative aspect-[4/3] w-full">
           {live && <video ref={video} playsInline muted className="absolute inset-0 h-full w-full object-cover" aria-label="Live camera view" />}
@@ -74,10 +80,12 @@ export function CameraCapture({ hint, ghostUrl, onPhoto, showSamples = false }: 
             <span className="rounded-full bg-forest/80 px-3 py-1 text-sm font-semibold text-white">{hint}</span>
           </div>
           {!live && (
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
               <Button variant="lime" onClick={start}><Camera className="h-5 w-5" aria-hidden />Open camera</Button>
+              <p className="hidden text-sm text-white/80 md:block">or drag a photo here</p>
             </div>
           )}
+          {dragging && <div className="absolute inset-0 z-10 flex items-center justify-center bg-forest/85 font-heading text-xl font-bold text-lime" aria-hidden>Drop your photo here</div>}
         </div>
       </Viewfinder>
       {error && <p role="alert" className="mt-2 text-sm font-semibold text-tomato-dark">{error}</p>}

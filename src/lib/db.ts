@@ -3,6 +3,7 @@ import Dexie, { type Table, liveQuery } from "dexie";
 import { useEffect, useState } from "react";
 import type { AnswerLevel, Guess, Mode } from "./model";
 import type { CropStage } from "./risk";
+import { ExportFileSchema } from "./schemas";
 import type { CoachResult } from "./vision/coach";
 import type { CompareResult } from "./vision/compare";
 
@@ -104,8 +105,11 @@ export async function exportAll(): Promise<Blob> {
 }
 
 export async function importAll(file: Blob): Promise<number> {
-  const json = JSON.parse(await file.text());
-  if (json.app !== "patra-lens" || !json.tables) throw new Error("This is not a Patra Lens export file.");
+  let raw: unknown;
+  try { raw = JSON.parse(await file.text()); } catch { throw new Error("This is not a Patra Lens export file."); }
+  const checked = ExportFileSchema.safeParse(raw);
+  if (!checked.success) throw new Error("This is not a Patra Lens export file.");
+  const json = checked.data;
   let n = 0;
   for (const t of TABLES) {
     const rows = await Promise.all((json.tables[t] ?? []).map(async (row: any) => {

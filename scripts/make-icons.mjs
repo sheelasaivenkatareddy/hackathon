@@ -6,6 +6,6 @@ fs.mkdirSync("public/icons", { recursive: true });
 for (const size of [192, 512]) {
   const inner = Math.round(size * 0.68);
   const logo = await sharp("public/logo-light.svg", { density: 600 }).resize(inner, inner).png().toBuffer();
-  await sharp({ create: { width: size, height: size, channels: 4, background: "#0B2B33" } })
+  await sharp({ create: { width: size, height: size, channels: 4, background: "#073B2C" } })
     .composite([{ input: logo, gravity: "center" }]).png().toFile(`public/icons/icon-${size}.png`);
 }

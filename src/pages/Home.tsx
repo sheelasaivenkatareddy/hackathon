@@ -4,6 +4,7 @@ import { Aperture, BookOpen, Camera, ChevronDown, CloudSun, HeartPulse, ImageOff
 import { ReactNode, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, Chip, CountUp, Reveal } from "../components/ui";
+import LiveDemo from "../components/LiveDemo";
 import { CompareSlider, HeroLeaf, LeafIllustration, Viewfinder } from "../components/viz";
 import type { SpotState } from "../components/viz/LeafIllustration";
 import { CONFIG } from "../config";
@@ -119,7 +120,7 @@ function IdeaPanels() {
     <div className="grid gap-4 sm:grid-cols-3">
       {panels.map((p, i) => (
         <Reveal key={p.day} delay={i}>
-          <Viewfinder className="rounded-card bg-forest p-3" color="#FBBF24">
+          <Viewfinder className="rounded-card bg-forest p-3" color="#E3B04B">
             <div className="flex items-center justify-between px-1 text-sm font-bold text-white">
               <span>{p.day}</span>
               {p.chip && <span className="rounded-full bg-tomato px-2.5 py-0.5 text-xs text-white">{p.chip}</span>}
@@ -273,8 +274,7 @@ export default function Home() {
           <div className="relative text-center">
             <motion.div style={{ y: phoneY }}>
               <HeroLeaf />
-              <p className="mt-3 text-xs text-white/70">Illustration</p>
-            </motion.div>
+              </motion.div>
             <motion.div initial={{ opacity: 0, x: -24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7, type: "spring", stiffness: 90, damping: 16 }} className="absolute left-0 top-[18%] hidden xl:block">
               <div className="glass float-soft px-4 py-3 text-left"><div className="font-heading text-xl font-extrabold text-lime">{pct(CONFIG.measured.fieldTop3)}</div><div className="text-xs text-white/85">Right answer in top 3</div></div>
             </motion.div>
@@ -287,6 +287,13 @@ export default function Home() {
 
       <StatsBand />
       <PlantStrip />
+
+      <Section tint>
+        <p className="eyebrow mb-2">Try it now</p>
+        <h2 className="h2">See a real answer in seconds</h2>
+        <p className="mt-3 max-w-2xl text-muted">Pick an example leaf. The same AI that runs in the app looks at it on your device, with nothing uploaded.</p>
+        <div className="mt-8"><LiveDemo /></div>
+      </Section>
 
       <Section>
         <p className="eyebrow mb-2">The problem</p>
@@ -311,7 +318,6 @@ export default function Home() {
           <span className="text-tomato-dark">Patra Lens: alert at the first new spot</span>
           <span className="text-muted">One-photo apps: when symptoms are clear</span>
         </div>
-        <p className="tiny mt-2">Illustration</p>
       </Section>
 
       <Section>

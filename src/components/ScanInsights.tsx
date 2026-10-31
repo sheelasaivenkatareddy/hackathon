@@ -128,19 +128,25 @@ export function LiveConditions() {
   const [place, setPlace] = useState<string | null>(null);
   const [isDefault, setIsDefault] = useState(false);
   const [weather, setWeather] = useState<LiveWeather | null | "failed">(null);
-  const [soil, setSoil] = useState<SoilData | null | "failed">(null);
+  const [soil, setSoil] = useState<SoilData | null | "failed" | "idle">("idle");
+  const [where, setWhere] = useState<{ lat: number; lon: number } | null>(null);
   useEffect(() => {
     let live = true;
     getArea().then(({ lat, lon, isDefault: d }) => {
       if (!live) return;
       setIsDefault(d);
+      setWhere({ lat, lon });
       loadPlace(lat, lon).then((p) => { if (live) setPlace(p); }).catch(() => undefined);
       loadLiveWeather(lat, lon).then((w) => { if (live) setWeather(w); }).catch(() => { if (live) setWeather("failed"); });
-      loadSoil(lat, lon).then((s) => { if (live) setSoil(s); }).catch(() => { if (live) setSoil("failed"); });
     });
     return () => { live = false; };
   }, []);
-  const hasSoil = soil && soil !== "failed" && (soil.ph !== null || soil.nitrogenGKg !== null || soil.carbonGKg !== null);
+  const loadSoilNow = () => {
+    if (!where) return;
+    setSoil(null);
+    loadSoil(where.lat, where.lon).then(setSoil).catch(() => setSoil("failed"));
+  };
+  const hasSoil = soil && soil !== "failed" && soil !== "idle" && (soil.ph !== null || soil.nitrogenGKg !== null || soil.carbonGKg !== null);
   return (
     <Card className="!bg-white">
       <div data-testid="live-conditions">
@@ -160,6 +166,7 @@ export function LiveConditions() {
         <h4 className="mt-4 flex items-center gap-1.5 text-sm font-semibold text-forest"><Sprout className="h-4 w-4 text-green" aria-hidden />Soil in your area</h4>
         <div data-testid="soil-data">
           {soil === null && <Skeleton className="mt-2 h-16" />}
+          {(soil === "idle" || soil === "failed") && <Button variant="secondary" onClick={loadSoilNow} className="mt-2 !text-sm" data-testid="load-soil">{soil === "failed" ? "Try soil nutrients again" : "Show soil nutrients (pH, nitrogen, carbon)"}</Button>}
           {soil === "failed" && !(weather && weather !== "failed" && weather.soilMoisture !== null) && <p className="small mt-1" data-testid="soil-failed">Soil data can't load right now. That service is sometimes down. A soil test is better anyway.</p>}
           {soil !== null && (
             <div className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-4">

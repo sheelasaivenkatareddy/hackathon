@@ -3,6 +3,7 @@ import { CONFIG } from "../config";
 import { Field, db, getSetting, setSetting } from "./db";
 import { Report, cellCentre, cellId, nearbyThisWeek } from "./radar";
 import { CropStage, OpenMeteo, RiskResult, computeRisk } from "./risk";
+import { ForecastSchema, parse } from "./schemas";
 
 const HOUR = 3600 * 1000;
 interface CachedWeather { at: number; json: OpenMeteo }
@@ -17,7 +18,7 @@ export async function loadWeather(lat: number, lon: number): Promise<WeatherResu
   try {
     const r = await fetch(url);
     if (!r.ok) throw new Error(`Weather error ${r.status}`);
-    const json = (await r.json()) as OpenMeteo;
+    const json = parse(ForecastSchema, await r.json(), "The forecast") as OpenMeteo;
     const at = Date.now();
     await setSetting(key, { at, json });
     return { json, fetchedAt: at, stale: false };
@@ -48,7 +49,7 @@ export async function loadRisk(field?: Pick<Field, "cellId" | "stage"> | null): 
   const centre = field?.cellId ? cellCentre(field.cellId) : CONFIG.radar.defaultCentre;
   const cell = field?.cellId ?? cellId(centre[0], centre[1]);
   const stage = field?.stage ?? "vegetative";
-  const showSample = await getSetting("radarShowSample", true);
+  const showSample = await getSetting("radarShowSample", false);
   const [weather, withSample, mine] = await Promise.all([loadWeather(centre[0], centre[1]), loadReports(showSample), loadReports(false)]);
   const nearby = nearbyThisWeek(withSample, cell);
   const nearbyMine = nearbyThisWeek(mine, cell);
