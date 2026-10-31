@@ -11,7 +11,7 @@ const STEPS = [
   ["Warning neighbours", "With consent, confirmed cases are shared as a rounded 1 km area. An unusual rise in an area triggers an alert."],
 ];
 const HONEST = [
-  "Patra Lens never names pesticides or doses. It tells you what to check and who to ask.",
+  "Patra Lens never names pesticides or pesticide doses. It tells you what to check and who to ask.",
   "Location is shared only if you turn it on, and only as an approximate 1 km area.",
   "Risk scores are estimates from weather and reports, not predictions.",
   "Sample, demo and synthetic items always carry a visible chip.",

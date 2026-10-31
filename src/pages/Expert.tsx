@@ -29,7 +29,7 @@ function QueueRow({ item, scans, onOpen }: { item: Item; scans: Scan[]; onOpen: 
   return (
     <li className="flex flex-wrap items-center gap-3 border-t border-line py-3">
       <img src={url} alt="Leaf photo waiting for an expert" className="h-16 w-16 rounded-xl object-cover" />
-      <div className="min-w-0 flex-1">
+      <div className="min-w-[min(100%,180px)] flex-1">
         <p className="font-semibold text-forest">{top ? disease(top.name) : "No model answer"}</p>
         <p className="small">{fmtShort(item.row.date)} · {item.kind === "scan" ? "Scan" : "Leaf Watch visit"}</p>
         <div className="mt-1 flex flex-wrap gap-1">

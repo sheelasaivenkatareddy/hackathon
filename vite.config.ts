@@ -58,6 +58,7 @@ export default defineConfig({
       },
     }),
   ],
+  define: { __BUILD__: JSON.stringify(new Date().toISOString().slice(0, 16).replace("T", " ")) },
   optimizeDeps: { exclude: ["onnxruntime-web"] },
   server: { port: 5173, strictPort: true },
   preview: { port: 5173, strictPort: true },

@@ -25,7 +25,7 @@ export default function RecoveryTwin({ visits }: { visits: Visit[] }) {
   const leafColour = (w: number) => mix(GREEN, SICK, Math.min(1, (affected * w) / 50));
   return (
     <div>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <svg viewBox="0 0 200 200" className="h-44 w-44 shrink-0" role="img" aria-label={`Plant illustration at ${health} percent health`}>
           <path d="M100 195 L100 15" stroke="#0F766E" strokeWidth="5" strokeLinecap="round" />
           <ellipse cx="100" cy="195" rx="50" ry="5" fill="#E2E8F0" />

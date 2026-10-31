@@ -7,6 +7,14 @@ import { ToastProvider } from "./components/ui";
 import "./index.css";
 import { I18nProvider } from "./lib/i18n";
 
+// When a new version of the site takes over, reload once so nobody stays on an old saved copy.
+if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+  let reloading = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!reloading) { reloading = true; window.location.reload(); }
+  });
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <MotionConfig reducedMotion="user">

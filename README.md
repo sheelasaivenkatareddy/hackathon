@@ -22,16 +22,17 @@ Limits to state plainly: these are public photos, not local farms. Tomato alone 
 
 Recreate the layer with `ml/field-head/` (`unpack_plantdoc.py`, then `extract.py`, then `train_head.py`). Python needs `onnxruntime`, `scikit-learn`, `numpy` and `pillow`. Credits are in `public/model/FIELD_MODEL_CREDITS.txt`.
 
-## Fertilizer suggestions
+## Action plan
 
-`src/lib/nutrition.ts` holds the guidance shown after a diagnosis. Keep to these rules when editing it:
+`src/lib/nutrition.ts` holds what is shown after a diagnosis. Keep to these rules when editing it:
 
-- Fertilizer types only, never amounts. Amounts depend on the soil.
+- Amounts are approximate, for the whole crop, and only where a university recommendation exists (tomato, potato, corn). They are not an extra dose for disease.
 - Specific advice appears only for a CLEAR answer. CHECK and EXPERT answers get general soil care.
-- A disease gets specific advice only when a source supports it. For example, late blight stays general, because we could not confirm the common claim that extra nitrogen worsens it.
+- A disease gets specific advice only when a source supports it.
+- The recovery timeline is an estimate, labelled as one, and never promises a cure. Fertilizer does not cure disease.
 - No pesticide names, doses or spray schedules.
 
-Have a local agriculture expert review this file before real farmers use it.
+Have a local agriculture expert review this file before real farmers use it. The doses are Tamil Nadu recommendations, so Karnataka or Andhra Pradesh numbers may differ.
 
 ## Run it
 

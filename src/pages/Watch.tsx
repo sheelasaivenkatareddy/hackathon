@@ -20,7 +20,7 @@ function PlantRow({ plant, visits, every }: { plant: Plant; visits: Visit[]; eve
   const due = nextCheckDate(last?.date, every);
   return (
     <li className="flex flex-wrap items-center gap-3 border-t border-line py-3">
-      <Link to={`/watch/${plant.id}`} className="flex min-w-0 flex-1 items-center gap-3">
+      <Link to={`/watch/${plant.id}`} className="flex min-w-[min(100%,220px)] flex-1 items-center gap-3">
         <span className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-green-tint">
           {url ? <img src={url} alt={`Latest photo of ${plant.name}`} className="h-full w-full object-cover" /> : <LeafIllustration className="h-full w-full p-1" title="" />}
         </span>

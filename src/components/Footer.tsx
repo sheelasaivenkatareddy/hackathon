@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+declare const __BUILD__: string;
+
 // Shown on the About page. The photo, map and model licences require this credit.
 export const REFERENCES: [string, string][] = [
   ["PlantVillage", "https://arxiv.org/abs/1511.08060"],
@@ -40,7 +42,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="wrap flex flex-wrap items-center justify-between gap-2 py-5 text-sm text-white/65">
-          <p>© 2026 Patra Lens</p>
+          <p>© 2026 Patra Lens · <span data-testid="version">Version {__BUILD__}</span></p>
           <Link to="/about" className="inline-flex min-h-[36px] items-center underline-offset-4 hover:text-white hover:underline">Credits and licences</Link>
         </div>
       </div>

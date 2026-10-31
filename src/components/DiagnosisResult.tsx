@@ -77,7 +77,7 @@ export default function DiagnosisResult({ url, diagnosis, lowReliability, hideMo
         <p className="small mt-3 font-semibold">{t("result.noAdvice")}</p>
       </div>
 
-      {level !== "RETAKE" && <FertilizerCard name={top?.name} level={level} />}
+      {level !== "RETAKE" && <FertilizerCard top={top} level={level} />}
     </div>
   );
 }

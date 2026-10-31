@@ -27,7 +27,7 @@ const FEATURES = [
   { icon: Sprout, title: "Leaf Watch", text: "Same leaves, every few days. New spots, holes and feeding marks are flagged.", to: "/watch" },
   { icon: Aperture, title: "Photo Coach", text: "Checks blur, light and leaf size before any answer.", to: "/scan" },
   { icon: Microscope, title: "Honest Diagnosis", text: "Top 3 answers with confidence, or 'not sure'.", to: "/scan" },
-  { icon: Wheat, title: "Fertilizer suggestions", text: "After a diagnosis, see which fertilizer types may help, what to avoid, and the source.", to: "/scan" },
+  { icon: Wheat, title: "Your action plan", text: "After a diagnosis, see what to use, approximately how much for your field, and what to expect.", to: "/scan" },
   { icon: HeartPulse, title: "Recovery Tracker", text: "After treatment, see whether the plant is improving.", to: "/watch" },
   { icon: CloudSun, title: "Risk Score", text: "Weather and nearby reports show when to check more often.", to: "/risk" },
   { icon: RadioTower, title: "Disease Radar", text: "A sudden rise in nearby confirmed cases triggers an early alert.", to: "/radar" },
@@ -43,7 +43,7 @@ const COMPARE = [
   ["Neighbour risk", "Not shown", "Area-level early alert"],
 ];
 const HONEST = [
-  { title: "No pesticide advice", text: "Patra Lens never names pesticides or doses. It tells you what to check and who to ask." },
+  { title: "No pesticide advice", text: "Patra Lens never names pesticides or pesticide doses. It tells you what to check and who to ask." },
   { title: "Private by default", text: "Location is shared only if you turn it on, and only as an approximate 1 km area." },
   { title: "Estimates, not promises", text: "Risk scores are estimates from weather and reports, not predictions." },
   { title: "Measured, not claimed", text: "Accuracy is measured on held-out field photos, not lab photos. Anything we have not measured yet shows 'To be measured'." },
@@ -56,7 +56,7 @@ const ROADMAP = [
 ];
 const FAQ = [
   ["Does Patra Lens tell me which pesticide to use?", "No. It suggests what to check and who to ask. Treatment decisions stay with the farmer and local experts."],
-  ["Does it suggest fertilizer?", "Yes. After a diagnosis it shows which fertilizer types may help and what to avoid, with the source where we have one. It never gives amounts, because those depend on your soil. Get them from a soil test or your KVK. Fertilizer does not cure disease."],
+  ["Does it suggest fertilizer?", "Yes. After a diagnosis it shows what to use and what to avoid. For tomato, potato and corn, enter your field size to see approximate amounts from university recommendations. A soil test gives better numbers. Fertilizer supports the plant but does not cure disease."],
   ["How accurate is it?", `On ${CONFIG.measured.fieldTestPhotos} public field photos it had never seen, the top answer was right ${pct(CONFIG.measured.fieldAccuracy)} of the time, and the right answer was in the top 3 ${pct(CONFIG.measured.fieldTop3)} of the time. Tomato alone was lower, at ${pct(CONFIG.measured.tomatoFieldAccuracy)}. These are not local farm photos yet, so always confirm with an expert.`],
   ["Does it need internet?", "Photo checks, spot comparison and the on-device model run in the browser. Weather and the shared radar need internet."],
   ["What happens to my location?", "It is shared only if you turn it on, and only as an approximate 1 km area. Exact locations are never stored."],

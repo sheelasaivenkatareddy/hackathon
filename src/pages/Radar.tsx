@@ -42,14 +42,15 @@ export default function Radar() {
       return;
     }
     if (!navigator.geolocation) { toast("Location is not available on this device."); return; }
+    setConsent(true); // move the switch now: the phone can take a while to answer
     navigator.geolocation.getCurrentPosition(
       (p) => {
         // Rounded immediately. The coordinates are not kept anywhere.
         const cell = cellId(p.coords.latitude, p.coords.longitude);
-        setConsent(true); setMyCell(cell);
+        setMyCell(cell);
         setSetting("radarConsent", true); setSetting("radarCell", cell);
       },
-      () => toast("Location was not shared, so the setting stays off."),
+      () => { setConsent(false); toast("Location was not shared, so the setting stays off."); },
       { enableHighAccuracy: false, timeout: 15000 },
     );
   };
@@ -105,7 +106,7 @@ export default function Radar() {
         <div className="space-y-5">
           <Card className="!bg-white">
             <Toggle checked={consent} onChange={onConsent} label={t("radar.consent")} hint="Off by default. If on, we ask for your location once, round it to a 1 km area and store only that area. Exact coordinates are never stored, sent or shown." />
-            {consent && <Chip tone="green" className="mt-2">Approximate area shared</Chip>}
+            {consent && <Chip tone={myCell ? "green" : "muted"} className="mt-2">{myCell ? "Approximate area shared" : "Finding your approximate area…"}</Chip>}
             <div className="mt-3 border-t border-line pt-3">
               <Toggle checked={showSample} onChange={onSample} label="Show sample data" hint="Made-up reports for the demo. These are not real farm reports." />
               {showSample && <div className="mt-1"><SampleChip /></div>}
