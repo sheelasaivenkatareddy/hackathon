@@ -117,6 +117,13 @@ A dark, mobile-first app inside the same site for farmers and labs. Open it from
 - **Schemes:** a quick eligibility check for PM-KISAN, PMFBY, KCC, Soil Health Card, PM-KUSUM and state schemes (AP Annadata Sukhibhava, Telangana Rythu Bharosa, Karnataka Krishi Bhagya). It is a guide, with links to the official portals.
 - **NPK Calculator:** crop, acres and soil test level give kg of N, P and K, then bags of DAP, urea and MOP, the approximate cost, and the split schedule.
 
+**Voice Agent:** a glowing microphone button on every page, on both the main site and Kisan Hub. Tap it and speak in Telugu, Hindi, English, Tamil, Kannada or Malayalam.
+- It answers aloud, using Claude through `ask-agent` in voice mode.
+- It opens screens by voice, for example "open mandi", "మండి ధరలు చూపించు" or "मौसम दिखाओ".
+- "Read this page" gives a voice-over of the current screen. Claude explains it in the farmer's language; offline, it reads a built-in intro.
+- "Hands-free" keeps listening after each answer, and "stop" or "ధన్యవాదాలు" ends it. "Narrate each screen" speaks an intro whenever a screen opens.
+- Commands and intros are in `src/hub/voiceAgent.ts`. The translations are drafts, so have native speakers check them.
+
 Code: `src/hub/` (data and logic), `src/hub/pages/` (screens), `supabase/functions/kisan-hub` (live mandi prices and escalations), `supabase/migrations/0003_escalations.sql`. Have local experts check the directory, scheme amounts and fertilizer doses before real use.
 
 ## Admin login (Expert screen)

@@ -5,6 +5,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import AgentPanel from "../components/AgentPanel";
 import Footer from "../components/Footer";
+import VoiceAgent from "../components/VoiceAgent";
 import HubLayout from "../hub/HubLayout";
 import { BottomSheet, Button } from "../components/ui";
 import { db, getSetting } from "../lib/db";
@@ -107,6 +108,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <main id="main" className="flex-1">{children}</main>
       <div className="pb-20 lg:pb-0"><Footer /></div>
       <AgentPanel />
+      <VoiceAgent lift />
 
       <nav className="pb-safe fixed inset-x-0 bottom-0 z-[500] border-t border-line bg-white lg:hidden" aria-label="Main">
         <ul className="mx-auto grid max-w-lg grid-cols-5">

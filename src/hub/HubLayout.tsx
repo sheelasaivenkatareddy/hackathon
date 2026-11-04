@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, Building2, Calculator, CloudSun, Gift, LayoutDashboard, LogOut, Menu, Mic, ScanLine, TrendingUp, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { Link, NavLink, Navigate, useLocation } from "react-router-dom";
+import VoiceAgent from "../components/VoiceAgent";
 import { signOut, useUser } from "./store";
 
 export const HUB_NAV = [
@@ -82,6 +83,9 @@ export default function HubLayout({ children }: { children: ReactNode }) {
       <main className="relative px-4 pb-28 pt-5 md:px-8 md:pt-8 lg:ml-64 lg:pb-12">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
+
+      {/* Kisan Vani has its own big microphone. */}
+      {!pathname.startsWith("/hub/vani") && <VoiceAgent />}
 
       {/* phone bottom bar */}
       <nav className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-navy-950/90 backdrop-blur-xl lg:hidden" aria-label="Kisan Hub">
