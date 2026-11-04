@@ -5,11 +5,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AudioLines, BookOpenText, Mic, Repeat, Square, Volume2, Wrench, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ChatMsg, askAgent } from "../lib/agent";
-import { cloudConfigured } from "../lib/cloud";
-import { answerOffline } from "../hub/offlineBrain";
-import { VoiceLang, getUser, setHubLang, useHubLang } from "../hub/store";
-import { GREETING, UI, VOICE_LANGS, VoiceCheck, askMic, canListen, checkVoice, isGreeting, listen, listenError, noVoiceFor, speak, stopSpeaking, voiceHelp } from "../hub/voice";
+import type { ChatMsg } from "../lib/agent";
+import { answerQuestion } from "../hub/answer";
+import { VoiceLang, setHubLang, useHubLang } from "../hub/store";
+import { GREETING, UI, VOICE_LANGS, VoiceCheck, askMic, canListen, checkVoice, isGreeting, listen, listenError, noVoiceFor, speak, stopSpeaking, unlockSpeech, voiceHelp } from "../hub/voice";
 import { INTRO, ROUTE, STOP_REPLY, openingSentence, pageText, parseCommand } from "../hub/voiceAgent";
 
 type Phase = "idle" | "listening" | "thinking" | "speaking";
@@ -50,10 +49,10 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
   const voiceOver = useCallback(async (l: VoiceLang): Promise<{ text: string; lang: VoiceLang }> => {
     const text = pageText();
     const intro = introFor(pathname, l);
-    if (cloudConfigured && text) {
+    if (text) {
       setPhase("thinking");
-      const res = await askAgent([{ role: "user", content: `Explain this app screen to me in 3 or 4 short spoken sentences: what it shows and what I can do here. Screen text: ${text}` }], l, false, true);
-      if (res.ok && !res.offline) return { text: res.answer, lang: l };
+      const res = await answerQuestion([{ role: "user", content: `Explain this app screen to me in 3 or 4 short spoken sentences: what it shows and what I can do here. Screen text: ${text}` }], l, true);
+      if (res.source === "Claude AI" || res.source === "AI") return { text: res.text, lang: l };
     }
     if (intro) return { text: intro, lang: l };
     return { text: text || "This screen has no text to read.", lang: "en" };
@@ -68,10 +67,8 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
     if (isGreeting(q)) return { text: GREETING[l], lang: l };
     setPhase("thinking");
     history.current = [...history.current, { role: "user" as const, content: q }].slice(-12);
-    const res = cloudConfigured ? await askAgent(history.current, l, true, true) : null;
-    // No AI answer (no key, or the AI failed): answer from the app's data, the last scan, or Wikipedia.
-    const answer = res?.ok && !res.offline ? { text: res.answer, lang: l } : await answerOffline(q, l, getUser());
-    setSource(res?.ok && !res.offline ? "Claude AI" : "source" in answer && answer.source === "wikipedia" ? "Wikipedia" : "App data (offline)");
+    const answer = await answerQuestion(history.current, l, true);
+    setSource(answer.source);
     history.current = [...history.current, { role: "assistant" as const, content: answer.text }];
     return answer;
   };
@@ -102,6 +99,7 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
   };
 
   const start = async () => {
+    unlockSpeech(); // must run inside the tap, before any await, or phones stay silent
     if (!canListen()) { setErr(listenError("unsupported")); setOpen(true); return; }
     stopSpeaking();
     // One tap = start listening. The settings panel stays closed; a small bubble shows what was heard and said.
@@ -113,6 +111,7 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
 
   const [check, setCheck] = useState<VoiceCheck | null>(null);
   const runCheck = async () => {
+    unlockSpeech();
     stopAll(); setErr("");
     const c = await checkVoice(langRef.current);
     if (c.mic !== "granted" && (await askMic())) c.mic = "granted";
@@ -122,6 +121,7 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
   };
   const stopAll = () => { live.current = false; stopRef.current(); stopSpeaking(); setPhase("idle"); };
   const readPage = async () => {
+    unlockSpeech();
     stopAll(); setOpen(true);
     live.current = true;
     const r = await voiceOver(langRef.current);

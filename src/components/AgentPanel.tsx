@@ -5,8 +5,7 @@ import { Fragment, ReactNode, useEffect, useRef, useState } from "react";
 import { ChatMsg, askAgent, useLatestScan } from "../lib/agent";
 import { useI18n } from "../lib/i18n";
 import { listenError, speak as speakAloud } from "../hub/voice";
-import { answerOffline, intentsOf } from "../hub/offlineBrain";
-import { getUser } from "../hub/store";
+import { answerQuestion } from "../hub/answer";
 
 const STORE_KEY = "patra-agent-chat";
 const AGENT_LANGS = [
@@ -86,19 +85,11 @@ export default function AgentPanel() {
     if (!q || busy) return;
     const next: ChatMsg[] = [...msgs, { role: "user", content: q }];
     setMsgs(next); setInput(""); setError(""); setBusy(true);
-    const r = await askAgent(next, lang, useScan && !!scan);
-    if (r.ok && r.offline) {
-      // No AI connected: the offline engine answers stage, price, weather, fertilizer and similar questions in the
-      // farmer's language; anything else keeps the disease-library search.
-      const o = await answerOffline(q, lang, getUser());
-      const known = intentsOf(q).length > 0 || o.source === "wikipedia";
-      setBusy(false);
-      setMsgs([...next, { role: "assistant", content: known ? o.text : r.answer }]); setOffline(true);
-      return;
-    }
+    // Claude, else the free AI (with the last scan), else the app's data, else Wikipedia.
+    const a = await answerQuestion(next, lang, false);
     setBusy(false);
-    if (r.ok) { setMsgs([...next, { role: "assistant", content: r.answer }]); setOffline(!!r.offline); }
-    else { setError(r.message); setMsgs(msgs); setInput(q); }
+    setMsgs([...next, { role: "assistant", content: a.text }]);
+    setOffline(a.source === "App data" || a.source === "Wikipedia");
   };
 
   const toggleMic = () => {

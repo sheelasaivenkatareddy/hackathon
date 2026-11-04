@@ -7,10 +7,10 @@ import { Link } from "react-router-dom";
 import { ChatMsg, askAgent, shareScanWithAgent } from "../../lib/agent";
 import { cloudConfigured } from "../../lib/cloud";
 import { bestSprayWindow, loadForecast, next24, sprayHours } from "../forecast";
-import { answerOffline } from "../offlineBrain";
+import { answerQuestion } from "../answer";
 import { VoiceLang, districtOf, getHubScans, setHubLang, useHubLang, useUser } from "../store";
 import { Glass, LangPicker, PageHead, Pill } from "../ui";
-import { GREETING, UI, VOICE_LANGS, askMic, canListen, canSpeak, isGreeting, listen, listenError, speak, stopSpeaking, voiceFor, voiceHelp, weatherSentence } from "../voice";
+import { GREETING, UI, VOICE_LANGS, askMic, canListen, canSpeak, isGreeting, listen, listenError, speak, stopSpeaking, unlockSpeech, voiceFor, voiceHelp, weatherSentence } from "../voice";
 
 type Phase = "idle" | "listening" | "thinking" | "speaking";
 interface Line extends ChatMsg { lang: VoiceLang; local?: boolean }
@@ -61,17 +61,13 @@ export default function KisanVani() {
     setChat(history);
     if (isGreeting(q)) { reply(GREETING[lang], lang); return; }
     setPhase("thinking");
-    const res = cloudConfigured ? await askAgent(history.map(({ role, content }) => ({ role, content })), lang, true, true) : null;
-    if (!res || !res.ok || res.offline) {
-      // No AI answer: the app's own data, the last scan, or Wikipedia, in the farmer's language.
-      const o = await answerOffline(q, lang, user);
-      reply(o.text, o.lang, true);
-      return;
-    }
-    reply(res.answer, lang);
+    // Claude, else the free AI (with the last scan), else the app's data, else Wikipedia.
+    const a = await answerQuestion(history.map(({ role, content }) => ({ role, content })), lang, true);
+    reply(a.text, a.lang, a.source === "App data" || a.source === "Wikipedia");
   };
 
   const mic = async () => {
+    unlockSpeech(); // inside the tap, before any await: phones only speak after a tap
     if (phase === "listening") { stopRef.current(); return; }
     if (phase === "speaking") { stopSpeaking(); setPhase("idle"); return; }
     setErr(""); setPartial("");
@@ -91,7 +87,7 @@ export default function KisanVani() {
     }
   };
 
-  const submit = (e: FormEvent) => { e.preventDefault(); const q = typed; setTyped(""); ask(q); };
+  const submit = (e: FormEvent) => { e.preventDefault(); unlockSpeech(); const q = typed; setTyped(""); ask(q); };
 
   // ------------------------------------------------------------------ spoken without the AI
   const speakDiagnosis = () => {
@@ -102,6 +98,7 @@ export default function KisanVani() {
     reply([`${s.crop}: ${block.problem}.`, block.reason, ...block.steps.slice(0, 3)].join(" "), l);
   };
   const speakWeather = async () => {
+    unlockSpeech();
     const d = districtOf(user);
     setPhase("thinking");
     const { f } = await loadForecast(d.lat, d.lon);

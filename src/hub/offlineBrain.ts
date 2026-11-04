@@ -13,14 +13,14 @@ type Intent = "photo" | "medicine" | "stage" | "price" | "weather" | "fertilizer
 const WORDS: Record<Intent, string[]> = {
   // About the photo the farmer just scanned.
   photo: ["photo", "scan", "picture", "this leaf", "my leaf", "result", "serious", "dangerous", "ఫోటో", "స్కాన్", "ఈ ఆకు", "నా ఆకు", "ఫలితం", "ప్రమాదం", "ఏమైంది", "फोटो", "स्कैन", "इस पत्ती", "मेरी पत्ती", "नतीजा", "खतरनाक", "क्या हुआ", "புகைப்படம்", "ஸ்கேன்", "இந்த இலை", "ಫೋಟೋ", "ಈ ಎಲೆ", "ഫോട്ടോ", "ഈ ഇല"],
-  medicine: ["medicine", "pesticide", "fungicide", "what to spray", "which spray", "chemical", "organic", "cure", "treatment", "మందు", "మందులు", "ఏ మందు", "నివారణ", "చికిత్స", "సేంద్రియ", "दवा", "दवाई", "कीटनाशक", "इलाज", "उपचार", "जैविक", "மருந்து", "சிகிச்சை", "ಔಷಧ", "ಚಿಕಿತ್ಸೆ", "മരുന്ന്", "ചികിത്സ"],
+  medicine: ["precaution", "prevent", "protect", "జాగ్రత్త", "జాగ్రత్తలు", "రక్షణ", "सावधानी", "बचाव", "बचें", "बचे", "रोकथाम", "முன்னெச்சரிக்கை", "ಮುನ್ನೆಚ್ಚರಿಕೆ", "മുൻകരുതൽ", "medicine", "pesticide", "fungicide", "what to spray", "which spray", "chemical", "organic", "cure", "treatment", "మందు", "మందులు", "ఏ మందు", "నివారణ", "చికిత్స", "సేంద్రియ", "दवा", "दवाई", "कीटनाशक", "इलाज", "उपचार", "जैविक", "மருந்து", "சிகிச்சை", "ಔಷಧ", "ಚಿಕಿತ್ಸೆ", "മരുന്ന്", "ചികിത്സ"],
   stage: ["stage", "growth", "how many days", "age of crop", "స్టేజ్", "స్టేజి", "దశ", "ఏ దశ", "వయసు", "ఎన్ని రోజుల", "स्टेज", "अवस्था", "चरण", "कितने दिन", "நிலை", "பருவம்", "ಹಂತ", "ಸ್ಟೇಜ್", "ഘട്ടം", "സ്റ്റേജ്"],
   price: ["price", "rate", "mandi", "market", "sell", "రేట్", "ధర", "మండి", "మార్కెట్", "అమ్మ", "रेट", "भाव", "दाम", "कीमत", "मंडी", "बाजार", "बेच", "விலை", "சந்தை", "ರೇಟ್", "ಬೆಲೆ", "ಮಾರುಕಟ್ಟೆ", "വില", "ചന്ത", "റേറ്റ്"],
   weather: ["weather", "rain", "spray", "forecast", "వాతావరణ", "వర్షం", "వాన", "పిచికారీ", "స్ప్రే", "मौसम", "बारिश", "छिड़काव", "स्प्रे", "வானிலை", "மழை", "தெளி", "ಹವಾಮಾನ", "ಮಳೆ", "ಸಿಂಪಡ", "കാലാവസ്ഥ", "മഴ", "തളി"],
   fertilizer: ["fertilizer", "fertiliser", "urea", "dap", "potash", "npk", "manure", "ఎరువు", "యూరియా", "డీఏపీ", "పొటాష్", "खाद", "उर्वरक", "यूरिया", "डीएपी", "पोटाश", "உரம்", "யூரியா", "ಗೊಬ್ಬರ", "ಯೂರಿಯಾ", "വളം", "യൂറിയ"],
   water: ["water", "irrigat", "watering", "నీరు", "నీళ్ళు", "నీళ్లు", "తడి", "పారుదల", "पानी", "सिंचाई", "தண்ணீர்", "பாசன", "ನೀರು", "ನೀರಾವರಿ", "വെള്ളം", "ജലസേചന"],
   disease: ["disease", "spot", "pest", "insect", "leaf", "yellow", "blight", "తెగులు", "మచ్చ", "పురుగు", "ఆకు", "పసుపు", "రోగం", "रोग", "धब्बे", "कीड़", "पत्ती", "पील", "நோய்", "புள்ளி", "பூச்சி", "இலை", "ರೋಗ", "ಕಲೆ", "ಕೀಟ", "ಎಲೆ", "രോഗം", "പുള്ളി", "കീട", "ഇല"],
-  scheme: ["scheme", "subsidy", "insurance", "pm kisan", "loan", "పథకం", "సబ్సిడీ", "బీమా", "రుణం", "योजना", "सब्सिडी", "बीमा", "ऋण", "लोन", "திட்டம்", "மானியம்", "காப்பீடு", "ಯೋಜನೆ", "ಸಬ್ಸಿಡಿ", "ವಿಮೆ", "പദ്ധതി", "സബ്സിഡി", "ഇൻഷുറൻസ്"],
+  scheme: ["scheme", "subsidy", "insurance", "pm kisan", "loan", "పథకం", "సబ్సిడీ", "బీమా", "రుణం", "योजना", "सब्सिडी", "फसल बीमा", "बीमा योजना", "ऋण", "लोन", "திட்டம்", "மானியம்", "காப்பீடு", "ಯೋಜನೆ", "ಸಬ್ಸಿಡಿ", "ವಿಮೆ", "പദ്ധതി", "സബ്സിഡി", "ഇൻഷുറൻസ്"],
   expert: ["expert", "officer", "lab", "help line", "helpline", "call", "doctor", "నిపుణ", "అధికారి", "ల్యాబ్", "ఫోన్", "కాల్", "विशेषज्ञ", "अधिकारी", "लैब", "फोन", "कॉल", "நிபுணர்", "அதிகாரி", "ತಜ್ಞ", "ಅಧಿಕಾರಿ", "വിദഗ്ധ", "ഓഫീസർ"],
   help: ["what can you do", "what all", "library", "available", "features", "menu", "ఏమి చేయగల", "ఏం చేయగల", "లైబ్రరీ", "అవైలబుల్", "ఏమేమి", "वाट", "क्या कर सकते", "लाइब्रेरी", "उपलब्ध", "என்ன செய்ய", "ಏನು ಮಾಡ", "എന്ത് ചെയ്യാ", "వాట్ వాట్"],
 };
@@ -224,7 +224,8 @@ export async function answerOffline(q: string, chosen: VoiceLang, user: HubUser 
   }
   if (out.length) return { text: out.join(" "), lang: l, source: "app" };
   // Not a farm topic the app knows: look it up on Wikipedia (free, no key), in the farmer's language if possible.
-  const w = await wikiAnswer(q, l);
+  // A crop question the app could not answer should not get a random encyclopedia article.
+  const w = named ? null : await wikiAnswer(q, l);
   if (w) return { text: w, lang: l, source: "wikipedia" };
   return { text: pick(NOT_UNDERSTOOD, l), lang: l, source: "app" };
 }
@@ -264,9 +265,10 @@ function scanTreatment(s: Scan, l: VoiceLang): string {
     safe: { en: "Follow the label, wear gloves and a mask.", te: "లేబుల్ ప్రకారం వాడండి, చేతి తొడుగులు, మాస్క్ ధరించండి.", hi: "लेबल के अनुसार इस्तेमाल करें, दस्ताने और मास्क पहनें।", ta: "லேபிள்படி பயன்படுத்தவும், கையுறை, முகக்கவசம் அணியவும்.", kn: "ಲೇಬಲ್ ಪ್ರಕಾರ ಬಳಸಿ, ಕೈಗವಸು, ಮಾಸ್ಕ್ ಧರಿಸಿ.", ml: "ലേബൽ പ്രകാരം ഉപയോഗിക്കുക, കൈയുറയും മാസ്കും ധരിക്കുക." },
   };
   const parts = [`${cropName(s.crop, l)}: ${b.problem}.`];
+  // Precautions: the translated steps in Telugu/Hindi, the scan's own list in English.
+  parts.push(...(l === "en" ? [...c.do_today, ...c.precautions].slice(0, 4) : b.steps.slice(0, 3)));
   if (chem.length) parts.push(`${pick(H.chem, l)}: ${chem.join("; ")}.`);
   if (org.length) parts.push(`${pick(H.org, l)}: ${org.join("; ")}.`);
-  if (!chem.length && !org.length) parts.push(...b.steps.slice(0, 3));
   parts.push(pick(H.safe, l));
   return parts.join(" ");
 }

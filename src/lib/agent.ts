@@ -12,6 +12,7 @@ export interface ChatMsg { role: "user" | "assistant"; content: string }
 let latestScan: LeafResult | null = null;
 const listeners = new Set<(s: LeafResult | null) => void>();
 export function shareScanWithAgent(s: LeafResult | null) { latestScan = s; listeners.forEach((l) => l(s)); }
+export const getLatestScan = () => latestScan;
 export function useLatestScan() {
   const [s, setS] = useState(latestScan);
   useEffect(() => { listeners.add(setS); return () => { listeners.delete(setS); }; }, []);

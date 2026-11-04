@@ -116,11 +116,25 @@ function chunks(text: string, max = 180): string[] {
   return parts.map((p) => p.trim()).filter(Boolean);
 }
 
+export const isPhone = () => typeof navigator !== "undefined" && /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+
+let unlocked = false;
+/** Phones only allow speech that starts from a tap. Call this inside the tap handler, before any await. */
+export function unlockSpeech() {
+  if (!canSpeak() || unlocked) return;
+  try {
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0;
+    speechSynthesis.speak(u);
+    unlocked = true;
+  } catch { /* not supported */ }
+}
+
 let speakToken = 0;
 let keepAlive: ReturnType<typeof setInterval> | undefined;
 
 /** True when the browser has no voice for the language: answers are then shown as text only. */
-export const noVoiceFor = (lang: VoiceLang) => !canSpeak() || !voiceFor(lang);
+export const noVoiceFor = (lang: VoiceLang) => !canSpeak() || (!voiceFor(lang) && !isPhone());
 
 /** Where to get a voice for the language, for the device the farmer is on. */
 export function voiceHelp(lang: VoiceLang): string {
@@ -147,8 +161,9 @@ export function speak(text: string, lang: VoiceLang, onEnd?: () => void) {
   voiceReadyFor(lang).then(() => {
     if (token !== speakToken) return;
     const v = voiceFor(lang);
-    // No voice for this language: an English voice would read Telugu script as noise, so stay silent (text is shown).
-    if (!v && lang !== "en") { clearTimeout(safety); finish(); return; }
+    // No listed voice for this language. Phones (Google / Apple speech) usually still speak it when asked by language,
+    // so try there. On a computer an English voice would read Telugu script as noise, so stay silent (text is shown).
+    if (!v && lang !== "en" && !isPhone()) { clearTimeout(safety); finish(); return; }
     pieces.forEach((p, i) => {
       const u = new SpeechSynthesisUtterance(p);
       u.lang = v?.lang ?? bcpOf(lang);
