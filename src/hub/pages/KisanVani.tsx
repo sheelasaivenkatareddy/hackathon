@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { ChatMsg, askAgent, shareScanWithAgent } from "../../lib/agent";
 import { cloudConfigured } from "../../lib/cloud";
 import { bestSprayWindow, loadForecast, next24, sprayHours } from "../forecast";
+import { answerOffline } from "../offlineBrain";
 import { VoiceLang, districtOf, getHubScans, setHubLang, useHubLang, useUser } from "../store";
 import { Glass, LangPicker, PageHead, Pill } from "../ui";
 import { GREETING, UI, VOICE_LANGS, askMic, canListen, canSpeak, isGreeting, listen, listenError, speak, stopSpeaking, voiceFor, voiceHelp, weatherSentence } from "../voice";
@@ -60,9 +61,15 @@ export default function KisanVani() {
     setChat(history);
     if (isGreeting(q)) { reply(GREETING[lang], lang); return; }
     setPhase("thinking");
-    const res = await askAgent(history.map(({ role, content }) => ({ role, content })), lang, true, true);
-    if (!res.ok) { setErr(res.message); setPhase("idle"); return; }
-    reply(res.answer, res.offline ? "en" : lang, !!res.offline);
+    const res = cloudConfigured ? await askAgent(history.map(({ role, content }) => ({ role, content })), lang, true, true) : null;
+    if (res && !res.ok) { setErr(res.message); setPhase("idle"); return; }
+    if (!res || res.offline) {
+      // No AI connected: answer from the app's own data, in the farmer's language.
+      const o = await answerOffline(q, lang, user);
+      reply(o.text, o.lang, true);
+      return;
+    }
+    reply(res.answer, lang);
   };
 
   const mic = async () => {

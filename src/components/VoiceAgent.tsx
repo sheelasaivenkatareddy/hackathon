@@ -7,7 +7,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChatMsg, askAgent } from "../lib/agent";
 import { cloudConfigured } from "../lib/cloud";
-import { VoiceLang, setHubLang, useHubLang } from "../hub/store";
+import { answerOffline } from "../hub/offlineBrain";
+import { VoiceLang, getUser, setHubLang, useHubLang } from "../hub/store";
 import { GREETING, UI, VOICE_LANGS, VoiceCheck, askMic, canListen, checkVoice, isGreeting, listen, listenError, noVoiceFor, speak, stopSpeaking, voiceHelp } from "../hub/voice";
 import { INTRO, ROUTE, STOP_REPLY, openingSentence, pageText, parseCommand } from "../hub/voiceAgent";
 
@@ -66,10 +67,12 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
     if (isGreeting(q)) return { text: GREETING[l], lang: l };
     setPhase("thinking");
     history.current = [...history.current, { role: "user" as const, content: q }].slice(-12);
-    const res = await askAgent(history.current, l, true, true);
-    if (!res.ok) return { text: res.message, lang: "en" };
-    history.current = [...history.current, { role: "assistant" as const, content: res.answer }];
-    return { text: res.answer, lang: res.offline ? "en" : l };
+    const res = cloudConfigured ? await askAgent(history.current, l, true, true) : null;
+    if (res && !res.ok) return { text: res.message, lang: "en" };
+    // No AI connected: answer from the app's own data, in the farmer's language.
+    const answer = !res || res.offline ? await answerOffline(q, l, getUser()) : { text: res.answer, lang: l };
+    history.current = [...history.current, { role: "assistant" as const, content: answer.text }];
+    return answer;
   };
 
   const turn = async (emptyTries = 0): Promise<void> => {
@@ -205,7 +208,7 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
                 <input type="checkbox" checked={narrate} onChange={(e) => setNarrate(e.target.checked)} className="h-4 w-4 accent-[#22D3EE]" />
               </label>
             </div>
-            <p className="mt-2 text-[11px] text-slate-500">{cloudConfigured ? "Answers by Claude AI." : "Offline mode: commands, greetings and screen voice-over work; questions use the disease library."}</p>
+            <p className="mt-2 text-[11px] text-slate-500">{cloudConfigured ? "Answers by Claude AI." : "Offline mode: answers crop stage, prices, weather, fertilizer, water, disease, schemes and expert questions from the app's data."}</p>
           </motion.div>
         )}
       </AnimatePresence>
