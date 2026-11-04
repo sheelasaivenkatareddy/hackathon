@@ -62,9 +62,8 @@ export default function KisanVani() {
     if (isGreeting(q)) { reply(GREETING[lang], lang); return; }
     setPhase("thinking");
     const res = cloudConfigured ? await askAgent(history.map(({ role, content }) => ({ role, content })), lang, true, true) : null;
-    if (res && !res.ok) { setErr(res.message); setPhase("idle"); return; }
-    if (!res || res.offline) {
-      // No AI connected: answer from the app's own data, in the farmer's language.
+    if (!res || !res.ok || res.offline) {
+      // No AI answer: the app's own data, the last scan, or Wikipedia, in the farmer's language.
       const o = await answerOffline(q, lang, user);
       reply(o.text, o.lang, true);
       return;
@@ -129,7 +128,7 @@ export default function KisanVani() {
     <div>
       <PageHead eyebrow="Real-time voice AI" title={<>Kisan <span className="neon-text">Vani</span></>}
         sub="Speak in your language. Kisan Vani listens, answers about your crop, and reads the answer aloud."
-        right={<Pill tone={cloudConfigured ? "lime" : "amber"}>{cloudConfigured ? "Claude AI online" : "Offline library mode"}</Pill>} />
+        right={<Pill tone="cyan">6 languages · uses your last scan</Pill>} />
 
       <div className="grid gap-5 lg:grid-cols-5">
         <Glass className="flex flex-col items-center lg:col-span-2">

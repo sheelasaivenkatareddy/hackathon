@@ -31,6 +31,7 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
   const [err, setErr] = useState("");
   const [handsFree, setHandsFree] = useState(() => pref("va:handsfree"));
   const [narrate, setNarrate] = useState(() => pref("va:narrate"));
+  const [source, setSource] = useState("");
 
   // Refs, because the hands-free loop outlives a render.
   const live = useRef(false), handsRef = useRef(handsFree), langRef = useRef(lang), stopRef = useRef<() => void>(() => undefined);
@@ -68,9 +69,9 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
     setPhase("thinking");
     history.current = [...history.current, { role: "user" as const, content: q }].slice(-12);
     const res = cloudConfigured ? await askAgent(history.current, l, true, true) : null;
-    if (res && !res.ok) return { text: res.message, lang: "en" };
-    // No AI connected: answer from the app's own data, in the farmer's language.
-    const answer = !res || res.offline ? await answerOffline(q, l, getUser()) : { text: res.answer, lang: l };
+    // No AI answer (no key, or the AI failed): answer from the app's data, the last scan, or Wikipedia.
+    const answer = res?.ok && !res.offline ? { text: res.answer, lang: l } : await answerOffline(q, l, getUser());
+    setSource(res?.ok && !res.offline ? "Claude AI" : "source" in answer && answer.source === "wikipedia" ? "Wikipedia" : "App data (offline)");
     history.current = [...history.current, { role: "assistant" as const, content: answer.text }];
     return answer;
   };
@@ -84,7 +85,7 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
       stopRef.current = l.stop;
       q = await l.done;
     } catch (e) {
-      live.current = false; setPhase("idle"); setOpen(true);
+      live.current = false; setPhase("idle");
       setErr(listenError((e as Error).message));
       return;
     }
@@ -103,9 +104,10 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
   const start = async () => {
     if (!canListen()) { setErr(listenError("unsupported")); setOpen(true); return; }
     stopSpeaking();
-    live.current = true; setOpen(true);
+    // One tap = start listening. The settings panel stays closed; a small bubble shows what was heard and said.
+    live.current = true; setSaid(""); setHeard("");
     // Ask for the microphone first, so a blocked mic shows a clear message instead of silence.
-    if (!(await askMic())) { live.current = false; setErr(listenError("not-allowed")); return; }
+    if (!(await askMic())) { live.current = false; setErr(listenError("not-allowed")); setOpen(true); return; }
     turn();
   };
 
@@ -208,7 +210,24 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
                 <input type="checkbox" checked={narrate} onChange={(e) => setNarrate(e.target.checked)} className="h-4 w-4 accent-[#22D3EE]" />
               </label>
             </div>
-            <p className="mt-2 text-[11px] text-slate-500">{cloudConfigured ? "Answers by Claude AI." : "Offline mode: answers crop stage, prices, weather, fertilizer, water, disease, schemes and expert questions from the app's data."}</p>
+            <p className="mt-2 text-[11px] text-slate-500">{source ? `Last answer from: ${source}.` : "Answers from Claude AI when connected; otherwise from the app's data, your last scan and Wikipedia."}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Compact bubble while talking (the settings panel stays closed). */}
+      <AnimatePresence>
+        {!open && (busy || said || err) && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} aria-live="polite"
+            className="w-[min(300px,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-[#081226]/95 p-3 text-sm text-slate-100 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#22D3EE]">{phase === "idle" ? (source || "Voice agent") : t[phase]}</p>
+              {!busy && <button onClick={() => { setSaid(""); setErr(""); setHeard(""); }} aria-label="Close" className="text-slate-500 hover:text-white"><X className="h-3.5 w-3.5" aria-hidden /></button>}
+            </div>
+            {heard && <p className="mt-1 text-slate-300">“{heard}”</p>}
+            {said && <p className="mt-1 max-h-48 overflow-y-auto whitespace-pre-wrap text-white">{said.replace(/\*\*/g, "")}</p>}
+            {err && <p role="alert" className="mt-1 font-semibold text-[#F87171]">{err}</p>}
+            {noVoiceFor(lang) && said && <button onClick={() => setOpen(true)} className="mt-1.5 text-[11px] font-semibold text-[#FBBF24] underline">No {VOICE_LANGS.find((v) => v.id === lang)!.label} voice here: fix it</button>}
           </motion.div>
         )}
       </AnimatePresence>

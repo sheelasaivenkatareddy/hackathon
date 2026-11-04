@@ -91,7 +91,7 @@ export default function AgentPanel() {
       // No AI connected: the offline engine answers stage, price, weather, fertilizer and similar questions in the
       // farmer's language; anything else keeps the disease-library search.
       const o = await answerOffline(q, lang, getUser());
-      const known = intentsOf(q).length > 0;
+      const known = intentsOf(q).length > 0 || o.source === "wikipedia";
       setBusy(false);
       setMsgs([...next, { role: "assistant", content: known ? o.text : r.answer }]); setOffline(true);
       return;
