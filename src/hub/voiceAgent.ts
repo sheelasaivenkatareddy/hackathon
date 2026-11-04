@@ -29,7 +29,10 @@ const READ_WORDS = ["read this page", "read the page", "read page", "what is on 
 const STOP_WORDS = ["stop", "bye", "thank you", "thanks", "ఆపు", "ఆపండి", "ధన్యవాదాలు", "रुको", "बंद करो", "धन्यवाद", "நிறுத்து", "நன்றி", "ನಿಲ್ಲಿಸು", "ಧನ್ಯವಾದ", "നിർത്തുക", "നന്ദി"];
 
 const norm = (s: string) => s.toLowerCase().replace(/[!?.,।]/g, " ").replace(/\s+/g, " ").trim();
-const has = (t: string, words: string[]) => words.some((w) => t.includes(w));
+// English words match whole words only, so "photosynthesis" does not open the photo scanner.
+const esc = (w: string) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const has = (t: string, words: string[]) =>
+  words.some((w) => (/^[\x00-\x7F]+$/.test(w) ? new RegExp(`\\b${esc(w)}\\b`, "i").test(t) : t.includes(w)));
 
 export type Command = { kind: "go"; dest: Dest } | { kind: "read" } | { kind: "stop" } | null;
 export function parseCommand(said: string): Command {
