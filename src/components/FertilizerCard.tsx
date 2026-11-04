@@ -66,7 +66,7 @@ export default function FertilizerCard({ top, level }: { top?: Guess; level: Ans
     <motion.section data-testid="fertilizer-card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.4 }} className="space-y-4 rounded-card border border-amber/40 bg-amber-tint/40 p-4 md:p-6">
       <h3 className="h3">Your action plan</h3>
 
-      <motion.div initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.35, type: "spring", stiffness: 180, damping: 18 }} className="rounded-2xl bg-forest p-4 text-white md:p-5" data-testid="use-this">
+      <motion.div initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.35, type: "spring", stiffness: 180, damping: 18 }} className="rounded-2xl bg-deep lit p-4 text-white md:p-5" data-testid="use-this">
         <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-lime"><Sprout className="h-4 w-4" aria-hidden />Use this</p>
         <p className="mt-1 font-heading text-xl font-extrabold md:text-2xl">{a.useThis}</p>
         <p className="mt-1 text-white/85">{a.headline}</p>

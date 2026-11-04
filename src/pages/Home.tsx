@@ -52,8 +52,8 @@ const HONEST = [
 ];
 const STACK = ["React", "OpenCV.js", "ONNX Runtime Web", "DINOv2", "Open-Meteo", "OpenStreetMap", "IndexedDB"];
 const ROADMAP = [
-  { title: "Now", items: ["13 plants", "Leaf Watch", "On-device model", "Risk and Radar"] },
-  { title: "Next", items: ["Offline install", "More Indian crops", "Voice guidance in Telugu and Kannada"] },
+  { title: "Now", items: ["13 plants + paddy", "Leaf Watch", "Voice agent in 6 languages", "Kisan Hub: mandi, labs, schemes"] },
+  { title: "Next", items: ["Offline install", "More Indian crops", "Live Agmarknet prices"] },
   { title: "Later", items: ["Field validation with local experts", "Extension-officer dashboard", "Pest trap photos"] },
 ];
 const FAQ = [
@@ -120,7 +120,7 @@ function IdeaPanels() {
     <div className="grid gap-4 sm:grid-cols-3">
       {panels.map((p, i) => (
         <Reveal key={p.day} delay={i}>
-          <Viewfinder className="rounded-card bg-forest p-3" color="#E3B04B">
+          <Viewfinder className="rounded-card bg-deep lit p-3" color="#E3B04B">
             <div className="flex items-center justify-between px-1 text-sm font-bold text-white">
               <span>{p.day}</span>
               {p.chip && <span className="rounded-full bg-tomato px-2.5 py-0.5 text-xs text-white">{p.chip}</span>}
@@ -352,7 +352,7 @@ export default function Home() {
         <h2 className="h2 mb-8">More than a one-photo answer</h2>
         <div className="overflow-x-auto rounded-card border border-line">
           <table className="w-full min-w-[320px] text-left text-sm md:text-base">
-            <thead className="bg-forest text-white">
+            <thead className="bg-deep lit text-white">
               <tr><th className="p-3 md:p-4"><span className="sr-only">Compared item</span></th><th scope="col" className="p-3 font-heading md:p-4">Basic photo-ID app</th><th scope="col" className="p-3 font-heading text-lime md:p-4">Patra Lens</th></tr>
             </thead>
             <tbody>

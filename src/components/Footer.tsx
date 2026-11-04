@@ -23,7 +23,7 @@ const COLUMNS: { title: string; links: [string, string][] }[] = [
 
 export default function Footer() {
   return (
-    <footer className="bg-forest text-white">
+    <footer className="bg-deep lit text-white">
       <div className="wrap grid gap-10 py-12 md:grid-cols-[1.6fr_1fr_1fr_1fr] md:py-16">
         <div>
           <Link to="/" className="inline-flex items-center gap-3 font-heading text-xl font-extrabold">

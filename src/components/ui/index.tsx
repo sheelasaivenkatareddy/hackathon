@@ -16,7 +16,7 @@ const VARIANTS: Record<Variant, string> = {
   secondary: "bg-white text-forest border border-line hover:bg-surface",
   ghost: "bg-transparent text-green-dark hover:bg-green-tint",
   danger: "bg-tomato text-white hover:bg-tomato-dark",
-  lime: "bg-lime text-forest hover:brightness-105",
+  lime: "bg-lime text-navy-950 hover:brightness-105",
   "outline-light": "bg-transparent text-white border border-white/70 hover:bg-white/10",
 };
 const BTN = "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50";
@@ -50,8 +50,8 @@ const TONES: Record<Tone, string> = {
   tomato: "bg-tomato-tint text-tomato-dark",
   amber: "bg-amber-tint text-amber-dark",
   muted: "bg-surface text-muted border border-line",
-  forest: "bg-forest text-white",
-  lime: "bg-lime text-forest",
+  forest: "bg-deep lit text-white",
+  lime: "bg-lime text-navy-950",
 };
 export const Chip = ({ tone = "muted", className, children }: { tone?: Tone; className?: string; children: ReactNode }) => (
   <span className={cx("inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold md:text-sm", TONES[tone], className)}>{children}</span>
@@ -144,7 +144,7 @@ export function Gauge({ score, label }: { score: number; label: string }) {
       <svg viewBox="0 0 220 128" className="w-full">
         <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="var(--line)" strokeWidth="18" strokeLinecap="round" />
         <motion.path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" strokeWidth="18" strokeLinecap="round" strokeDasharray={C}
-          initial={{ strokeDashoffset: C, stroke: "#047857" }} animate={{ strokeDashoffset: C * (1 - score / 100), stroke: colour.includes("tomato") ? "#B94A2C" : colour.includes("amber") ? "#D97706" : "#047857" }} transition={{ duration: 1 }} />
+          initial={{ strokeDashoffset: C, stroke: "#22D3EE" }} animate={{ strokeDashoffset: C * (1 - score / 100), stroke: colour.includes("tomato") ? "#F87171" : colour.includes("amber") ? "#FBBF24" : "#22D3EE" }} transition={{ duration: 1 }} />
         {/* The invisible half centres the group's box on the pivot, because SVG motion rotates around that centre. */}
         <motion.g initial={{ rotate: -90 }} animate={{ rotate: -90 + (score / 100) * 180 }} transition={{ type: "spring", stiffness: 70, damping: 10 }}>
           <line x1="110" y1="184" x2="110" y2="110" stroke="transparent" strokeWidth="4" />
@@ -166,7 +166,7 @@ export function Stepper({ steps, current }: { steps: string[]; current: number }
     <ol className="flex items-center gap-2" aria-label="Steps">
       {steps.map((s, i) => (
         <li key={s} className="flex flex-1 items-center gap-2" aria-current={i === current ? "step" : undefined}>
-          <span className={cx("flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold", i < current ? "bg-green text-white" : i === current ? "bg-forest text-white" : "bg-surface text-muted border border-line")}>
+          <span className={cx("flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold", i < current ? "bg-green text-white" : i === current ? "bg-deep lit text-white" : "bg-surface text-muted border border-line")}>
             {i < current ? <Check className="h-4 w-4" aria-hidden /> : i + 1}
           </span>
           <span className={cx("hidden text-sm font-semibold sm:inline", i === current ? "text-forest" : "text-muted")}>{s}</span>
@@ -200,7 +200,7 @@ export function BottomSheet({ open, onClose, title, children }: { open: boolean;
   return (
     <AnimatePresence>
       {open && (
-        <motion.div className="fixed inset-0 z-[1000] flex items-end justify-center bg-forest/50 md:items-center md:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
+        <motion.div className="fixed inset-0 z-[1000] flex items-end justify-center bg-deep/70 md:items-center md:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
           <motion.div ref={panel} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title}
             className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-t-3xl bg-white p-4 pb-8 shadow-soft outline-none md:rounded-3xl md:p-6"
             initial={{ y: 60 }} animate={{ y: 0 }} exit={{ y: 60 }} transition={{ type: "spring", stiffness: 320, damping: 30 }} onClick={(e) => e.stopPropagation()}>
@@ -231,7 +231,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-24 z-[1100] flex justify-center px-4 md:bottom-8">
         <AnimatePresence>
-          {msg && <motion.div key={msg.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} className="rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white shadow-soft">{msg.text}</motion.div>}
+          {msg && <motion.div key={msg.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} className="rounded-full bg-deep lit px-5 py-3 text-sm font-semibold text-white shadow-soft">{msg.text}</motion.div>}
         </AnimatePresence>
       </div>
     </ToastCtx.Provider>
@@ -257,7 +257,7 @@ export function InfoTip({ text }: { text: string }) {
       <button type="button" onClick={() => setOpen((o) => !o)} onBlur={() => setOpen(false)} aria-label={text} aria-expanded={open} className="flex h-6 w-6 items-center justify-center rounded-full text-muted hover:bg-green-tint">
         <Info className="h-4 w-4" aria-hidden />
       </button>
-      {open && <span role="tooltip" className="absolute bottom-full left-1/2 z-20 mb-1 w-56 -translate-x-1/2 rounded-xl bg-forest p-3 text-xs font-medium text-white shadow-soft">{text}</span>}
+      {open && <span role="tooltip" className="absolute bottom-full left-1/2 z-20 mb-1 w-56 -translate-x-1/2 rounded-xl bg-deep lit p-3 text-xs font-medium text-white shadow-soft">{text}</span>}
     </span>
   );
 }

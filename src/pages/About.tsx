@@ -37,7 +37,7 @@ export default function About() {
         <Card className="!bg-white">
           <h2 className="h3">How it works</h2>
           <ol className="mt-3 space-y-3">
-            {STEPS.map(([t, d], i) => <li key={t} className="flex gap-3"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-forest text-sm font-bold text-white">{i + 1}</span><span><strong className="text-forest">{t}.</strong> {d}</span></li>)}
+            {STEPS.map(([t, d], i) => <li key={t} className="flex gap-3"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-deep lit text-sm font-bold text-white">{i + 1}</span><span><strong className="text-forest">{t}.</strong> {d}</span></li>)}
           </ol>
         </Card>
         <Card className="!bg-white">

@@ -87,7 +87,7 @@ export default function LeafReport({ url, result, source }: { url: string; resul
 
       <div className="grid gap-5 md:grid-cols-2">
         <figure>
-          <Viewfinder className="overflow-hidden rounded-card bg-forest"><SpotCircles url={url} detections={r.detections} onPick={setPicked} picked={picked} /></Viewfinder>
+          <Viewfinder className="overflow-hidden rounded-card bg-deep lit"><SpotCircles url={url} detections={r.detections} onPick={setPicked} picked={picked} /></Viewfinder>
           <figcaption className="mt-2 flex flex-wrap gap-3 text-sm">
             <span className="flex items-center gap-1.5"><span className="h-3.5 w-3.5 rounded-full border-[3px]" style={{ borderColor: RED }} aria-hidden />Disease ({diseased})</span>
             <span className="flex items-center gap-1.5"><span className="h-3.5 w-3.5 rounded-full border-[3px]" style={{ borderColor: YELLOW }} aria-hidden />Dried or damaged ({dry})</span>

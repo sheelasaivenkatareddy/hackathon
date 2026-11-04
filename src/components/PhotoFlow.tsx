@@ -72,12 +72,12 @@ export function CameraCapture({ hint, ghostUrl, onPhoto, showSamples = false }: 
 
   return (
     <div onDragOver={(e) => { e.preventDefault(); setDragging(true); }} onDragLeave={() => setDragging(false)} onDrop={onDrop} data-testid="dropzone">
-      <Viewfinder className="overflow-hidden rounded-card bg-forest">
+      <Viewfinder className="overflow-hidden rounded-card bg-deep lit">
         <div className="relative aspect-[4/3] w-full">
           {live && <video ref={video} playsInline muted className="absolute inset-0 h-full w-full object-cover" aria-label="Live camera view" />}
           {ghostUrl && ghost && <img src={ghostUrl} alt="Your last photo of this leaf, shown faintly" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: 0.35 }} />}
           <div className="absolute inset-x-0 bottom-3 flex justify-center px-4 text-center">
-            <span className="rounded-full bg-forest/80 px-3 py-1 text-sm font-semibold text-white">{hint}</span>
+            <span className="rounded-full bg-deep/80 lit px-3 py-1 text-sm font-semibold text-white">{hint}</span>
           </div>
           {!live && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
@@ -85,7 +85,7 @@ export function CameraCapture({ hint, ghostUrl, onPhoto, showSamples = false }: 
               <p className="hidden text-sm text-white/80 md:block">or drag a photo here</p>
             </div>
           )}
-          {dragging && <div className="absolute inset-0 z-10 flex items-center justify-center bg-forest/85 font-heading text-xl font-bold text-lime" aria-hidden>Drop your photo here</div>}
+          {dragging && <div className="absolute inset-0 z-10 flex items-center justify-center bg-deep/85 lit font-heading text-xl font-bold text-lime" aria-hidden>Drop your photo here</div>}
         </div>
       </Viewfinder>
       {error && <p role="alert" className="mt-2 text-sm font-semibold text-tomato-dark">{error}</p>}
@@ -213,7 +213,7 @@ export function PhotoFlow({ hint, ghostUrl, showSamples, acceptNonLeaf, onAccept
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <Viewfinder className="self-start overflow-hidden rounded-card bg-forest">
+      <Viewfinder className="self-start overflow-hidden rounded-card bg-deep lit">
         <img src={checked.url} alt="The photo you just took" className="block aspect-[4/3] w-full object-cover" />
       </Viewfinder>
       <div className="space-y-4">

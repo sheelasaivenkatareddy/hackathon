@@ -25,7 +25,7 @@ export default function DiagnosisResult({ url, diagnosis, lowReliability, hideMo
 
       <div className="grid gap-5 md:grid-cols-2">
         <figure>
-          <Viewfinder className="overflow-hidden rounded-card bg-forest">
+          <Viewfinder className="overflow-hidden rounded-card bg-deep lit">
             <div className="relative">
               <img src={url} alt="The scanned leaf" className="block w-full" />
               {showOverlay && heatmap && heatmap.kind !== "model-png" && (

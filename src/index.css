@@ -2,35 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
+/* One theme: deep navy, cyan/teal accents. Channels ("r g b") feed Tailwind; the hex copies feed SVG strokes. */
 :root {
-  --forest: #073B2C;
-  --green: #047857;
-  --leaf: #10B981;
-  --lime: #E3B04B;
-  --tomato: #B94A2C;
-  --amber: #D97706;
-  --surface: #F6F2EA;
-  --ink: #1C2B24;
-  --muted: #55625B;
-  --line: #E6DFD1;
+  color-scheme: dark;
+  --c-white: 13 23 43;        /* cards and panels (old "white") */
+  --c-surface: 18 31 56;      /* raised areas, inputs */
+  --c-forest: 236 246 255;    /* headings and strong text (old dark green) */
+  --c-ink: 203 213 225;       /* body text */
+  --c-muted: 148 163 184;
+  --c-line: 36 52 82;
+  --c-green: 34 211 238;      /* primary: cyan */
+  --c-green-dark: 103 232 249;
+  --c-green-tint: 14 48 64;
+  --c-leaf: 45 212 191;       /* teal */
+  --c-lime: 163 230 53;       /* highlight */
+  --c-tomato: 248 113 113;
+  --c-tomato-dark: 254 202 202;
+  --c-tomato-tint: 69 26 33;
+  --c-amber: 251 191 36;
+  --c-amber-dark: 253 224 71;
+  --c-amber-tint: 66 48 12;
+
+  --forest: #ECF6FF;
+  --green: #22D3EE;
+  --leaf: #2DD4BF;
+  --lime: #A3E635;
+  --tomato: #F87171;
+  --amber: #FBBF24;
+  --surface: #121F38;
+  --ink: #CBD5E1;
+  --muted: #94A3B8;
+  --line: #243452;
+  --page: #060D1F;
+}
+
+/* Inside these, "white" is real white (Kisan Hub, the voice agent and the dark hero use literal white text). */
+.hub, .lit, .hero-mesh {
+  --c-white: 255 255 255;
+  --c-forest: 4 10 24;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    background: var(--page);
   }
   body {
-    @apply bg-white font-sans text-base text-ink antialiased md:text-lg;
+    @apply font-sans text-base text-ink antialiased md:text-lg;
+    background:
+      radial-gradient(60rem 40rem at 85% -10%, rgba(34, 211, 238, 0.10), transparent 60%),
+      radial-gradient(50rem 36rem at -10% 110%, rgba(45, 212, 191, 0.08), transparent 60%),
+      var(--page);
+    background-attachment: fixed;
     overflow-x: hidden;
   }
+  ::selection { background: rgba(34, 211, 238, 0.35); }
+  select option { background: #0D172B; color: #E2E8F0; }
   h1, h2, h3, h4 {
     @apply font-heading;
   }
   *:focus-visible {
-    outline: 2px solid var(--lime);
+    outline: 2px solid #22D3EE;
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px var(--forest);
     border-radius: 4px;
   }
   @media (prefers-reduced-motion: reduce) {
@@ -56,7 +90,7 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: linear-gradient(150deg, #052B20 0%, #073B2C 45%, #0A5240 100%);
+  background: linear-gradient(150deg, #040A18 0%, #081A33 50%, #0A2A3F 100%);
 }
 .hero-mesh::before, .hero-mesh::after {
   content: "";
@@ -69,18 +103,18 @@
 }
 .hero-mesh::before {
   top: -25vmax; right: -15vmax;
-  background: radial-gradient(circle, rgba(227, 176, 75, 0.34), transparent 65%);
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.28), transparent 65%);
   animation: drift 16s ease-in-out infinite alternate;
 }
 .hero-mesh::after {
   bottom: -35vmax; left: -20vmax;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.4), transparent 65%);
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.3), transparent 65%);
   animation: drift 20s ease-in-out infinite alternate-reverse;
 }
 @keyframes drift { to { transform: translate3d(-6vmax, 5vmax, 0) scale(1.12); } }
 
 .text-glow {
-  background: linear-gradient(95deg, #F1D58A, #E3B04B 55%, #C99A3C);
+  background: linear-gradient(95deg, #67E8F9, #22D3EE 45%, #2DD4BF);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -145,7 +179,12 @@
 }
 
 /* Radar */
-.leaflet-container { font: inherit; z-index: 0; }
+.leaflet-container { font: inherit; z-index: 0; background: #0D172B; }
+/* Dark map to match the theme: the OpenStreetMap tiles, inverted and re-tinted. */
+.leaflet-tile-pane { filter: invert(1) hue-rotate(185deg) brightness(0.85) contrast(0.9) saturate(0.6); }
+.leaflet-control-attribution { background: rgba(13, 23, 43, 0.8) !important; color: #94A3B8; }
+.leaflet-control-attribution a { color: #67E8F9; }
+.leaflet-bar a { background: #121F38; color: #E2E8F0; border-color: #243452; }
 .cell-pulse { animation: cellPulse 1.8s ease-in-out infinite; }
 @keyframes cellPulse {
   0%, 100% { fill-opacity: 0.18; stroke-opacity: 0.9; }

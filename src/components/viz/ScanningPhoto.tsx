@@ -13,10 +13,10 @@ export default function ScanningPhoto({ url, steps }: { url: string; steps: stri
   }, [reduce, steps.length]);
   return (
     <div className="mx-auto max-w-xl" role="status" aria-label={steps[step]}>
-      <Viewfinder className="overflow-hidden rounded-card bg-forest">
+      <Viewfinder className="overflow-hidden rounded-card bg-deep lit">
         <div className="relative">
           <img src={url} alt="Your leaf, being checked" className="block w-full" />
-          <div className="scan-grid absolute inset-0 bg-forest/25" aria-hidden />
+          <div className="scan-grid absolute inset-0 bg-deep/25 lit" aria-hidden />
           {!reduce && (
             <motion.div aria-hidden className="absolute inset-x-0 h-16 bg-gradient-to-b from-transparent to-lime/50" style={{ borderBottom: "2px solid #E3B04B", boxShadow: "0 6px 18px #E3B04B" }}
               initial={{ top: "-15%" }} animate={{ top: "100%" }} transition={{ duration: 1.7, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }} />

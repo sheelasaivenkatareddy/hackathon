@@ -100,7 +100,7 @@ export default function Risk() {
               <h2 className="h3">5-day outlook</h2>
               <ul className="-mx-1 mt-3 flex gap-3 overflow-x-auto px-1 pb-1 md:grid md:grid-cols-5">
                 {view.risk.days.map((d) => (
-                  <li key={d.date} className={`min-w-[132px] rounded-xl p-3 ${d.date === today ? "bg-forest text-white" : "bg-surface"}`}>
+                  <li key={d.date} className={`min-w-[132px] rounded-xl p-3 ${d.date === today ? "bg-deep lit text-white" : "bg-surface"}`}>
                     <p className="font-semibold">{d.date === today ? "Today" : dayName(d.date)}</p>
                     <p className={`text-xs ${d.date === today ? "text-white/80" : "text-muted"}`}>{d.past ? "Past" : d.date === today ? dayName(d.date) : "Forecast"}</p>
                     <dl className="mt-2 space-y-0.5 text-sm">

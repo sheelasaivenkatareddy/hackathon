@@ -42,7 +42,7 @@ export function SummaryBar({ text, report, feedback, onFeedback }: { text: strin
     toast("Report saved. Show it to your KVK or agriculture officer.");
   };
   return (
-    <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-card bg-forest p-4 text-white md:p-6" data-testid="human-summary">
+    <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-card bg-deep lit p-4 text-white md:p-6" data-testid="human-summary">
       <p className="font-heading text-lg font-bold leading-snug md:text-2xl">{text}</p>
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {canSpeak && <Button variant="outline-light" onClick={speak} className="!text-sm">{speaking ? <VolumeX className="h-4 w-4" aria-hidden /> : <Volume2 className="h-4 w-4" aria-hidden />}{speaking ? "Stop" : "Read aloud"}</Button>}

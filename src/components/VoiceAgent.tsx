@@ -146,7 +146,7 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
   const ring = phase === "listening" ? "from-neon-pink to-neon-cyan" : phase === "thinking" ? "from-neon-amber to-neon-pink" : phase === "speaking" ? "from-neon-lime to-neon-cyan" : "from-neon-cyan to-neon-teal";
 
   return (
-    <div data-voice-agent className={`fixed right-4 ${lift ? "z-[660]" : "z-50"} flex flex-col items-end gap-3 md:right-6 ${pos}`}>
+    <div data-voice-agent className={`lit fixed right-4 ${lift ? "z-[660]" : "z-50"} flex flex-col items-end gap-3 md:right-6 ${pos}`}>
       <AnimatePresence>
         {open && (
           <motion.div role="dialog" aria-label="Voice agent" initial={{ opacity: 0, y: 12, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 12, scale: 0.96 }}

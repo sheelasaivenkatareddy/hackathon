@@ -18,7 +18,7 @@ function ThumbButton({ visit, selected, onClick }: { visit: Visit; selected: boo
   return (
     <button onClick={onClick} aria-pressed={selected} className={`relative shrink-0 overflow-hidden rounded-xl border-2 ${selected ? "border-tomato" : "border-transparent"}`}>
       <img src={url} alt={`Photo from ${fmtShort(visit.date)}`} className="h-24 w-24 object-cover" />
-      <span className="absolute inset-x-1 bottom-1 rounded-full bg-forest/85 px-2 py-0.5 text-center text-xs font-semibold text-white">{fmtShort(visit.date)}</span>
+      <span className="absolute inset-x-1 bottom-1 rounded-full bg-deep/85 lit px-2 py-0.5 text-center text-xs font-semibold text-white">{fmtShort(visit.date)}</span>
     </button>
   );
 }

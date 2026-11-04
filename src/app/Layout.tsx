@@ -118,7 +118,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               return (
                 <li key={it.to} className="flex justify-center">
                   <NavLink to={it.to} className="flex flex-col items-center">
-                    <span className={`scan-glow -mt-6 flex h-14 w-14 items-center justify-center rounded-full ${active ? "bg-forest" : "bg-green"} text-white`}><Icon className="h-7 w-7" aria-hidden /></span>
+                    <span className={`scan-glow -mt-6 flex h-14 w-14 items-center justify-center rounded-full ${active ? "bg-deep lit" : "bg-green"} text-white`}><Icon className="h-7 w-7" aria-hidden /></span>
                     <span className={`pb-1 text-xs font-semibold ${active ? "text-forest" : "text-muted"}`}>{t(it.key)}</span>
                   </NavLink>
                 </li>

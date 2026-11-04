@@ -7,7 +7,7 @@ import { LeafIllustration, SpotState } from "./LeafIllustration";
 
 export const PhoneFrame = ({ children, className }: { children: ReactNode; className?: string }) => (
   <div className={`relative mx-auto w-[260px] rounded-[40px] border-[8px] border-black/80 bg-black/80 shadow-2xl md:w-[300px] ${className ?? ""}`}>
-    <div className="relative aspect-[9/17] overflow-hidden rounded-[32px] bg-forest">{children}</div>
+    <div className="relative aspect-[9/17] overflow-hidden rounded-[32px] bg-deep lit">{children}</div>
   </div>
 );
 
@@ -46,8 +46,8 @@ export function CompareSlider({ a, b, labelA, labelB, altA, altB, aspect = "4 / 
       onPointerUp={() => { dragging.current = false; }}>
       {a && <img src={a} alt={altA} className="absolute inset-0 h-full w-full object-cover" draggable={false} />}
       {b && <motion.img src={b} alt={altB} className="absolute inset-0 h-full w-full object-cover" style={{ clipPath: clip }} draggable={false} />}
-      <span className="absolute left-2 top-2 rounded-full bg-forest/85 px-3 py-1 text-xs font-semibold text-white">{labelA}</span>
-      <span className="absolute right-2 top-2 rounded-full bg-forest/85 px-3 py-1 text-xs font-semibold text-white">{labelB}</span>
+      <span className="absolute left-2 top-2 rounded-full bg-deep/85 lit px-3 py-1 text-xs font-semibold text-white">{labelA}</span>
+      <span className="absolute right-2 top-2 rounded-full bg-deep/85 lit px-3 py-1 text-xs font-semibold text-white">{labelB}</span>
       <motion.div className="absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white" style={{ left }} aria-hidden />
       <motion.div role="slider" tabIndex={0} aria-label="Compare the two photos" aria-valuemin={0} aria-valuemax={100} aria-valuenow={now}
         onKeyDown={(e) => {
@@ -102,8 +102,8 @@ export function WPattern({ count = 5 }: { count?: number }) {
   const dots = Array.from({ length: count }, (_, i) => at(count === 1 ? 0 : i / (count - 1)));
   return (
     <svg viewBox="0 0 320 180" className="w-full max-w-md rounded-card bg-green-tint" role="img" aria-label={`Field with ${count} sentinel plants placed along a W pattern`}>
-      <rect x="10" y="10" width="300" height="160" rx="12" fill="none" stroke="#10B981" strokeWidth="2" strokeDasharray="6 6" />
-      <motion.polyline key={count} points={W.map((p) => p.join(",")).join(" ")} fill="none" stroke="#047857" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round"
+      <rect x="10" y="10" width="300" height="160" rx="12" fill="none" stroke="#2DD4BF" strokeWidth="2" strokeDasharray="6 6" />
+      <motion.polyline key={count} points={W.map((p) => p.join(",")).join(" ")} fill="none" stroke="#22D3EE" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round"
         initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.1, ease: "easeInOut" }} />
       {dots.map(([x, y], i) => (
         <motion.circle key={`${count}-${i}`} cx={x} cy={y} r="8" fill="#B94A2C" stroke="#fff" strokeWidth="2" style={{ transformOrigin: `${x}px ${y}px` }}
@@ -137,7 +137,7 @@ export function HeroLeaf() {
   }, [cycle, reduce]);
   return (
     <PhoneFrame>
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0C4A39] to-forest" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0A2A3F] to-deep" />
       <AnimatePresence mode="popLayout">
         <motion.span key={phase.day} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ opacity: 0 }} className="absolute left-3 top-4 z-10 rounded-full bg-lime px-3 py-1 text-xs font-bold text-forest">{phase.day}</motion.span>
       </AnimatePresence>

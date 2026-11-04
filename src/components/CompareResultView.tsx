@@ -103,7 +103,7 @@ export default function CompareResultView({ older, newer, plantName, synthetic, 
         )}
       </AnimatePresence>
 
-      <Viewfinder className="overflow-hidden rounded-card bg-forest">
+      <Viewfinder className="overflow-hidden rounded-card bg-deep lit">
         <motion.div className="relative" animate={{ scale: zoom ? 2 : 1 }} transition={{ type: "spring", stiffness: 240, damping: 26 }}
           style={{ transformOrigin: zoom ? `${(zoom.x / r.workSize.width) * 100}% ${(zoom.y / r.workSize.height) * 100}%` : "50% 50%" }}
           onClick={() => { if (zoom) setZoom(null); }}>

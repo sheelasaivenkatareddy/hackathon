@@ -111,7 +111,7 @@ export default function AgentPanel() {
         {!open && (
           <motion.button key="fab" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)} aria-label="Ask the AI farm assistant"
-            className="fixed bottom-24 right-4 z-[650] flex min-h-[56px] items-center gap-2 rounded-full bg-forest px-4 py-3 font-semibold text-white shadow-soft ring-2 ring-lime/70 hover:brightness-110 md:bottom-6 md:right-6">
+            className="fixed bottom-24 right-4 z-[650] flex min-h-[56px] items-center gap-2 rounded-full bg-deep lit px-4 py-3 font-semibold text-white shadow-soft ring-2 ring-lime/70 hover:brightness-110 md:bottom-6 md:right-6">
             <Bot className="h-6 w-6" aria-hidden /><span className="hidden sm:inline">Ask AI</span>
             {scan && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full bg-lime" aria-hidden />}
           </motion.button>
@@ -121,11 +121,11 @@ export default function AgentPanel() {
       <AnimatePresence>
         {open && (
           <>
-            <motion.div key="backdrop" className="fixed inset-0 z-[690] bg-forest/30 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} />
+            <motion.div key="backdrop" className="fixed inset-0 z-[690] bg-deep/60 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} />
             <motion.aside key="panel" role="dialog" aria-label="AI farm assistant"
               className="fixed inset-y-0 right-0 z-[700] flex w-full flex-col border-l border-line bg-white shadow-2xl sm:w-[420px]"
               initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 34 }}>
-              <header className="flex items-center gap-3 bg-forest px-4 py-3 text-white">
+              <header className="flex items-center gap-3 bg-deep lit px-4 py-3 text-white">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-lime text-forest"><Bot className="h-6 w-6" aria-hidden /></span>
                 <div className="min-w-0 flex-1">
                   <p className="font-heading font-bold leading-tight">Patra Lens Assistant</p>
