@@ -3,11 +3,14 @@ import { CheckCircle2, Plus, RotateCcw, Save, UserCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DiagnosisResult from "../components/DiagnosisResult";
-import { SymptomChecklist, TreatmentCard } from "../components/Guidance";
+import { SymptomChecklist } from "../components/Guidance";
+import LeafReport from "../components/LeafReport";
 import { LiveConditions, ScanReport, SummaryBar, humanSummary } from "../components/ScanInsights";
 import { AcceptedPhoto, PhotoFlow } from "../components/PhotoFlow";
 import { BottomSheet, Button, Chip, ModelStatusChip, useToast } from "../components/ui";
 import ScanningPhoto from "../components/viz/ScanningPhoto";
+import { localResult } from "../lib/careplan";
+import { LeafResult, Profile, analyzeInCloud, cloudConfigured, getProfile, saveProfile, saveToCloud } from "../lib/cloud";
 import { Diagnosis, PLANTS, diagnose, modelStatus } from "../lib/diagnose";
 import { Scan as ScanRow, db, getSetting, uid, useLive } from "../lib/db";
 import { useI18n } from "../lib/i18n";
@@ -15,7 +18,28 @@ import type { Mode } from "../lib/model";
 import { fertilizerAdvice, outlookFor } from "../lib/nutrition";
 import { shrinkForStorage } from "../lib/vision/browser";
 import { leafMasks } from "../lib/vision/masks";
+import { photoKind, spotRegions } from "../lib/vision/regions";
 import { saveVisit } from "../lib/watch";
+
+function ProfileCard() {
+  const [p, setP] = useState<Profile | null>(null);
+  const [saved, setSaved] = useState(false);
+  useEffect(() => { getProfile().then((v) => { setP(v); setSaved(!!v.name); }); }, []);
+  if (!p || saved) return null;
+  const field = (k: keyof Profile, label: string, type = "text") => (
+    <label className="block flex-1"><span className="field-label">{label}</span>
+      <input className="field-input" type={type} value={p[k]} onChange={(e) => setP({ ...p, [k]: e.target.value })} />
+    </label>
+  );
+  return (
+    <form className="mt-5 rounded-card border border-line bg-white p-4" onSubmit={async (e) => { e.preventDefault(); await saveProfile(p); setSaved(true); }}>
+      <p className="font-semibold text-forest">Tell us who you are (optional)</p>
+      <p className="small">Your name and village are saved with your scans so an expert can follow up.</p>
+      <div className="mt-3 flex flex-col gap-3 md:flex-row">{field("name", "Name")}{field("phone", "Phone", "tel")}{field("village", "Village")}</div>
+      <Button type="submit" className="mt-3" disabled={!p.name.trim()}>Save</Button>
+    </form>
+  );
+}
 
 const greeting = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening"; };
 
@@ -25,6 +49,8 @@ export default function Scan() {
   const [mode, setMode] = useState<Mode>("demo");
   const [accepted, setAccepted] = useState<AcceptedPhoto | null>(null);
   const [diag, setDiag] = useState<Diagnosis | null>(null);
+  const [report, setReport] = useState<{ result: LeafResult; source: "ai-vision" | "on-device" } | null>(null);
+  const [cloudNote, setCloudNote] = useState("");
   const [scanId, setScanId] = useState<string | null>(null);
   const [flowKey, setFlowKey] = useState(0);
   const [sheet, setSheet] = useState<null | "save" | "sentinel">(null);
@@ -38,10 +64,23 @@ export default function Scan() {
 
   const onAccepted = async (a: AcceptedPhoto) => {
     setAccepted(a);
+    setCloudNote("");
     const started = performance.now();
+    const cloud = cloudConfigured ? analyzeInCloud(a.photo) : null;
     const d = await diagnose(a.photo, a.work, a.coach, a.usedAnyway, a.sampleFile);
     const seconds = (performance.now() - started) / 1000;
     const affectedPct = leafMasks(a.work).affectedPct;
+    const local = localResult(d, photoKind(a.work), spotRegions(a.work));
+    const ai = cloud ? await cloud : null;
+    if (ai?.ok) setReport({ result: ai.result, source: "ai-vision" });
+    else {
+      setReport({ result: local, source: "on-device" });
+      if (ai && ai.code !== "off") {
+        // AI vision is not set up or did not answer: still save the phone's own answer for the admin.
+        const saved = ai.code === "limit" ? ai : await saveToCloud(a.photo, local);
+        setCloudNote(saved.ok ? "" : saved.message);
+      }
+    }
     setDiag(d);
     setMode(d.prediction.mode);
     const row: ScanRow = {
@@ -53,7 +92,7 @@ export default function Scan() {
     setScanId(row.id);
   };
 
-  const again = () => { setAccepted(null); setDiag(null); setScanId(null); setFlowKey((k) => k + 1); };
+  const again = () => { setAccepted(null); setDiag(null); setReport(null); setScanId(null); setFlowKey((k) => k + 1); };
 
   const confirm = async () => {
     if (!scan) return;
@@ -121,24 +160,34 @@ export default function Scan() {
             <span className="font-semibold text-forest">Plants:</span>
             {PLANTS.map((p) => <Chip key={p} tone={p === "Tomato" ? "green" : "muted"}>{p}</Chip>)}
           </div>
-          <div className="mt-5"><PhotoFlow key={flowKey} hint={t("scan.fillFrame")} showSamples onAccepted={onAccepted} /></div>
+          {cloudConfigured && <ProfileCard />}
+          <div className="mt-5"><PhotoFlow key={flowKey} hint={t("scan.fillFrame")} showSamples acceptNonLeaf onAccepted={onAccepted} /></div>
+          {cloudConfigured && <p className="tiny mt-3">Your photo and its result are saved to the Patra Lens database, so our team can check answers and help farmers nearby.</p>}
         </>
       )}
 
-      {accepted && !diag && <div className="mt-6"><ScanningPhoto url={accepted.url} steps={["Getting the AI ready on your phone…", "Looking at the leaf…", "Comparing with known plant problems…", "Working out how sure it is…"]} /></div>}
+      {accepted && !diag && <div className="mt-6"><ScanningPhoto url={accepted.url} steps={["Getting the AI ready…", "Checking what is in the photo…", "Finding the problem spots…", "Writing your care plan…"]} /></div>}
 
-      {accepted && diag && (
+      {accepted && diag && report && (
         <div className="mt-6">
-          <div className="mb-5">
-            <SummaryBar text={summary} report={reportText()} feedback={scan?.feedback} onFeedback={sendFeedback} />
-          </div>
-          <DiagnosisResult url={accepted.url} diagnosis={diag} lowReliability={accepted.usedAnyway} hideModelChip />
-          <div className="mt-5 space-y-5">
-            <SymptomChecklist name={diag.prediction.top3[0]?.name} level={diag.level} />
-            <TreatmentCard name={diag.prediction.top3[0]?.name} level={diag.level} />
-            <ScanReport top={diag.prediction.top3[0]} level={diag.level} mode={diag.prediction.mode} coach={accepted.coach} affectedPct={scan?.affectedPct} seconds={scan?.seconds} />
-            <LiveConditions />
-          </div>
+          {report.result.is_plant && report.result.subject !== "flower" && (
+            <div className="mb-5">
+              <SummaryBar text={report.source === "ai-vision" ? report.result.languages.en.reason : summary} report={reportText()} feedback={scan?.feedback} onFeedback={sendFeedback} />
+            </div>
+          )}
+          {cloudNote && <p role="note" className="mb-4 rounded-xl bg-amber-tint px-4 py-3 text-sm font-semibold text-amber-dark">Not saved online: {cloudNote}</p>}
+          <LeafReport url={accepted.url} result={report.result} source={report.source} />
+          {report.result.subject === "leaf" && (
+            <div className="mt-5 space-y-5">
+              {report.source === "on-device" && <SymptomChecklist name={diag.prediction.top3[0]?.name} level={diag.level} />}
+              <details className="rounded-card border border-line bg-white p-4 md:p-6">
+                <summary className="cursor-pointer font-heading font-bold text-forest">How the on-device AI saw it</summary>
+                <div className="mt-4"><DiagnosisResult url={accepted.url} diagnosis={diag} lowReliability={accepted.usedAnyway} hideModelChip /></div>
+              </details>
+              <ScanReport top={diag.prediction.top3[0]} level={diag.level} mode={diag.prediction.mode} coach={accepted.coach} affectedPct={scan?.affectedPct} seconds={scan?.seconds} />
+              <LiveConditions />
+            </div>
+          )}
           <p className="small mt-3">Photo checks: Sharpness {Math.round(accepted.coach.sharpness.value)} · Light {Math.round(accepted.coach.light.value)} · Leaf in frame {Math.round(accepted.coach.leafInFrame.value)}%</p>
           <div className="mt-5 flex flex-wrap gap-2">
             {canConfirm && <Button onClick={confirm} disabled={!scan || scan.confirmed}><CheckCircle2 className="h-5 w-5" aria-hidden />{scan?.confirmed ? "Confirmed" : "Confirm"}</Button>}

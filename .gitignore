@@ -5,3 +5,7 @@ public/opencv
 public/ort
 *.local
 .vercel
+.env.supabase
+admin-credentials.txt
+.supabase-db-password.txt
+supabase/.temp

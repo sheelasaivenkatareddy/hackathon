@@ -13,6 +13,7 @@ const Scan = lazy(() => import("../pages/Scan"));
 const Risk = lazy(() => import("../pages/Risk"));
 const Radar = lazy(() => import("../pages/Radar"));
 const Expert = lazy(() => import("../pages/Expert"));
+const Admin = lazy(() => import("../pages/Admin"));
 const Settings = lazy(() => import("../pages/Settings"));
 const About = lazy(() => import("../pages/About"));
 const History = lazy(() => import("../pages/History"));
@@ -48,6 +49,7 @@ export default function App() {
               <Route path="/risk" element={<Risk />} />
               <Route path="/radar" element={<Radar />} />
               <Route path="/expert" element={<Expert />} />
+              <Route path="/admin" element={<Admin />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />

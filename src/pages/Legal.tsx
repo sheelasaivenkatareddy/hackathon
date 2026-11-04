@@ -18,10 +18,15 @@ const Page = ({ title, children }: { title: string; children: ReactNode }) => (
 export function Privacy() {
   return (
     <Page title="Privacy">
-      <p>Patra Lens is built to keep your data on your own phone or computer. There are no accounts, and nothing to sign up for.</p>
+      <p>There are no accounts for farmers, and nothing to sign up for.</p>
+      <section><h2>What we save when you scan</h2>
+        <p>Each photo you scan on the Scan page is sent to the Patra Lens database (hosted on Supabase) with its result, a random ID for your phone, and the name, phone number and village you choose to enter. Our team uses it to check answers and follow up with farmers. Only Patra Lens admins can see it.</p>
+        <p>To find and circle the problem spots, the photo is also sent to Anthropic's Claude AI. Anthropic does not use it to train its models.</p>
+        <p>To have your scans removed from the database, contact the Patra Lens team.</p>
+      </section>
       <section><h2>What stays on your device</h2>
-        <p>Your photos, scans, fields, plants, notes and settings are saved in your browser's storage on your device. The AI runs on your device too, so your photos are not uploaded to Patra Lens or to any AI service.</p>
-        <p>You can export everything, or delete everything, in <Link to="/settings">Settings</Link>.</p>
+        <p>Your fields, sentinel plants, Leaf Watch photos, notes and settings are saved in your browser's storage on your device. A copy of each scan is kept there too.</p>
+        <p>You can export everything, or delete everything on this device, in <Link to="/settings">Settings</Link>.</p>
       </section>
       <section><h2>What is sent to other services</h2>
         <p>To show weather, places, maps and descriptions, your browser asks these free services directly:</p>
@@ -40,7 +45,7 @@ export function Privacy() {
         <p>Location is optional and off by default. If you turn on area sharing, your phone's location is rounded to a square about 1 km wide before anything is saved. Your exact coordinates are never stored, sent or shown.</p>
       </section>
       <section><h2>What we do not do</h2>
-        <ul><li>No advertising and no analytics trackers.</li><li>No selling or sharing of your data. We do not hold it.</li><li>No tracking cookies.</li></ul>
+        <ul><li>No advertising and no analytics trackers.</li><li>No selling of your data.</li><li>No tracking cookies.</li></ul>
       </section>
     </Page>
   );

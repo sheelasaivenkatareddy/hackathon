@@ -174,7 +174,7 @@ export interface AcceptedPhoto { photo: Blob; work: RGBAImage; coach: CoachResul
  * Take a photo, run the Photo Coach, and hand back the photo once it passes or the user chooses "Use anyway".
  * `extra` shows a chip when a sample is used.
  */
-export function PhotoFlow({ hint, ghostUrl, showSamples, onAccepted, onStart }: { hint: string; ghostUrl?: string; showSamples?: boolean; onAccepted: (p: AcceptedPhoto) => void; onStart?: () => void }) {
+export function PhotoFlow({ hint, ghostUrl, showSamples, acceptNonLeaf, onAccepted, onStart }: { hint: string; ghostUrl?: string; showSamples?: boolean; acceptNonLeaf?: boolean; onAccepted: (p: AcceptedPhoto) => void; onStart?: () => void }) {
   const { t } = useI18n();
   const [checked, setChecked] = useState<AcceptedPhoto | null>(null);
   const [animDone, setAnimDone] = useState(false);
@@ -195,9 +195,13 @@ export function PhotoFlow({ hint, ghostUrl, showSamples, onAccepted, onStart }: 
   };
 
   // A passing photo moves on by itself, after a pause long enough to read the measured values.
+  // With acceptNonLeaf, a sharp, well-lit photo with little leaf in it (a flower, a fruit, no plant) also moves on,
+  // so the scan can say what it is instead of asking for a retake.
   useEffect(() => {
-    if (!checked?.coach.pass || !animDone) return;
-    const timer = setTimeout(() => onAccepted(checked), 1000);
+    if (!checked || !animDone) return;
+    const c = checked.coach, onlyLeafFailed = acceptNonLeaf && c.sharpness.pass && c.light.pass && !c.leafInFrame.pass;
+    if (!c.pass && !onlyLeafFailed) return;
+    const timer = setTimeout(() => onAccepted(onlyLeafFailed ? { ...checked, usedAnyway: true } : checked), 1000);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked, animDone]);
@@ -216,7 +220,7 @@ export function PhotoFlow({ hint, ghostUrl, showSamples, onAccepted, onStart }: 
         <h2 className="h3">{t("coach.checking")}</h2>
         <CoachChecklist coach={checked.coach} onDone={() => setAnimDone(true)} />
         {checked.sampleFile && <SampleChip />}
-        {animDone && !checked.coach.pass && (
+        {animDone && !checked.coach.pass && !(acceptNonLeaf && checked.coach.sharpness.pass && checked.coach.light.pass) && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
             <AnswerBadge level="RETAKE" />
             <div className="flex flex-wrap gap-2">

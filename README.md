@@ -86,7 +86,22 @@ The live camera needs HTTPS or localhost. Upload and sample photos work everywhe
 
 The full script is in `03_DEMO_SCRIPT.md` in the Developer Kit.
 
-## Admin login
+## Cloud database, AI vision and the admin page
+
+With Supabase connected, every scan is saved online (photo, result, the farmer's name, phone and village if given) and an admin can see all of them at `/admin`. With a Claude API key added, each photo is also checked by Claude vision (`claude-opus-5-5`). It says whether the photo shows a leaf, a flower or no plant at all, and whether the plant is tomato. It circles each diseased area in red and each dried or damaged area in yellow, and it writes a care plan covering precautions, watering, fertilizer, and chemical and organic sprays with doses, in English, Telugu and Hindi.
+
+Without the key, the phone's own model gives the answer, the circles come from leaf colour (rougher), and the scan is still saved.
+
+Set it up once:
+
+1. Copy `.env.supabase.example` to `.env.supabase`. Fill in `SUPABASE_ACCESS_TOKEN` (from [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens)), `ADMIN_EMAIL`, and optionally `ANTHROPIC_API_KEY` (from [console.anthropic.com](https://console.anthropic.com/settings/keys)).
+2. Run `npm run setup:supabase`. It creates the `patra-lens` project (Mumbai region), the `scans` table and the private `scan-photos` bucket. It also creates the admin account, deploys the `analyze-leaf` function and writes `.env.local`. It is safe to run again.
+3. The admin email and generated password are in `admin-credentials.txt`. Sign in at `/admin`.
+4. For the live site, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from `.env.local` to Vercel's environment variables, then redeploy.
+
+How it is protected: the browser never writes to the table. Only the `analyze-leaf` function does, with the service key that stays on Supabase. Row-level security lets only users with `app_metadata.role = "admin"` read, edit or delete scans and photos. Each phone can send at most 60 scans an hour, which keeps Claude costs bounded. In Supabase's Table Editor, the `scans` table shows every scan, and Storage → `scan-photos` holds the photos.
+
+## Admin login (Expert screen)
 
 By default, the Expert screen asks for the admin's Gmail and a password. Only a SHA-256 hash of the two is in the code (`expert.adminLoginSha256` in `src/config.ts`, which also shows how to change it). This is a login for the demo: it does not contact Gmail or Google.
 

@@ -16,8 +16,8 @@ export default {
         line: "#E6DFD1",
       },
       fontFamily: {
-        sans: ["Inter", "Noto Sans Telugu", "Noto Sans Kannada", "system-ui", "sans-serif"],
-        heading: ["Plus Jakarta Sans", "Noto Sans Telugu", "Noto Sans Kannada", "system-ui", "sans-serif"],
+        sans: ["Inter", "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Kannada", "system-ui", "sans-serif"],
+        heading: ["Plus Jakarta Sans", "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Kannada", "system-ui", "sans-serif"],
       },
       borderRadius: { card: "16px" },
       boxShadow: { soft: "0 8px 24px rgba(7, 59, 44,.08)" },
