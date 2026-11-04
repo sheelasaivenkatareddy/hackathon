@@ -113,7 +113,7 @@ if (env.DATA_GOV_API_KEY) {
 }
 const npx = process.platform === "win32" ? "npx.cmd" : "npx";
 for (const fn of ["analyze-leaf", "ask-agent", "kisan-hub"]) {
-  execFileSync(npx, ["--yes", "supabase@3.0.0", "functions", "deploy", fn, "--project-ref", REF, "--no-verify-jwt", "--use-api"],
+  execFileSync(npx, ["--yes", "supabase@3.0.0", "functions", "deploy", fn, "--project-ref", REF, "--no-verify-jwt", "--use-api", "--yes"],
     { stdio: "inherit", env: { ...process.env, SUPABASE_ACCESS_TOKEN: TOKEN }, shell: process.platform === "win32" });
 }
 
