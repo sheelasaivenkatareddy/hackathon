@@ -305,9 +305,12 @@ const firstSentences = (t: string, n = 3) => (t.match(/[^.!?।]+[.!?।]+/g) ??
 export async function wikiAnswer(q: string, l: VoiceLang): Promise<string | null> {
   const query = q.replace(STOP, " ").replace(TELUGU_FILLER, " ").replace(HINDI_FILLER, " ").replace(/[?!.,]/g, " ").replace(/\s+/g, " ").trim();
   if (query.length < 2) return null;
+  // Only use an article that is really about the question: a main word of the question must be in its title.
+  const words = query.toLowerCase().split(/\s+/).filter((w) => w.length >= 3);
+  const relevant = (title: string) => { const t = title.toLowerCase(); return words.some((w) => t.includes(w.slice(0, Math.max(3, w.length - 2)))); };
   const native = l !== "en" && !/^[\x00-\x7F]+$/.test(query) ? await wikiSearch(l, query) : null;
-  if (native) return `${pick(FROM_WIKI, l)}: ${firstSentences(native.extract)}`;
+  if (native && relevant(native.title)) return `${pick(FROM_WIKI, l)}: ${firstSentences(native.extract)}`;
   const en = await wikiSearch("en", query);
-  if (!en) return null;
+  if (!en || !relevant(en.title)) return null;
   return `${pick(FROM_WIKI, l)}: ${await translate(firstSentences(en.extract, 2), l)}`;
 }

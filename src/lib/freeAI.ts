@@ -45,7 +45,8 @@ async function askGemini(messages: ChatMsg[], system: string): Promise<string | 
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Pollinations free tier. If it says "retry after N s", wait and retry (at most twice, up to 25 s). */
+/** Pollinations free tier. If it says "retry after N s", wait and retry (at most twice, up to 50 s each):
+ *  a proper AI answer a little later is better than a weaker fallback now. */
 async function askPollinations(messages: ChatMsg[], system: string): Promise<string | null> {
   const body = JSON.stringify({ model: "openai", messages: [{ role: "system", content: system }, ...messages.slice(-10).map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }))] });
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -58,7 +59,7 @@ async function askPollinations(messages: ChatMsg[], system: string): Promise<str
       if (r.status !== 402 && r.status !== 429) return null;
       const msg = await r.text();
       const secs = Number(msg.match(/retry after (\d+)\s*s/i)?.[1] ?? 15);
-      if (secs > 25) return null;
+      if (secs > 50) return null;
       await wait((secs + 1) * 1000);
     } catch { return null; }
   }

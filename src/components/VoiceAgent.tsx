@@ -3,12 +3,12 @@
 // aloud as a voice-over, and in hands-free mode keeps listening after each answer.
 import { AnimatePresence, motion } from "framer-motion";
 import { AudioLines, BookOpenText, Mic, Repeat, Square, Volume2, Wrench, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { ChatMsg } from "../lib/agent";
 import { answerQuestion } from "../hub/answer";
 import { VoiceLang, setHubLang, useHubLang } from "../hub/store";
-import { GREETING, UI, VOICE_LANGS, VoiceCheck, askMic, canListen, checkVoice, isGreeting, listen, listenError, noVoiceFor, speak, stopSpeaking, unlockSpeech, voiceHelp } from "../hub/voice";
+import { GREETING, UI, VOICE_LANGS, VoiceCheck, askMic, canListen, checkVoice, isGreeting, listen, listenError, micError, noVoiceFor, speak, stopSpeaking, unlockSpeech, voiceHelp } from "../hub/voice";
 import { INTRO, ROUTE, STOP_REPLY, openingSentence, pageText, parseCommand } from "../hub/voiceAgent";
 
 type Phase = "idle" | "listening" | "thinking" | "speaking";
@@ -100,13 +100,29 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
 
   const start = async () => {
     unlockSpeech(); // must run inside the tap, before any await, or phones stay silent
-    if (!canListen()) { setErr(listenError("unsupported")); setOpen(true); return; }
     stopSpeaking();
     // One tap = start listening. The settings panel stays closed; a small bubble shows what was heard and said.
-    live.current = true; setSaid(""); setHeard("");
-    // Ask for the microphone first, so a blocked mic shows a clear message instead of silence.
-    if (!(await askMic())) { live.current = false; setErr(listenError("not-allowed")); setOpen(true); return; }
+    setSaid(""); setHeard(""); setErr("");
+    if (!canListen()) { setErr(listenError("unsupported")); return; }
+    // Ask for the microphone first. If it cannot be used, the bubble offers a text box instead (no panel).
+    const mic = await askMic();
+    if (mic !== "ok") { setErr(micError(mic)); return; }
+    live.current = true;
     turn();
+  };
+
+  // Typed question from the bubble (when the microphone cannot be used): same answers, spoken aloud.
+  const [typed, setTyped] = useState("");
+  const askTyped = async (e: FormEvent) => {
+    e.preventDefault();
+    unlockSpeech();
+    const q = typed.trim();
+    if (!q) return;
+    setTyped(""); setErr(""); setHeard(q); live.current = true;
+    const r = await handle(q);
+    if (!live.current) return;
+    await sayAsync(r.text, r.lang);
+    live.current = false; setPhase("idle");
   };
 
   const [check, setCheck] = useState<VoiceCheck | null>(null);
@@ -114,7 +130,7 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
     unlockSpeech();
     stopAll(); setErr("");
     const c = await checkVoice(langRef.current);
-    if (c.mic !== "granted" && (await askMic())) c.mic = "granted";
+    if (c.mic !== "granted" && (await askMic()) === "ok") c.mic = "granted";
     setCheck(c);
     await sayAsync(GREETING[langRef.current], langRef.current);
     setPhase("idle");
@@ -226,8 +242,15 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
             </div>
             {heard && <p className="mt-1 text-slate-300">“{heard}”</p>}
             {said && <p className="mt-1 max-h-48 overflow-y-auto whitespace-pre-wrap text-white">{said.replace(/\*\*/g, "")}</p>}
-            {err && <p role="alert" className="mt-1 font-semibold text-[#F87171]">{err}</p>}
-            {noVoiceFor(lang) && said && <button onClick={() => setOpen(true)} className="mt-1.5 text-[11px] font-semibold text-[#FBBF24] underline">No {VOICE_LANGS.find((v) => v.id === lang)!.label} voice here: fix it</button>}
+            {err && <p role="alert" className="mt-1 text-xs font-semibold text-[#FBBF24]">{err}</p>}
+            {err && (
+              <form onSubmit={askTyped} className="mt-2 flex gap-1.5">
+                <input value={typed} onChange={(e) => setTyped(e.target.value)} autoFocus aria-label="Type your question" placeholder="Type your question…"
+                  className="min-h-[38px] flex-1 rounded-lg border border-white/15 bg-white/5 px-2.5 text-sm text-white placeholder:text-slate-500 focus:border-[#22D3EE] focus:outline-none" />
+                <button type="submit" disabled={!typed.trim()} className="min-h-[38px] rounded-lg bg-[#22D3EE] px-3 text-xs font-bold text-[#040A18] disabled:opacity-40">Ask</button>
+              </form>
+            )}
+            {noVoiceFor(lang) && said &&<button onClick={() => setOpen(true)} className="mt-1.5 text-[11px] font-semibold text-[#FBBF24] underline">No {VOICE_LANGS.find((v) => v.id === lang)!.label} voice here: fix it</button>}
           </motion.div>
         )}
       </AnimatePresence>

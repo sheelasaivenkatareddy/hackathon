@@ -10,7 +10,7 @@ import { bestSprayWindow, loadForecast, next24, sprayHours } from "../forecast";
 import { answerQuestion } from "../answer";
 import { VoiceLang, districtOf, getHubScans, setHubLang, useHubLang, useUser } from "../store";
 import { Glass, LangPicker, PageHead, Pill } from "../ui";
-import { GREETING, UI, VOICE_LANGS, askMic, canListen, canSpeak, isGreeting, listen, listenError, speak, stopSpeaking, unlockSpeech, voiceFor, voiceHelp, weatherSentence } from "../voice";
+import { GREETING, UI, VOICE_LANGS, askMic, canListen, canSpeak, isGreeting, listen, listenError, micError, speak, stopSpeaking, unlockSpeech, voiceFor, voiceHelp, weatherSentence } from "../voice";
 
 type Phase = "idle" | "listening" | "thinking" | "speaking";
 interface Line extends ChatMsg { lang: VoiceLang; local?: boolean }
@@ -72,7 +72,8 @@ export default function KisanVani() {
     if (phase === "speaking") { stopSpeaking(); setPhase("idle"); return; }
     setErr(""); setPartial("");
     if (!canListen()) { setErr(listenError("unsupported")); setShowKeys(true); return; }
-    if (!(await askMic())) { setErr(listenError("not-allowed")); setShowKeys(true); return; }
+    const micState = await askMic();
+    if (micState !== "ok") { setErr(micError(micState)); setShowKeys(true); return; }
     setPhase("listening");
     try {
       const l = listen(lang, setPartial);

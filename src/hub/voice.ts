@@ -28,8 +28,10 @@ export const canListen = () => typeof window !== "undefined" && !!RecognitionCto
 /** Plain-language reason for a speech recognition error code. */
 export function listenError(code: string): string {
   switch (code) {
+    case "insecure":
+      return "Voice needs a secure link. Open https://patra-lens.vercel.app (or http://localhost:5173 on this PC). You can type your question below.";
     case "not-allowed": case "service-not-allowed":
-      return "The microphone is blocked. Click the lock icon in the address bar, set Microphone to Allow, then reload the page.";
+      return "Microphone not allowed. Tap the lock icon in the address bar → Microphone → Allow. Or type your question below.";
     case "audio-capture": return "No microphone was found. Plug in a headset or check the Windows sound settings.";
     case "network": return "Speech recognition needs the internet. Check the connection and try again.";
     case "language-not-supported": return "This browser cannot understand this language by voice. Try English, or use Chrome.";
@@ -193,10 +195,22 @@ export async function checkVoice(lang: VoiceLang): Promise<VoiceCheck> {
   return { canListen: canListen(), canSpeak: canSpeak(), mic, voice: v ? v.name : null, browser };
 }
 
-/** Asks for the microphone straight away, so the browser shows its Allow prompt. */
-export async function askMic(): Promise<boolean> {
-  try { const s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach((t) => t.stop()); return true; } catch { return false; }
+/** Asks for the microphone straight away, so the browser shows its Allow prompt.
+ *  "insecure": the page is not on https or localhost (for example http://10.x.x.x), where browsers never allow the mic. */
+export async function askMic(): Promise<"ok" | "blocked" | "nomic" | "insecure"> {
+  if (typeof window !== "undefined" && !window.isSecureContext) return "insecure";
+  if (!navigator.mediaDevices?.getUserMedia) return "ok"; // let speech recognition ask by itself
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+    s.getTracks().forEach((t) => t.stop());
+    return "ok";
+  } catch (e) {
+    const n = (e as Error).name;
+    return n === "NotAllowedError" || n === "SecurityError" ? "blocked" : n === "NotFoundError" ? "nomic" : "ok";
+  }
 }
+export const micError = (r: Awaited<ReturnType<typeof askMic>>) =>
+  r === "insecure" ? listenError("insecure") : r === "nomic" ? listenError("audio-capture") : listenError("not-allowed");
 
 // ------------------------------------------------------------------ phrases said without the AI
 const GREETING_WORDS = [
