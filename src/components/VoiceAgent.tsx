@@ -2,13 +2,13 @@
 // ask-agent in voice mode), opens screens by voice ("open mandi", "మండి ధరలు చూపించు"), reads the current screen
 // aloud as a voice-over, and in hands-free mode keeps listening after each answer.
 import { AnimatePresence, motion } from "framer-motion";
-import { AudioLines, BookOpenText, Mic, Repeat, Square, Volume2, X } from "lucide-react";
+import { AudioLines, BookOpenText, Mic, Repeat, Square, Volume2, Wrench, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChatMsg, askAgent } from "../lib/agent";
 import { cloudConfigured } from "../lib/cloud";
 import { VoiceLang, setHubLang, useHubLang } from "../hub/store";
-import { GREETING, UI, VOICE_LANGS, canListen, canSpeak, isGreeting, listen, speak, stopSpeaking, voiceFor } from "../hub/voice";
+import { GREETING, UI, VOICE_LANGS, VoiceCheck, askMic, canListen, checkVoice, isGreeting, listen, listenError, noVoiceFor, speak, stopSpeaking, voiceHelp } from "../hub/voice";
 import { INTRO, ROUTE, STOP_REPLY, openingSentence, pageText, parseCommand } from "../hub/voiceAgent";
 
 type Phase = "idle" | "listening" | "thinking" | "speaking";
@@ -39,7 +39,6 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
 
   const sayAsync = (text: string, l: VoiceLang) => new Promise<void>((resolve) => {
     setSaid(text);
-    if (!canSpeak()) { resolve(); return; }
     setPhase("speaking");
     speak(text, l, resolve);
   });
@@ -80,9 +79,9 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
       const l = listen(langRef.current, setHeard);
       stopRef.current = l.stop;
       q = await l.done;
-    } catch {
-      live.current = false; setPhase("idle");
-      setErr("The microphone is blocked. Allow it in the browser, or use Chrome on Android.");
+    } catch (e) {
+      live.current = false; setPhase("idle"); setOpen(true);
+      setErr(listenError((e as Error).message));
       return;
     }
     if (!live.current) return;
@@ -97,11 +96,23 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
     live.current = false; setPhase("idle");
   };
 
-  const start = () => {
-    if (!canListen()) { setErr("This browser cannot hear speech. Use Chrome on Android or desktop."); setOpen(true); return; }
+  const start = async () => {
+    if (!canListen()) { setErr(listenError("unsupported")); setOpen(true); return; }
     stopSpeaking();
     live.current = true; setOpen(true);
+    // Ask for the microphone first, so a blocked mic shows a clear message instead of silence.
+    if (!(await askMic())) { live.current = false; setErr(listenError("not-allowed")); return; }
     turn();
+  };
+
+  const [check, setCheck] = useState<VoiceCheck | null>(null);
+  const runCheck = async () => {
+    stopAll(); setErr("");
+    const c = await checkVoice(langRef.current);
+    if (c.mic !== "granted" && (await askMic())) c.mic = "granted";
+    setCheck(c);
+    await sayAsync(GREETING[langRef.current], langRef.current);
+    setPhase("idle");
   };
   const stopAll = () => { live.current = false; stopRef.current(); stopSpeaking(); setPhase("idle"); };
   const readPage = async () => {
@@ -152,13 +163,27 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
               {said && <p className="mt-1.5 max-h-40 overflow-y-auto whitespace-pre-wrap text-white">{said.replace(/\*\*/g, "")}</p>}
               {!heard && !said && <p className="mt-1.5 text-slate-400">Try: “హాయ్”, “మండి ధరలు చూపించు”, “open weather”, “read this page”, or ask about your crop.</p>}
               {err && <p role="alert" className="mt-1.5 font-semibold text-[#F87171]">{err}</p>}
-              {canSpeak() && !voiceFor(lang) && <p className="mt-1.5 text-xs text-[#FBBF24]">No {VOICE_LANGS.find((v) => v.id === lang)!.label} voice on this device, so answers show as text.</p>}
+              {noVoiceFor(lang) && <p className="mt-1.5 text-xs text-[#FBBF24]">{voiceHelp(lang)}</p>}
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
               <button onClick={readPage} className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-slate-100 hover:border-[#22D3EE]/50"><BookOpenText className="h-4 w-4 text-[#22D3EE]" aria-hidden />Read this page</button>
               <button onClick={() => said && sayAsync(said, lang).then(() => setPhase("idle"))} disabled={!said} className="flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-slate-100 hover:border-[#22D3EE]/50 disabled:opacity-40"><Volume2 className="h-4 w-4 text-[#A3E635]" aria-hidden />Say again</button>
             </div>
+            <button onClick={runCheck} className="mt-2 flex min-h-[40px] w-full items-center justify-center gap-1.5 rounded-xl border border-[#FBBF24]/40 bg-[#FBBF24]/10 text-xs font-bold text-[#FBBF24] hover:bg-[#FBBF24]/20">
+              <Wrench className="h-4 w-4" aria-hidden />Test voice on this device
+            </button>
+            {check && (
+              <ul className="mt-2 space-y-1 rounded-xl border border-white/10 bg-white/[0.03] p-2.5 text-[11px]">
+                {[
+                  [check.canListen, check.canListen ? `Voice input works in ${check.browser}` : `${check.browser} cannot hear speech: use Chrome or Edge`],
+                  [check.mic === "granted", check.mic === "granted" ? "Microphone allowed" : "Microphone blocked: lock icon in the address bar → Microphone → Allow, then reload"],
+                  [!!check.voice, check.voice ? `Speaking voice: ${check.voice}. You should hear the greeting now.` : voiceHelp(lang)],
+                ].map(([ok, text]) => (
+                  <li key={String(text)} className={`flex gap-1.5 ${ok ? "text-[#A3E635]" : "text-[#F87171]"}`}><span aria-hidden>{ok ? "✓" : "✗"}</span><span>{text as string}</span></li>
+                ))}
+              </ul>
+            )}
             <div className="mt-3 space-y-1.5 text-xs">
               <label className="flex min-h-[36px] cursor-pointer items-center justify-between gap-2 rounded-lg px-1">
                 <span className="flex items-center gap-1.5 font-semibold text-slate-200"><Repeat className="h-3.5 w-3.5 text-[#F472B6]" aria-hidden />Hands-free (keep listening)</span>

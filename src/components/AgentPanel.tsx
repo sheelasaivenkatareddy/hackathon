@@ -4,6 +4,7 @@ import { Bot, Leaf, Mic, MicOff, Send, Trash2, Volume2, X } from "lucide-react";
 import { Fragment, ReactNode, useEffect, useRef, useState } from "react";
 import { ChatMsg, askAgent, useLatestScan } from "../lib/agent";
 import { useI18n } from "../lib/i18n";
+import { listenError, speak as speakAloud } from "../hub/voice";
 
 const STORE_KEY = "patra-agent-chat";
 const AGENT_LANGS = [
@@ -96,16 +97,11 @@ export default function AgentPanel() {
     rec.lang = speechLang; rec.interimResults = false; rec.maxAlternatives = 1;
     rec.onresult = (e: any) => { const t = e.results[0][0].transcript; setInput((v) => (v ? `${v} ${t}` : t)); };
     rec.onend = () => setListening(false);
-    rec.onerror = () => setListening(false);
-    recRef.current = rec; setListening(true); rec.start();
+    rec.onerror = (e: { error: string }) => { setListening(false); if (e.error !== "no-speech" && e.error !== "aborted") setError(listenError(e.error)); };
+    recRef.current = rec; setListening(true); setError(""); rec.start();
   };
-  const speak = (text: string) => {
-    if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text.replace(/\*\*/g, "").replace(/^[-*•]\s+/gm, ""));
-    u.lang = speechLang;
-    window.speechSynthesis.speak(u);
-  };
+  // Shared voice: device voice when installed, otherwise the online voice (Telugu/Kannada on Windows).
+  const speak = (text: string) => speakAloud(text, lang);
 
   return (
     <>
@@ -167,7 +163,7 @@ export default function AgentPanel() {
                   <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className={m.role === "user" ? "flex justify-end" : "flex justify-start"}>
                     <div className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-[15px] leading-relaxed ${m.role === "user" ? "rounded-tr-sm bg-green text-white" : "rounded-tl-sm bg-surface text-ink"}`}>
                       {m.role === "assistant" ? <Formatted text={m.content} /> : m.content}
-                      {m.role === "assistant" && "speechSynthesis" in window && (
+                      {m.role === "assistant" && (
                         <button onClick={() => speak(m.content)} className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-green-dark hover:underline"><Volume2 className="h-3.5 w-3.5" aria-hidden />Read aloud</button>
                       )}
                     </div>

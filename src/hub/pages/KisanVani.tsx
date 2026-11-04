@@ -9,7 +9,7 @@ import { cloudConfigured } from "../../lib/cloud";
 import { bestSprayWindow, loadForecast, next24, sprayHours } from "../forecast";
 import { VoiceLang, districtOf, getHubScans, useHubLang, useUser } from "../store";
 import { Glass, LangPicker, PageHead, Pill } from "../ui";
-import { GREETING, UI, VOICE_LANGS, canListen, canSpeak, isGreeting, listen, speak, stopSpeaking, voiceFor, weatherSentence } from "../voice";
+import { GREETING, UI, VOICE_LANGS, askMic, canListen, canSpeak, isGreeting, listen, listenError, speak, stopSpeaking, voiceFor, voiceHelp, weatherSentence } from "../voice";
 
 type Phase = "idle" | "listening" | "thinking" | "speaking";
 interface Line extends ChatMsg { lang: VoiceLang; local?: boolean }
@@ -43,7 +43,7 @@ export default function KisanVani() {
   useEffect(() => { if (canSpeak()) speechSynthesis.onvoiceschanged = () => force((n) => n + 1); }, []);
 
   const say = (text: string, l: VoiceLang) => {
-    if (mute || !canSpeak()) { setPhase("idle"); return; }
+    if (mute) { setPhase("idle"); return; }
     setPhase("speaking");
     speak(text, l, () => setPhase("idle"));
   };
@@ -68,16 +68,19 @@ export default function KisanVani() {
   const mic = async () => {
     if (phase === "listening") { stopRef.current(); return; }
     if (phase === "speaking") { stopSpeaking(); setPhase("idle"); return; }
-    setErr(""); setPartial(""); setPhase("listening");
+    setErr(""); setPartial("");
+    if (!canListen()) { setErr(listenError("unsupported")); setShowKeys(true); return; }
+    if (!(await askMic())) { setErr(listenError("not-allowed")); setShowKeys(true); return; }
+    setPhase("listening");
     try {
       const l = listen(lang, setPartial);
       stopRef.current = l.stop;
       const text = await l.done;
       setPartial("");
       await ask(text);
-    } catch {
+    } catch (e) {
       setPhase("idle");
-      setErr("Microphone is not available here. Allow the microphone, or type your question.");
+      setErr(listenError((e as Error).message));
       setShowKeys(true);
     }
   };
@@ -138,7 +141,7 @@ export default function KisanVani() {
           <p className="font-heading text-lg font-bold text-white" aria-live="polite">{phase === "idle" ? t.tap : t[phase]}</p>
           {partial && <p className="mt-2 max-w-xs text-center text-slate-300">"{partial}"</p>}
           {!canListen() && <p className="mt-2 text-center text-xs text-slate-400">This browser cannot hear speech. Use Chrome on Android, or type below.</p>}
-          {noVoice && <p className="mt-2 text-center text-xs text-neon-amber">No {VOICE_LANGS.find((v) => v.id === lang)!.label} voice is installed on this device, so answers are shown as text. Add it in the phone's text-to-speech settings.</p>}
+          {noVoice && <p className="mt-2 text-center text-xs text-neon-amber">{voiceHelp(lang)}</p>}
 
           <div className="mt-6 grid w-full grid-cols-3 gap-2">
             <button onClick={speakDiagnosis} className="flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-3 text-xs font-bold text-slate-200 hover:border-neon-red/50"><Leaf className="h-5 w-5 text-neon-red" aria-hidden />My diagnosis</button>

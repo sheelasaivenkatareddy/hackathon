@@ -20,7 +20,9 @@ function readEnv(file) {
 }
 
 const env = { ...readEnv(ENV_FILE), ...process.env };
-const TOKEN = env.SUPABASE_ACCESS_TOKEN;
+// Without a pasted token, use the one `npx supabase login` saved on this computer.
+const CLI_TOKEN_FILE = `${process.env.USERPROFILE ?? process.env.HOME}/.supabase/access-token`;
+const TOKEN = env.SUPABASE_ACCESS_TOKEN || (existsSync(CLI_TOKEN_FILE) ? readFileSync(CLI_TOKEN_FILE, "utf8").trim() : "");
 if (!TOKEN) {
   console.error(`Missing SUPABASE_ACCESS_TOKEN. Copy .env.supabase.example to ${ENV_FILE} and fill it in.`);
   process.exit(1);

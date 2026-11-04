@@ -25,51 +25,163 @@ const RecognitionCtor = (): (new () => Recognition) | null => {
 };
 export const canListen = () => typeof window !== "undefined" && !!RecognitionCtor();
 
-/** Listens once. Calls onText with partial text while the farmer speaks; resolves with the final text ("" if nothing). */
+/** Plain-language reason for a speech recognition error code. */
+export function listenError(code: string): string {
+  switch (code) {
+    case "not-allowed": case "service-not-allowed":
+      return "The microphone is blocked. Click the lock icon in the address bar, set Microphone to Allow, then reload the page.";
+    case "audio-capture": return "No microphone was found. Plug in a headset or check the Windows sound settings.";
+    case "network": return "Speech recognition needs the internet. Check the connection and try again.";
+    case "language-not-supported": return "This browser cannot understand this language by voice. Try English, or use Chrome.";
+    case "unsupported": return "This browser cannot hear speech. Use Google Chrome or Microsoft Edge.";
+    default: return `Voice input stopped (${code}). Tap the microphone and try again.`;
+  }
+}
+
+/** Listens once. Calls onText with partial text while the farmer speaks; resolves with the final text ("" if nothing).
+ *  Rejects with an Error whose message is the browser's error code (see listenError). */
 export function listen(lang: VoiceLang, onText: (t: string) => void): { done: Promise<string>; stop: () => void } {
   const Ctor = RecognitionCtor();
-  if (!Ctor) return { done: Promise.reject(new Error("no-speech")), stop: () => undefined };
+  if (!Ctor) return { done: Promise.reject(new Error("unsupported")), stop: () => undefined };
   const r = new Ctor();
   r.lang = bcpOf(lang); r.interimResults = true; r.continuous = false;
-  let text = "";
+  let text = "", settled = false;
   const done = new Promise<string>((resolve, reject) => {
+    const ok = (t: string) => { if (!settled) { settled = true; resolve(t); } };
+    const fail = (c: string) => { if (!settled) { settled = true; reject(new Error(c)); } };
     r.onresult = (e) => {
       text = Array.from(e.results).map((res) => res[0].transcript).join(" ").trim();
       onText(text);
     };
-    r.onerror = (e) => (e.error === "no-speech" || e.error === "aborted" ? resolve(text) : reject(new Error(e.error)));
-    r.onend = () => resolve(text);
+    r.onerror = (e) => (e.error === "no-speech" || e.error === "aborted" ? ok(text) : fail(e.error));
+    r.onend = () => ok(text);
+    // Some browsers never fire onend if the mic is cut off: give up after 20 s.
+    setTimeout(() => { try { r.stop(); } catch { /* already stopped */ } ok(text); }, 20_000);
   });
-  r.start();
-  return { done, stop: () => r.stop() };
+  // Speech must stop before listening, or the agent hears itself.
+  stopSpeaking();
+  try { r.start(); } catch { return { done: Promise.reject(new Error("busy")), stop: () => undefined }; }
+  return { done, stop: () => { try { r.stop(); } catch { /* already stopped */ } } };
 }
 
 // ------------------------------------------------------------------ text to speech
 export const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window;
 
+/** Voices load late (Chrome, Edge): wait for them, at most 1.5 s. */
+export function voicesReady(): Promise<SpeechSynthesisVoice[]> {
+  if (!canSpeak()) return Promise.resolve([]);
+  const now = speechSynthesis.getVoices();
+  if (now.length) return Promise.resolve(now);
+  return new Promise((resolve) => {
+    const done = () => resolve(speechSynthesis.getVoices());
+    speechSynthesis.addEventListener?.("voiceschanged", done, { once: true });
+    setTimeout(done, 1500);
+  });
+}
+
+/** Edge's natural (online) voices arrive a moment after the local ones: wait up to 3 s for this language's voice. */
+export async function voiceReadyFor(lang: VoiceLang): Promise<void> {
+  await voicesReady();
+  if (!canSpeak() || voiceFor(lang)) return;
+  await new Promise<void>((resolve) => {
+    const t = setTimeout(done, 3000);
+    function done() { clearTimeout(t); speechSynthesis.removeEventListener?.("voiceschanged", check); resolve(); }
+    function check() { if (voiceFor(lang)) done(); }
+    speechSynthesis.addEventListener?.("voiceschanged", check);
+  });
+}
+
+/** Best voice for the language: natural/online voices first (Edge "Online (Natural)", Google voices). */
 export function voiceFor(lang: VoiceLang): SpeechSynthesisVoice | undefined {
   if (!canSpeak()) return undefined;
   const all = speechSynthesis.getVoices(), bcp = bcpOf(lang).toLowerCase(), base = bcp.slice(0, 2);
-  return all.find((v) => v.lang.toLowerCase() === bcp) ?? all.find((v) => v.lang.toLowerCase().startsWith(base));
+  const match = all.filter((v) => v.lang.toLowerCase().replace("_", "-") === bcp || v.lang.toLowerCase().startsWith(`${base}-`) || v.lang.toLowerCase() === base);
+  const score = (v: SpeechSynthesisVoice) => (/natural/i.test(v.name) ? 3 : 0) + (/online|google/i.test(v.name) ? 2 : 0) + (v.lang.toLowerCase().replace("_", "-") === bcp ? 1 : 0);
+  return match.sort((a, b) => score(b) - score(a))[0];
 }
 
 /** Markdown and emoji read badly aloud, so they are stripped first. */
 export const plain = (s: string) =>
   s.replace(/\*\*|__|`|#+\s/g, "").replace(/^\s*[-*]\s+/gm, "").replace(/\[(.*?)\]\(.*?\)/g, "$1").replace(/[\u{1F300}-\u{1FAFF}]/gu, "").trim();
 
+/** Short pieces: Chrome stops reading a long utterance after about 15 seconds. */
+function chunks(text: string, max = 180): string[] {
+  const parts = text.split(/(?<=[.!?।॥\n])\s+/).flatMap((s) => {
+    if (s.length <= max) return [s];
+    const out: string[] = []; let cur = "";
+    for (const w of s.split(/\s+/)) { if ((cur + " " + w).length > max && cur) { out.push(cur); cur = w; } else cur = cur ? `${cur} ${w}` : w; }
+    if (cur) out.push(cur);
+    return out;
+  });
+  return parts.map((p) => p.trim()).filter(Boolean);
+}
+
+let speakToken = 0;
+let keepAlive: ReturnType<typeof setInterval> | undefined;
+
+/** True when the browser has no voice for the language: answers are then shown as text only. */
+export const noVoiceFor = (lang: VoiceLang) => !canSpeak() || !voiceFor(lang);
+
+/** Where to get a voice for the language, for the device the farmer is on. */
+export function voiceHelp(lang: VoiceLang): string {
+  const name = VOICE_LANGS.find((v) => v.id === lang)!.label;
+  const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  if (/Android/i.test(ua)) return `No ${name} voice on this phone yet. Open Settings → Text-to-speech → Google speech services → Install voice data → ${name}. Then reload.`;
+  if (/Edg\//.test(ua)) return `No ${name} voice found. Check the internet connection (Edge's natural voices are online), then reload.`;
+  if (/iPhone|iPad|Mac/i.test(ua)) return `No ${name} voice on this device. Settings → Accessibility → Spoken Content → Voices → add ${name}.`;
+  return `This browser has no ${name} voice, so answers are shown as text. Open this site in Microsoft Edge (it has natural Telugu, Hindi, Tamil, Kannada and Malayalam voices), or use Chrome on an Android phone.`;
+}
+
+/** Speaks in pieces, with a keep-alive for Chrome and a safety timer, so onEnd always fires once. */
 export function speak(text: string, lang: VoiceLang, onEnd?: () => void) {
+  const token = ++speakToken;
   if (!canSpeak()) { onEnd?.(); return; }
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(plain(text));
-  u.lang = bcpOf(lang);
-  const v = voiceFor(lang);
-  if (v) u.voice = v;
-  u.rate = 0.95;
-  u.onend = () => onEnd?.();
-  u.onerror = () => onEnd?.();
-  speechSynthesis.speak(u);
+  clearInterval(keepAlive);
+  let finished = false;
+  const finish = () => { if (finished) return; finished = true; clearInterval(keepAlive); if (token === speakToken) onEnd?.(); };
+  const pieces = chunks(plain(text));
+  if (!pieces.length) { finish(); return; }
+  // Rough reading time, plus slack: if the browser never reports the end, carry on anyway.
+  const safety = setTimeout(finish, pieces.join(" ").length * 110 + 4000);
+  voiceReadyFor(lang).then(() => {
+    if (token !== speakToken) return;
+    const v = voiceFor(lang);
+    // No voice for this language: an English voice would read Telugu script as noise, so stay silent (text is shown).
+    if (!v && lang !== "en") { clearTimeout(safety); finish(); return; }
+    pieces.forEach((p, i) => {
+      const u = new SpeechSynthesisUtterance(p);
+      u.lang = v?.lang ?? bcpOf(lang);
+      try { if (v) u.voice = v; } catch { /* lang alone still picks a voice */ }
+      u.rate = 0.95;
+      if (i === pieces.length - 1) { u.onend = () => { clearTimeout(safety); finish(); }; }
+      u.onerror = (e) => { if (e.error !== "interrupted" && e.error !== "canceled") { clearTimeout(safety); finish(); } };
+      speechSynthesis.speak(u);
+    });
+    keepAlive = setInterval(() => { if (speechSynthesis.speaking && !speechSynthesis.paused) { speechSynthesis.pause(); speechSynthesis.resume(); } }, 10_000);
+  });
 }
-export const stopSpeaking = () => { if (canSpeak()) speechSynthesis.cancel(); };
+export const stopSpeaking = () => {
+  speakToken++; clearInterval(keepAlive);
+  if (canSpeak()) speechSynthesis.cancel();
+};
+
+// ------------------------------------------------------------------ device check
+export interface VoiceCheck { canListen: boolean; canSpeak: boolean; mic: "granted" | "denied" | "prompt" | "unknown"; voice: string | null; browser: string }
+export async function checkVoice(lang: VoiceLang): Promise<VoiceCheck> {
+  await voiceReadyFor(lang);
+  let mic: VoiceCheck["mic"] = "unknown";
+  try { mic = (await navigator.permissions.query({ name: "microphone" as PermissionName })).state as VoiceCheck["mic"]; } catch { /* not supported */ }
+  const ua = navigator.userAgent;
+  const browser = /Edg\//.test(ua) ? "Edge" : /Firefox\//.test(ua) ? "Firefox" : /Chrome\//.test(ua) ? "Chrome" : /Safari\//.test(ua) ? "Safari" : "Other";
+  const v = voiceFor(lang);
+  return { canListen: canListen(), canSpeak: canSpeak(), mic, voice: v ? v.name : null, browser };
+}
+
+/** Asks for the microphone straight away, so the browser shows its Allow prompt. */
+export async function askMic(): Promise<boolean> {
+  try { const s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach((t) => t.stop()); return true; } catch { return false; }
+}
 
 // ------------------------------------------------------------------ phrases said without the AI
 const GREETING_WORDS = [
