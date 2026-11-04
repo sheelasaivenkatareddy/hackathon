@@ -103,6 +103,22 @@ Set it up once:
 
 How it is protected: the browser never writes to the table. Only the `analyze-leaf` function does, with the service key that stays on Supabase. Row-level security lets only users with `app_metadata.role = "admin"` read, edit or delete scans and photos. Each phone can send at most 60 scans an hour, which keeps Claude costs bounded. In Supabase's Table Editor, the `scans` table shows every scan, and Storage → `scan-photos` holds the photos.
 
+## Kisan Hub (`/hub`)
+
+A dark, mobile-first app inside the same site for farmers and labs. Open it from the "Kisan Hub" button in the header.
+
+- **Login:** mobile number and OTP, with a Farmer or Expert/Lab role, then a one-time profile (state, district, village, acres, crops). The OTP is simulated for the demo: the code is shown on screen and no SMS is sent. Use an SMS provider before real use.
+- **Dashboard:** weather advisories, the spray window, scan history, the best mandi price for each of the farmer's crops, and lab requests.
+- **Kisan Vani:** a voice assistant in Telugu, Hindi, English, Tamil, Kannada and Malayalam. It uses the browser's speech recognition and speech synthesis, and gets its answers from `ask-agent` in voice mode. Greetings, "My diagnosis", "Weather alert" and "Crop plan" also work offline.
+- **Crop Scanner:** tomato and paddy, by drag and drop or camera. It uses the same AI as `/scan`: red circles mark lesions, yellow circles mark dry or nutrient-starved tissue, and a table gives each box's coordinates. Every scan is saved with the farmer's name, phone, time and approximate location (about 1 km, or the district centre). Paddy needs the online AI; offline, only the colour circles are shown.
+- **Mandi Prices:** AP, Telangana and Karnataka APMC markets, in ₹ per quintal, with trend badges and MSP alerts (kharif 2025-26). Prices are live from Agmarknet when `DATA_GOV_API_KEY` is set. Otherwise the page shows sample prices with a clear label.
+- **Labs & RBK:** ICAR institutes, universities, KVKs, RBKs/Rythu Vedikas, RSKs and officers, searchable. Each entry has Call, WhatsApp, and "Send scan for review", which writes to the `escalations` table and shows up under "Lab requests" on `/admin`. Only the national helplines (KCC 1800-180-1551, PMFBY 14447) carry phone numbers. Other entries call KCC until a verified number is added in `src/hub/directory.ts`.
+- **Weather & Spray:** a 7-day Open-Meteo forecast, rain, humidity, heat and wind alerts, and a 48-hour spray timeline.
+- **Schemes:** a quick eligibility check for PM-KISAN, PMFBY, KCC, Soil Health Card, PM-KUSUM and state schemes (AP Annadata Sukhibhava, Telangana Rythu Bharosa, Karnataka Krishi Bhagya). It is a guide, with links to the official portals.
+- **NPK Calculator:** crop, acres and soil test level give kg of N, P and K, then bags of DAP, urea and MOP, the approximate cost, and the split schedule.
+
+Code: `src/hub/` (data and logic), `src/hub/pages/` (screens), `supabase/functions/kisan-hub` (live mandi prices and escalations), `supabase/migrations/0003_escalations.sql`. Have local experts check the directory, scheme amounts and fertilizer doses before real use.
+
 ## Admin login (Expert screen)
 
 By default, the Expert screen asks for the admin's Gmail and a password. Only a SHA-256 hash of the two is in the code (`expert.adminLoginSha256` in `src/config.ts`, which also shows how to change it). This is a login for the demo: it does not contact Gmail or Google.

@@ -23,11 +23,20 @@ const Privacy = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Pr
 const Terms = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Terms })));
 const Methodology = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Methodology })));
 const NotFound = lazy(() => import("../pages/NotFound"));
+const HubLogin = lazy(() => import("../hub/pages/HubLogin"));
+const HubDashboard = lazy(() => import("../hub/pages/HubDashboard"));
+const KisanVani = lazy(() => import("../hub/pages/KisanVani"));
+const HubScanner = lazy(() => import("../hub/pages/HubScanner"));
+const Mandi = lazy(() => import("../hub/pages/Mandi"));
+const Labs = lazy(() => import("../hub/pages/Labs"));
+const HubWeather = lazy(() => import("../hub/pages/Weather"));
+const Schemes = lazy(() => import("../hub/pages/Schemes"));
+const NpkCalc = lazy(() => import("../hub/pages/NpkCalc"));
 
 const Loading = () => (
   <div className="wrap space-y-4 py-10" role="status" aria-label="Loading">
-    <Skeleton className="h-10 w-2/3" />
-    <Skeleton className="h-64 w-full" />
+    <Skeleton className="h-10 w-2/3 opacity-60" />
+    <Skeleton className="h-64 w-full opacity-60" />
   </div>
 );
 
@@ -58,6 +67,15 @@ export default function App() {
               <Route path="/diseases" element={<Diseases />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/about" element={<About />} />
+              <Route path="/hub" element={<HubDashboard />} />
+              <Route path="/hub/login" element={<HubLogin />} />
+              <Route path="/hub/vani" element={<KisanVani />} />
+              <Route path="/hub/scan" element={<HubScanner />} />
+              <Route path="/hub/mandi" element={<Mandi />} />
+              <Route path="/hub/labs" element={<Labs />} />
+              <Route path="/hub/weather" element={<HubWeather />} />
+              <Route path="/hub/schemes" element={<Schemes />} />
+              <Route path="/hub/npk" element={<NpkCalc />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>

@@ -47,12 +47,12 @@ async function offlineAnswer(question: string): Promise<string> {
   ].join("\n");
 }
 
-export async function askAgent(messages: ChatMsg[], lang: string, withScan: boolean): Promise<AgentReply> {
+export async function askAgent(messages: ChatMsg[], lang: string, withScan: boolean, voice = false): Promise<AgentReply> {
   const question = messages[messages.length - 1]?.content ?? "";
   if (!supabase) return { ok: true, answer: await offlineAnswer(question), offline: true };
   const [device_id, profile] = await Promise.all([deviceId(), getProfile()]);
   const { data, error } = await supabase.functions.invoke("ask-agent", {
-    body: { device_id, messages, lang, profile: { name: profile.name }, scan: withScan && latestScan ? scanSummary(latestScan) : undefined },
+    body: { device_id, messages, lang, voice, profile: { name: profile.name }, scan: withScan && latestScan ? scanSummary(latestScan) : undefined },
   });
   if (error) {
     let code = "";

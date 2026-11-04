@@ -14,6 +14,9 @@ export default {
         ink: "#1C2B24",
         muted: "#55625B",
         line: "#E6DFD1",
+        // Kisan Hub (dark, neon)
+        navy: { 950: "#040A18", 900: "#081226", 800: "#0E1C38", 700: "#16284B" },
+        neon: { cyan: "#22D3EE", teal: "#2DD4BF", lime: "#A3E635", pink: "#F472B6", amber: "#FBBF24", red: "#F87171" },
       },
       fontFamily: {
         sans: ["Inter", "Noto Sans Telugu", "Noto Sans Devanagari", "Noto Sans Kannada", "system-ui", "sans-serif"],

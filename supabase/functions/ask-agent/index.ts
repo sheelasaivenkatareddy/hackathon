@@ -17,7 +17,7 @@ const CORS = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
-const LANG_NAME = { en: "English", te: "Telugu", hi: "Hindi", kn: "Kannada" } as const;
+const LANG_NAME = { en: "English", te: "Telugu", hi: "Hindi", kn: "Kannada", ta: "Tamil", ml: "Malayalam" } as const;
 
 const SYSTEM = `You are Patra Lens Assistant, a friendly crop doctor and agronomist inside the Patra Lens app, helping small farmers in India.
 
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ error: "Use POST." }, 405);
 
-  let body: { device_id?: string; messages?: Msg[]; scan?: unknown; lang?: string; profile?: { name?: string } };
+  let body: { device_id?: string; messages?: Msg[]; scan?: unknown; lang?: string; profile?: { name?: string }; voice?: boolean };
   try { body = await req.json(); } catch { return json({ error: "Send JSON." }, 400); }
   const deviceId = typeof body.device_id === "string" ? body.device_id.slice(0, 64) : "";
   const messages = (Array.isArray(body.messages) ? body.messages : [])
@@ -57,7 +57,10 @@ Deno.serve(async (req) => {
 
   const lang = LANG_NAME[(body.lang ?? "en") as keyof typeof LANG_NAME] ?? "English";
   // The farmer's context goes after the cached instructions, so the stable prefix still caches.
-  const context = [`Preferred language: ${lang}.`, body.scan ? `The farmer's latest scan result (JSON): ${JSON.stringify(body.scan).slice(0, 6000)}` : "No scan shared."].join("\n");
+  const context = [
+    `Preferred language: ${lang}.`,
+    ...(body.voice ? [`This is Kisan Vani voice mode: the answer is read aloud. Reply in ${lang} script in 2 to 4 short spoken sentences, with no markdown, lists or symbols. Say numbers and doses in words a farmer would say.`] : []),
+    body.scan ? `The farmer's latest scan result (JSON): ${JSON.stringify(body.scan).slice(0, 6000)}` : "No scan shared."].join("\n");
 
   let answer = "";
   try {

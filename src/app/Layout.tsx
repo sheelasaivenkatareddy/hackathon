@@ -1,10 +1,11 @@
 // Top bar (desktop), bottom bar with raised Scan button (mobile), More sheet, language sheet, footer.
 import { motion, useScroll } from "framer-motion";
-import { BookOpen, CloudSun, Globe, History, LayoutDashboard, Home, Info, Menu, RadioTower, ScanLine, Settings, ShieldCheck, Sprout, UserCheck } from "lucide-react";
+import { BookOpen, CloudSun, Globe, History, LayoutDashboard, Home, Info, Menu, RadioTower, ScanLine, Settings, ShieldCheck, Sprout, UserCheck, Zap } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import AgentPanel from "../components/AgentPanel";
 import Footer from "../components/Footer";
+import HubLayout from "../hub/HubLayout";
 import { BottomSheet, Button } from "../components/ui";
 import { db, getSetting } from "../lib/db";
 import { LANGS, useI18n } from "../lib/i18n";
@@ -19,6 +20,7 @@ const ITEMS = [
   { to: "/radar", key: "nav.radar", icon: RadioTower },
 ];
 const MORE = [
+  { to: "/hub", label: "Kisan Hub (mandi, voice AI, labs)", icon: Zap },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/history", label: "My scans", icon: History },
   { to: "/diseases", label: "Disease library", icon: BookOpen },
@@ -72,6 +74,9 @@ export default function Layout({ children }: { children: ReactNode }) {
     })().catch(() => undefined);
   }, []);
 
+  // Kisan Hub has its own dark shell and its own voice assistant (Kisan Vani).
+  if (pathname.startsWith("/hub")) return <HubLayout>{children}</HubLayout>;
+
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-3">Skip to content</a>
@@ -92,6 +97,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           </nav>
           <div className="hidden items-center gap-3 lg:flex">
             <LanguageSwitch />
+            <Link to="/hub" className="flex min-h-[44px] items-center gap-1.5 rounded-full bg-[#040A18] px-4 text-[15px] font-bold text-[#22D3EE] shadow-[0_0_16px_rgba(34,211,238,0.35)] hover:brightness-125"><Zap className="h-4 w-4" aria-hidden />Kisan Hub</Link>
             <Button to="/watch" className="!text-[15px]">Start Leaf Watch</Button>
           </div>
           <button onClick={() => setMoreOpen(true)} className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface lg:hidden" aria-label="More"><Menu className="h-6 w-6 text-forest" aria-hidden /></button>

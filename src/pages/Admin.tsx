@@ -4,7 +4,7 @@ import { Download, LogOut, RefreshCw, Search, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import LeafReport from "../components/LeafReport";
 import { BottomSheet, Button, Chip, useToast } from "../components/ui";
-import { CloudScan, cloudConfigured, isAdminSession, supabase } from "../lib/cloud";
+import { CloudEscalation, CloudScan, cloudConfigured, isAdminSession, supabase } from "../lib/cloud";
 
 const PAGE = 100;
 const fmt = (iso: string) => new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
@@ -51,6 +51,50 @@ function Questions() {
   );
 }
 
+const STATUS_LABEL = { new: "New", in_review: "In review", resolved: "Resolved" } as const;
+
+/** Scans farmers forwarded from Kisan Hub to a lab, KVK, RBK/RSK or officer. */
+function LabRequests() {
+  const toast = useToast();
+  const [rows, setRows] = useState<CloudEscalation[] | null>(null);
+  const [err, setErr] = useState("");
+  const [replies, setReplies] = useState<Record<string, string>>({});
+  const load = useCallback(() => {
+    supabase!.from("escalations").select("*").order("created_at", { ascending: false }).limit(200)
+      .then(({ data, error }) => { if (error) setErr(error.message); else setRows((data ?? []) as CloudEscalation[]); });
+  }, []);
+  useEffect(load, [load]);
+  const update = async (id: string, patch: Partial<CloudEscalation>) => {
+    const { error } = await supabase!.from("escalations").update(patch).eq("id", id);
+    if (error) toast(`Could not save: ${error.message}`); else { toast("Saved."); load(); }
+  };
+  if (err) return <p role="alert" className="mt-6 font-semibold text-tomato-dark">Could not load lab requests: {err}. Run npm run setup:supabase again to add the table.</p>;
+  if (!rows) return <p className="mt-6" role="status">Loading…</p>;
+  if (!rows.length) return <p className="mt-8 text-center">No lab requests yet. Farmers send them from Kisan Hub → Labs & RBK.</p>;
+  return (
+    <ul className="mt-6 space-y-3">
+      {rows.map((r) => (
+        <li key={r.id} className="rounded-card border border-line bg-white p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="tiny">{fmt(r.created_at)} · to <strong>{r.lab_name}</strong></p>
+            <Chip tone={r.status === "resolved" ? "green" : r.status === "in_review" ? "amber" : "tomato"}>{STATUS_LABEL[r.status]}</Chip>
+          </div>
+          <p className="mt-1 font-semibold text-forest">{r.crop ?? "Crop not given"}: {r.disease ?? "No diagnosis"}</p>
+          <p className="small">{r.user_name || "No name"}{r.phone ? <> · <a className="underline" href={`tel:${r.phone}`}>+91 {r.phone}</a></> : null}{r.village ? ` · ${r.village}` : ""}{r.scan_id ? " · photo in Scans tab" : ""}</p>
+          {r.note && <p className="mt-2 rounded-xl bg-surface p-3 text-sm">"{r.note}"</p>}
+          <div className="mt-3 flex flex-col gap-2 md:flex-row">
+            <input className="field-input" placeholder="Reply / advice for the farmer" value={replies[r.id] ?? r.lab_reply ?? ""} onChange={(e) => setReplies({ ...replies, [r.id]: e.target.value })} />
+            <select className="field-input md:!w-40" value={r.status} onChange={(e) => update(r.id, { status: e.target.value as CloudEscalation["status"] })} aria-label="Status">
+              {Object.entries(STATUS_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
+            <Button variant="secondary" onClick={() => update(r.id, { lab_reply: replies[r.id] ?? r.lab_reply ?? "" })}>Save reply</Button>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function toCsv(rows: CloudScan[]) {
   const cols: (keyof CloudScan)[] = ["created_at", "user_name", "phone", "village", "device_id", "source", "is_plant", "plant", "is_tomato", "disease", "severity", "confidence", "feedback", "admin_note", "photo_path", "id"];
   const esc = (v: unknown) => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
@@ -67,7 +111,7 @@ export default function Admin() {
   const [more, setMore] = useState(true);
   const [q, setQ] = useState(""), [filter, setFilter] = useState<"all" | "diseased" | "healthy" | "not-tomato" | "not-plant">("all");
   const [open, setOpen] = useState<CloudScan | null>(null);
-  const [tab, setTab] = useState<"scans" | "questions">("scans");
+  const [tab, setTab] = useState<"scans" | "questions" | "labs">("scans");
   const [note, setNote] = useState("");
 
   useEffect(() => {
@@ -169,12 +213,12 @@ export default function Admin() {
         </div>
       </div>
 
-      <div role="tablist" aria-label="Admin sections" className="mt-6 inline-grid grid-cols-2 gap-1 rounded-xl bg-surface p-1">
-        {([["scans", "Scans"], ["questions", "Farmer questions"]] as const).map(([id, label]) => (
+      <div role="tablist" aria-label="Admin sections" className="mt-6 inline-grid grid-cols-3 gap-1 rounded-xl bg-surface p-1">
+        {([["scans", "Scans"], ["questions", "Farmer questions"], ["labs", "Lab requests"]] as const).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`min-h-[44px] rounded-lg px-4 text-sm font-semibold ${tab === id ? "bg-white text-forest shadow-soft" : "text-muted hover:text-forest"}`}>{label}</button>
         ))}
       </div>
-      {tab === "questions" ? <Questions /> : <>
+      {tab === "questions" ? <Questions /> : tab === "labs" ? <LabRequests /> : <>
       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-5">
         {[["Scans loaded", stats.total], ["Users (phones)", stats.users], ["Today", stats.today], ["With a problem", stats.diseased], ["Not tomato", stats.notTomato]].map(([l, v]) => (
           <div key={l} className="rounded-card border border-line bg-white p-4"><p className="small">{l}</p><p className="font-heading text-3xl font-extrabold text-forest">{v}</p></div>

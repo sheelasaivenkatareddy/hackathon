@@ -10,3 +10,5 @@ admin-credentials.txt
 .supabase-db-password.txt
 supabase/.temp
 .claude/settings.local.json
+.vite-dev.log
+.vite-preview.log

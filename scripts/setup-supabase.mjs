@@ -96,15 +96,21 @@ if (!res.ok) {
 writeFileSync("admin-credentials.txt", `Patra Lens admin (sign in at /admin)\nEmail: ${ADMIN_EMAIL}\nPassword: ${password}\nSupabase dashboard: https://supabase.com/dashboard/project/${REF}\n`);
 
 // 4. function + Claude key
-step("Deploying the analyze-leaf and ask-agent functions");
+step("Deploying the analyze-leaf, ask-agent and kisan-hub functions");
 if (env.ANTHROPIC_API_KEY) {
   await api(`/projects/${REF}/secrets`, { method: "POST", body: JSON.stringify([{ name: "ANTHROPIC_API_KEY", value: env.ANTHROPIC_API_KEY }]) });
   console.log("  Claude key stored as a function secret.");
 } else {
   console.log("  No ANTHROPIC_API_KEY: scans will use the on-phone AI and still be saved. Add the key and re-run to turn on AI vision.");
 }
+if (env.DATA_GOV_API_KEY) {
+  await api(`/projects/${REF}/secrets`, { method: "POST", body: JSON.stringify([{ name: "DATA_GOV_API_KEY", value: env.DATA_GOV_API_KEY }]) });
+  console.log("  data.gov.in key stored: Mandi prices will be live from Agmarknet.");
+} else {
+  console.log("  No DATA_GOV_API_KEY: Mandi prices show labelled sample data.");
+}
 const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-for (const fn of ["analyze-leaf", "ask-agent"]) {
+for (const fn of ["analyze-leaf", "ask-agent", "kisan-hub"]) {
   execFileSync(npx, ["--yes", "supabase@3.0.0", "functions", "deploy", fn, "--project-ref", REF, "--no-verify-jwt", "--use-api"],
     { stdio: "inherit", env: { ...process.env, SUPABASE_ACCESS_TOKEN: TOKEN }, shell: process.platform === "win32" });
 }

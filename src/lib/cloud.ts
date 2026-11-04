@@ -52,11 +52,13 @@ export type CloudOutcome =
   | { ok: true; id: string; source: "ai-vision" | "on-device"; result: LeafResult }
   | { ok: false; code: "off" | "no_ai" | "ai_failed" | "limit" | "network" | "error"; message: string };
 
-async function call(mode: "analyze" | "save", photo: Blob, local?: unknown): Promise<CloudOutcome> {
+export interface Place { lat: number; lon: number }
+
+async function call(mode: "analyze" | "save", photo: Blob, local?: unknown, location?: Place | null): Promise<CloudOutcome> {
   if (!supabase) return { ok: false, code: "off", message: "Cloud is not set up." };
   const [image_b64, device_id, profile] = await Promise.all([toBase64(photo), deviceId(), getProfile()]);
   const { data, error } = await supabase.functions.invoke("analyze-leaf", {
-    body: { mode, image_b64, media_type: photo.type || "image/jpeg", device_id, profile, local },
+    body: { mode, image_b64, media_type: photo.type || "image/jpeg", device_id, profile, local, location },
   });
   if (error) {
     let body: { code?: string; error?: string } = {};
@@ -69,9 +71,26 @@ async function call(mode: "analyze" | "save", photo: Blob, local?: unknown): Pro
 }
 
 /** Claude vision looks at the photo; the photo and answer are saved for the admin. */
-export const analyzeInCloud = (photo: Blob) => call("analyze", photo);
+export const analyzeInCloud = (photo: Blob, location?: Place | null) => call("analyze", photo, undefined, location);
 /** Saves a result worked out on the phone, so the admin still sees the scan. */
-export const saveToCloud = (photo: Blob, local: LeafResult) => call("save", photo, local);
+export const saveToCloud = (photo: Blob, local: LeafResult, location?: Place | null) => call("save", photo, local, location);
+
+/** Forwards a scan to a lab, KVK, RBK/RSK or officer (kisan-hub function, escalations table). */
+export async function escalateInCloud(e: { scanId?: string; lab: { id: string; name: string }; crop?: string; disease?: string; note?: string; summary?: unknown }): Promise<{ ok: true; id: string } | { ok: false; message: string }> {
+  if (!supabase) return { ok: false, message: "Cloud is not set up." };
+  const [device_id, profile] = await Promise.all([deviceId(), getProfile()]);
+  const { data, error } = await supabase.functions.invoke("kisan-hub", {
+    body: { action: "escalate", device_id, scan_id: e.scanId, lab: e.lab, crop: e.crop, disease: e.disease, note: e.note, summary: e.summary, profile },
+  });
+  if (error) return { ok: false, message: error.message };
+  return { ok: true, id: data.id };
+}
+
+export interface CloudEscalation {
+  id: string; created_at: string; scan_id: string | null; user_name: string | null; phone: string | null; village: string | null;
+  lab_id: string; lab_name: string; crop: string | null; disease: string | null; note: string | null;
+  status: "new" | "in_review" | "resolved"; lab_reply: string | null;
+}
 
 // ------------------------------------------------------------------ admin
 export interface CloudScan {
