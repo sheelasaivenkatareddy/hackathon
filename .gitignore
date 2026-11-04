@@ -9,3 +9,4 @@ public/ort
 admin-credentials.txt
 .supabase-db-password.txt
 supabase/.temp
+.claude/settings.local.json
