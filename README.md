@@ -92,6 +92,8 @@ With Supabase connected, every scan is saved online (photo, result, the farmer's
 
 Without the key, the phone's own model gives the answer, the circles come from leaf colour (rougher), and the scan is still saved.
 
+**AI assistant:** the "Ask AI" button on every page opens a chat panel at the side. The `ask-agent` function sends the chat to Claude. It answers questions about diseases, fertilizer doses, sprays and watering in English, Telugu, Hindi or Kannada. It can use the farmer's latest scan, takes voice questions and reads answers aloud. Every question and answer is saved to the `agent_chats` table and shown under "Farmer questions" on `/admin`. Each phone can ask up to 40 questions an hour. Without the Claude key, the panel searches the disease library on the phone instead.
+
 Set it up once:
 
 1. Copy `.env.supabase.example` to `.env.supabase`. Fill in `SUPABASE_ACCESS_TOKEN` (from [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens)), `ADMIN_EMAIL`, and optionally `ANTHROPIC_API_KEY` (from [console.anthropic.com](https://console.anthropic.com/settings/keys)).

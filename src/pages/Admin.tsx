@@ -26,6 +26,31 @@ function SignIn({ onError }: { onError: string }) {
   );
 }
 
+interface Chat { id: string; created_at: string; device_id: string; user_name: string | null; lang: string | null; question: string; answer: string }
+
+function Questions() {
+  const [rows, setRows] = useState<Chat[] | null>(null);
+  const [err, setErr] = useState("");
+  useEffect(() => {
+    supabase!.from("agent_chats").select("*").order("created_at", { ascending: false }).limit(200)
+      .then(({ data, error }) => { if (error) setErr(error.message); else setRows((data ?? []) as Chat[]); });
+  }, []);
+  if (err) return <p role="alert" className="mt-6 font-semibold text-tomato-dark">Could not load questions: {err}</p>;
+  if (!rows) return <p className="mt-6" role="status">Loading…</p>;
+  if (!rows.length) return <p className="mt-8 text-center">No questions yet.</p>;
+  return (
+    <ul className="mt-6 space-y-3">
+      {rows.map((c) => (
+        <li key={c.id} className="rounded-card border border-line bg-white p-4">
+          <p className="tiny">{fmt(c.created_at)} · {c.user_name || "No name"} · {c.lang?.toUpperCase()} · device {c.device_id.slice(0, 8)}</p>
+          <p className="mt-1 font-semibold text-forest">{c.question}</p>
+          <details className="mt-1"><summary className="cursor-pointer text-sm font-semibold text-green-dark">Answer</summary><p className="mt-2 whitespace-pre-line text-sm">{c.answer}</p></details>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function toCsv(rows: CloudScan[]) {
   const cols: (keyof CloudScan)[] = ["created_at", "user_name", "phone", "village", "device_id", "source", "is_plant", "plant", "is_tomato", "disease", "severity", "confidence", "feedback", "admin_note", "photo_path", "id"];
   const esc = (v: unknown) => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
@@ -42,6 +67,7 @@ export default function Admin() {
   const [more, setMore] = useState(true);
   const [q, setQ] = useState(""), [filter, setFilter] = useState<"all" | "diseased" | "healthy" | "not-tomato" | "not-plant">("all");
   const [open, setOpen] = useState<CloudScan | null>(null);
+  const [tab, setTab] = useState<"scans" | "questions">("scans");
   const [note, setNote] = useState("");
 
   useEffect(() => {
@@ -143,6 +169,12 @@ export default function Admin() {
         </div>
       </div>
 
+      <div role="tablist" aria-label="Admin sections" className="mt-6 inline-grid grid-cols-2 gap-1 rounded-xl bg-surface p-1">
+        {([["scans", "Scans"], ["questions", "Farmer questions"]] as const).map(([id, label]) => (
+          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`min-h-[44px] rounded-lg px-4 text-sm font-semibold ${tab === id ? "bg-white text-forest shadow-soft" : "text-muted hover:text-forest"}`}>{label}</button>
+        ))}
+      </div>
+      {tab === "questions" ? <Questions /> : <>
       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-5">
         {[["Scans loaded", stats.total], ["Users (phones)", stats.users], ["Today", stats.today], ["With a problem", stats.diseased], ["Not tomato", stats.notTomato]].map(([l, v]) => (
           <div key={l} className="rounded-card border border-line bg-white p-4"><p className="small">{l}</p><p className="font-heading text-3xl font-extrabold text-forest">{v}</p></div>
@@ -182,6 +214,7 @@ export default function Admin() {
         ))}
       </ul>
       {more && rows.length > 0 && <div className="mt-6 text-center"><Button variant="secondary" onClick={() => load(false)} loading={loading}>Load more</Button></div>}
+      </>}
 
       <BottomSheet open={!!open} onClose={() => setOpen(null)} title={open ? `${open.user_name || "No name"} · ${fmt(open.created_at)}` : ""}>
         {open && (

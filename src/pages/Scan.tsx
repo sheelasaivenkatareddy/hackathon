@@ -9,6 +9,7 @@ import { LiveConditions, ScanReport, SummaryBar, humanSummary } from "../compone
 import { AcceptedPhoto, PhotoFlow } from "../components/PhotoFlow";
 import { BottomSheet, Button, Chip, ModelStatusChip, useToast } from "../components/ui";
 import ScanningPhoto from "../components/viz/ScanningPhoto";
+import { shareScanWithAgent } from "../lib/agent";
 import { localResult } from "../lib/careplan";
 import { LeafResult, Profile, analyzeInCloud, cloudConfigured, getProfile, saveProfile, saveToCloud } from "../lib/cloud";
 import { Diagnosis, PLANTS, diagnose, modelStatus } from "../lib/diagnose";
@@ -72,6 +73,7 @@ export default function Scan() {
     const affectedPct = leafMasks(a.work).affectedPct;
     const local = localResult(d, photoKind(a.work), spotRegions(a.work));
     const ai = cloud ? await cloud : null;
+    shareScanWithAgent(ai?.ok ? ai.result : local);
     if (ai?.ok) setReport({ result: ai.result, source: "ai-vision" });
     else {
       setReport({ result: local, source: "on-device" });

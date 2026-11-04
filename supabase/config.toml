@@ -2,3 +2,6 @@ project_id = "patra-lens"
 
 [functions.analyze-leaf]
 verify_jwt = false
+
+[functions.ask-agent]
+verify_jwt = false

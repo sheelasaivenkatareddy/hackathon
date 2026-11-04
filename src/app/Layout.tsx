@@ -3,6 +3,7 @@ import { motion, useScroll } from "framer-motion";
 import { BookOpen, CloudSun, Globe, History, LayoutDashboard, Home, Info, Menu, RadioTower, ScanLine, Settings, ShieldCheck, Sprout, UserCheck } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import AgentPanel from "../components/AgentPanel";
 import Footer from "../components/Footer";
 import { BottomSheet, Button } from "../components/ui";
 import { db, getSetting } from "../lib/db";
@@ -99,6 +100,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       <main id="main" className="flex-1">{children}</main>
       <div className="pb-20 lg:pb-0"><Footer /></div>
+      <AgentPanel />
 
       <nav className="pb-safe fixed inset-x-0 bottom-0 z-[500] border-t border-line bg-white lg:hidden" aria-label="Main">
         <ul className="mx-auto grid max-w-lg grid-cols-5">

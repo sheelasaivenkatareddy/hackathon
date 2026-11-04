@@ -7,7 +7,7 @@
 //  5. writes .env.local with the public URL and key for the website
 import { execFileSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 
 const API = "https://api.supabase.com/v1";
 const ENV_FILE = ".env.supabase";
@@ -70,11 +70,14 @@ const ANON = keyOf("anon"), SERVICE = keyOf("service_role");
 if (!ANON || !SERVICE) throw new Error("Could not read the project's anon and service_role keys.");
 
 // 2. schema
-step("Creating the scans table, photo bucket and admin rules");
-const sql = readFileSync("supabase/migrations/0001_scans.sql", "utf8");
-for (let i = 0; ; i++) {
-  try { await api(`/projects/${REF}/database/query`, { method: "POST", body: JSON.stringify({ query: sql }) }); break; }
-  catch (e) { if (i > 11) throw e; await sleep(10_000); }
+step("Creating the tables, photo bucket and admin rules");
+for (const file of readdirSync("supabase/migrations").filter((f) => f.endsWith(".sql")).sort()) {
+  const sql = readFileSync(`supabase/migrations/${file}`, "utf8");
+  for (let i = 0; ; i++) {
+    try { await api(`/projects/${REF}/database/query`, { method: "POST", body: JSON.stringify({ query: sql }) }); break; }
+    catch (e) { if (i > 11) throw e; await sleep(10_000); }
+  }
+  console.log(`  ${file}`);
 }
 
 // 3. admin account
@@ -93,7 +96,7 @@ if (!res.ok) {
 writeFileSync("admin-credentials.txt", `Patra Lens admin (sign in at /admin)\nEmail: ${ADMIN_EMAIL}\nPassword: ${password}\nSupabase dashboard: https://supabase.com/dashboard/project/${REF}\n`);
 
 // 4. function + Claude key
-step("Deploying the analyze-leaf function");
+step("Deploying the analyze-leaf and ask-agent functions");
 if (env.ANTHROPIC_API_KEY) {
   await api(`/projects/${REF}/secrets`, { method: "POST", body: JSON.stringify([{ name: "ANTHROPIC_API_KEY", value: env.ANTHROPIC_API_KEY }]) });
   console.log("  Claude key stored as a function secret.");
@@ -101,8 +104,10 @@ if (env.ANTHROPIC_API_KEY) {
   console.log("  No ANTHROPIC_API_KEY: scans will use the on-phone AI and still be saved. Add the key and re-run to turn on AI vision.");
 }
 const npx = process.platform === "win32" ? "npx.cmd" : "npx";
-execFileSync(npx, ["--yes", "supabase@3.0.0", "functions", "deploy", "analyze-leaf", "--project-ref", REF, "--no-verify-jwt", "--use-api"],
-  { stdio: "inherit", env: { ...process.env, SUPABASE_ACCESS_TOKEN: TOKEN }, shell: process.platform === "win32" });
+for (const fn of ["analyze-leaf", "ask-agent"]) {
+  execFileSync(npx, ["--yes", "supabase@3.0.0", "functions", "deploy", fn, "--project-ref", REF, "--no-verify-jwt", "--use-api"],
+    { stdio: "inherit", env: { ...process.env, SUPABASE_ACCESS_TOKEN: TOKEN }, shell: process.platform === "win32" });
+}
 
 // 5. website settings
 step("Writing .env.local for the website");
