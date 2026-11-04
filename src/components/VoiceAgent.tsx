@@ -15,7 +15,8 @@ type Phase = "idle" | "listening" | "thinking" | "speaking";
 
 const pref = (k: string) => { try { return localStorage.getItem(k) === "1"; } catch { return false; } };
 const savePref = (k: string, v: boolean) => { try { localStorage.setItem(k, v ? "1" : "0"); } catch { /* blocked */ } };
-const introFor = (path: string, l: VoiceLang) => (INTRO[path] ?? INTRO[path.replace(/\/$/, "")])?.[l];
+const isWindowsNotEdge = () => /Windows/.test(navigator.userAgent) && !/Edg\//.test(navigator.userAgent);
+const introFor =(path: string, l: VoiceLang) => (INTRO[path] ?? INTRO[path.replace(/\/$/, "")])?.[l];
 
 /** `lift` raises the orb above the chat button on the main site. */
 export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
@@ -163,7 +164,17 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
               {said && <p className="mt-1.5 max-h-40 overflow-y-auto whitespace-pre-wrap text-white">{said.replace(/\*\*/g, "")}</p>}
               {!heard && !said && <p className="mt-1.5 text-slate-400">Try: “హాయ్”, “మండి ధరలు చూపించు”, “open weather”, “read this page”, or ask about your crop.</p>}
               {err && <p role="alert" className="mt-1.5 font-semibold text-[#F87171]">{err}</p>}
-              {noVoiceFor(lang) && <p className="mt-1.5 text-xs text-[#FBBF24]">{voiceHelp(lang)}</p>}
+              {noVoiceFor(lang) && (
+                <div className="mt-1.5">
+                  <p className="text-xs text-[#FBBF24]">{voiceHelp(lang)}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {isWindowsNotEdge() && (
+                      <a href={`microsoft-edge:${window.location.href}`} className="inline-flex min-h-[36px] items-center rounded-lg bg-[#22D3EE] px-3 text-xs font-bold text-[#040A18] hover:brightness-110">Open in Edge</a>
+                    )}
+                    {lang !== "en" && <button onClick={() => setHubLang("en")} className="inline-flex min-h-[36px] items-center rounded-lg border border-white/15 px-3 text-xs font-bold text-white hover:bg-white/10">Use English voice</button>}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">

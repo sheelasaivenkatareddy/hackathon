@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { ChatMsg, askAgent, shareScanWithAgent } from "../../lib/agent";
 import { cloudConfigured } from "../../lib/cloud";
 import { bestSprayWindow, loadForecast, next24, sprayHours } from "../forecast";
-import { VoiceLang, districtOf, getHubScans, useHubLang, useUser } from "../store";
+import { VoiceLang, districtOf, getHubScans, setHubLang, useHubLang, useUser } from "../store";
 import { Glass, LangPicker, PageHead, Pill } from "../ui";
 import { GREETING, UI, VOICE_LANGS, askMic, canListen, canSpeak, isGreeting, listen, listenError, speak, stopSpeaking, voiceFor, voiceHelp, weatherSentence } from "../voice";
 
@@ -141,7 +141,15 @@ export default function KisanVani() {
           <p className="font-heading text-lg font-bold text-white" aria-live="polite">{phase === "idle" ? t.tap : t[phase]}</p>
           {partial && <p className="mt-2 max-w-xs text-center text-slate-300">"{partial}"</p>}
           {!canListen() && <p className="mt-2 text-center text-xs text-slate-400">This browser cannot hear speech. Use Chrome on Android, or type below.</p>}
-          {noVoice && <p className="mt-2 text-center text-xs text-neon-amber">{voiceHelp(lang)}</p>}
+          {noVoice && (
+            <div className="mt-2 text-center">
+              <p className="text-xs text-neon-amber">{voiceHelp(lang)}</p>
+              <div className="mt-2 flex flex-wrap justify-center gap-2">
+                {/Windows/.test(navigator.userAgent) && !/Edg\//.test(navigator.userAgent) && <a href={`microsoft-edge:${window.location.href}`} className="hub-btn-primary !min-h-[36px] !text-xs">Open in Edge</a>}
+                {lang !== "en" && <button onClick={() => setHubLang("en")} className="hub-btn-ghost !min-h-[36px] !text-xs">Use English voice</button>}
+              </div>
+            </div>
+          )}
 
           <div className="mt-6 grid w-full grid-cols-3 gap-2">
             <button onClick={speakDiagnosis} className="flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-3 text-xs font-bold text-slate-200 hover:border-neon-red/50"><Leaf className="h-5 w-5 text-neon-red" aria-hidden />My diagnosis</button>
