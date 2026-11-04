@@ -35,7 +35,7 @@ export interface Profile { name: string; phone: string; village: string }
 export const getProfile = () => getSetting<Profile>("profile", { name: "", phone: "", village: "" });
 export const saveProfile = (p: Profile) => setSetting("profile", p);
 
-async function deviceId(): Promise<string> {
+export async function deviceId(): Promise<string> {
   let id = await getSetting<string>("deviceId", "");
   if (!id) { id = uid(); await setSetting("deviceId", id); }
   return id;

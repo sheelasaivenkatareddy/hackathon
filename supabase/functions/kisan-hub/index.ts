@@ -1,5 +1,6 @@
 // kisan-hub: server side of Kisan Hub.
 // POST { action: "mandi", state, commodities }  -> live APMC prices from Agmarknet (data.gov.in), when DATA_GOV_API_KEY is set.
+// POST { action: "chat", device_id, system, messages } -> an answer from Google Gemini, when GEMINI_API_KEY is set.
 // POST { action: "escalate", device_id, scan_id?, lab: { id, name }, crop?, disease?, note?, summary?, profile? }
 //   -> saves a scan forwarded to a lab or RBK in the escalations table.
 // Secrets: DATA_GOV_API_KEY (optional), SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (set by Supabase).
@@ -18,6 +19,10 @@ const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 const clean = (v: unknown, max = 120) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const GEMINI_MODEL = "gemini-flash-latest";
+const MAX_CHATS_PER_HOUR = 60; // per device, so one phone cannot use up the shared free quota
+const chatHits = new Map<string, number[]>(); // per warm instance; good enough for a soft limit
 
 // One warm instance serves many phones, so a short cache keeps data.gov.in calls low.
 const mandiCache = new Map<string, { at: number; records: unknown[] }>();
@@ -79,6 +84,38 @@ Deno.serve(async (req) => {
     const { data, error } = await db.from("escalations").insert(row).select("id").single();
     if (error) { console.error("escalate failed", error); return json({ error: "Could not save the request." }, 500); }
     return json({ id: data.id });
+  }
+
+  if (body.action === "chat") {
+    // Free-tier AI for the assistants when the Claude key is not set: Google Gemini (free key, no card).
+    const key = Deno.env.get("GEMINI_API_KEY");
+    if (!key) return json({ error: "Gemini is not set up.", code: "no_ai" }, 503);
+    const deviceId = clean(body.device_id, 64);
+    if (!deviceId) return json({ error: "device_id is required." }, 400);
+    const now = Date.now(), hits = (chatHits.get(deviceId) ?? []).filter((t) => now - t < 3600_000);
+    if (hits.length >= MAX_CHATS_PER_HOUR) return json({ error: "Too many questions from this phone in the last hour.", code: "limit" }, 429);
+    chatHits.set(deviceId, [...hits, now]);
+    const system = clean(body.system, 6000) ?? "";
+    const msgs = (Array.isArray(body.messages) ? body.messages : []).slice(-10)
+      .filter((m: any) => (m?.role === "user" || m?.role === "assistant") && typeof m.content === "string")
+      .map((m: any) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content.slice(0, 2000) }] }));
+    if (!msgs.length) return json({ error: "messages are required." }, 400);
+    try {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+        signal: AbortSignal.timeout(25_000),
+        body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: msgs, generationConfig: { maxOutputTokens: 800, temperature: 0.4 } }),
+      });
+      if (!r.ok) { console.error("gemini", r.status, (await r.text()).slice(0, 300)); return json({ error: "The AI could not answer.", code: "ai_failed" }, 502); }
+      const j = await r.json();
+      const answer = (j?.candidates?.[0]?.content?.parts ?? []).map((p: any) => p.text ?? "").join("").trim();
+      if (!answer) return json({ error: "The AI sent no answer.", code: "ai_failed" }, 502);
+      return json({ answer });
+    } catch (e) {
+      console.error("gemini failed", e);
+      return json({ error: "The AI could not answer.", code: "ai_failed" }, 502);
+    }
   }
 
   return json({ error: "Unknown action." }, 400);

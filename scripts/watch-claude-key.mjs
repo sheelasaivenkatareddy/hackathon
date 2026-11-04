@@ -12,7 +12,7 @@ const deadline = Date.now() + 2 * 3600_000;
 while (Date.now() < deadline) {
   const env = read();
   const ref = env.SUPABASE_PROJECT_REF, token = env.SUPABASE_ACCESS_TOKEN;
-  const todo = ["ANTHROPIC_API_KEY", "DATA_GOV_API_KEY"].filter((k) => env[k] && !installed.has(k));
+  const todo = ["ANTHROPIC_API_KEY", "GEMINI_API_KEY", "DATA_GOV_API_KEY"].filter((k) => env[k] && !installed.has(k));
   if (ref && token && todo.length) {
     const r = await fetch(`https://api.supabase.com/v1/projects/${ref}/secrets`, {
       method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
@@ -21,7 +21,7 @@ while (Date.now() < deadline) {
     if (r.ok) { todo.forEach((k) => installed.add(k)); console.log(`installed: ${todo.join(", ")}`); }
     else console.log(`could not install (${r.status}); will retry`);
   }
-  if (installed.has("ANTHROPIC_API_KEY")) break;
+  if (installed.has("ANTHROPIC_API_KEY") && installed.has("GEMINI_API_KEY")) break;
   await new Promise((res) => setTimeout(res, 5000));
 }
 console.log(installed.size ? "done" : "no key added within 2 hours");

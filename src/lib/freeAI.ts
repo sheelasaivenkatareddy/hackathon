@@ -4,7 +4,7 @@
 // The farmer's question, recent chat and a summary of their last scan are sent; nothing else.
 // Replace with the Claude ask-agent function in production by adding ANTHROPIC_API_KEY.
 import type { ChatMsg } from "./agent";
-import type { LeafResult } from "./cloud";
+import { type LeafResult, deviceId, supabase } from "./cloud";
 
 const URL_ = "https://text.pollinations.ai/openai";
 const LANG_NAME: Record<string, string> = { en: "English", te: "Telugu", hi: "Hindi", ta: "Tamil", kn: "Kannada", ml: "Malayalam" };
@@ -31,22 +31,41 @@ Organic: ${s.care.organic.map((o) => `${o.product} ${o.dose}`).join("; ") || "no
 Recovery: ${s.care.recovery || "not given"}.`;
 }
 
-export async function askFreeAI(messages: ChatMsg[], lang: string, voice: boolean, context: string): Promise<string | null> {
+/** Google Gemini through the kisan-hub function (free key kept on the server). null when not set up. */
+async function askGemini(messages: ChatMsg[], system: string): Promise<string | null> {
+  if (!supabase) return null;
   try {
-    const r = await fetch(URL_, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      signal: AbortSignal.timeout(30_000),
-      body: JSON.stringify({
-        model: "openai",
-        messages: [{ role: "system", content: `${SYSTEM(lang, voice)}\n\n${context}` }, ...messages.slice(-10).map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }))],
-      }),
+    const { data, error } = await supabase.functions.invoke("kisan-hub", {
+      body: { action: "chat", device_id: await deviceId(), system, messages: messages.slice(-10) },
     });
-    if (!r.ok) return null;
-    const j = await r.json();
-    const text = String(j?.choices?.[0]?.message?.content ?? "").trim();
-    return text || null;
-  } catch {
-    return null;
+    if (error || !data?.answer) return null;
+    return String(data.answer).trim() || null;
+  } catch { return null; }
+}
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Pollinations free tier. If it says "retry after N s", wait and retry (at most twice, up to 25 s). */
+async function askPollinations(messages: ChatMsg[], system: string): Promise<string | null> {
+  const body = JSON.stringify({ model: "openai", messages: [{ role: "system", content: system }, ...messages.slice(-10).map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }))] });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const r = await fetch(URL_, { method: "POST", headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(30_000), body });
+      if (r.ok) {
+        const text = String((await r.json())?.choices?.[0]?.message?.content ?? "").trim();
+        return text || null;
+      }
+      if (r.status !== 402 && r.status !== 429) return null;
+      const msg = await r.text();
+      const secs = Number(msg.match(/retry after (\d+)\s*s/i)?.[1] ?? 15);
+      if (secs > 25) return null;
+      await wait((secs + 1) * 1000);
+    } catch { return null; }
   }
+  return null;
+}
+
+export async function askFreeAI(messages: ChatMsg[], lang: string, voice: boolean, context: string): Promise<string | null> {
+  const system = `${SYSTEM(lang, voice)}\n\n${context}`;
+  return (await askGemini(messages, system)) ?? (await askPollinations(messages, system));
 }

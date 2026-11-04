@@ -105,6 +105,10 @@ if (env.ANTHROPIC_API_KEY) {
 } else {
   console.log("  No ANTHROPIC_API_KEY: scans will use the on-phone AI and still be saved. Add the key and re-run to turn on AI vision.");
 }
+if (env.GEMINI_API_KEY) {
+  await api(`/projects/${REF}/secrets`, { method: "POST", body: JSON.stringify([{ name: "GEMINI_API_KEY", value: env.GEMINI_API_KEY }]) });
+  console.log("  Gemini key stored: free AI answers without the 45-second limit.");
+}
 if (env.DATA_GOV_API_KEY) {
   await api(`/projects/${REF}/secrets`, { method: "POST", body: JSON.stringify([{ name: "DATA_GOV_API_KEY", value: env.DATA_GOV_API_KEY }]) });
   console.log("  data.gov.in key stored: Mandi prices will be live from Agmarknet.");
