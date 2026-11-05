@@ -5,6 +5,7 @@ import { ArrowLeft, Building2, Calculator, CloudSun, Gift, LayoutDashboard, LogO
 import { ReactNode, useEffect, useState } from "react";
 import { Link, NavLink, Navigate, useLocation } from "react-router-dom";
 import VoiceAgent from "../components/VoiceAgent";
+import { OfflineGate, useOnline, worksOffline } from "../components/OfflineGate";
 import { cacheOfflinePack, ensureOfflinePack, usePackState } from "../lib/offline";
 import { signOut, useUser } from "./store";
 import { startSync, syncNow, useSyncState } from "./sync";
@@ -39,7 +40,7 @@ function SyncBadge({ className = "" }: { className?: string }) {
   const { online, syncing, waiting } = useSyncState();
   const pack = usePackState();
   const tone = !online ? "border-neon-amber/40 bg-neon-amber/10 text-neon-amber" : waiting ? "border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan" : "border-neon-lime/30 bg-neon-lime/10 text-neon-lime";
-  const label = !online ? `Offline${waiting ? ` · ${waiting} waiting to upload` : " · scans still work"}` : syncing ? "Uploading…" : waiting ? `${waiting} waiting · tap to upload` : "Online · all saved";
+  const label = !online ? `Offline · scan only${waiting ? ` · ${waiting} waiting to upload` : ""}` : syncing ? "Uploading…" : waiting ? `${waiting} waiting · tap to upload` : "Online · all saved";
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
       <button onClick={() => syncNow()} disabled={!online || syncing || !waiting} aria-live="polite"
@@ -57,6 +58,7 @@ export default function HubLayout({ children }: { children: ReactNode }) {
   const user = useUser();
   const { pathname } = useLocation();
   const [more, setMore] = useState(false);
+  const online = useOnline();
   useEffect(() => setMore(false), [pathname]);
   const active = (to: string) => (to === "/hub" ? pathname === "/hub" || pathname === "/hub/" : pathname.startsWith(to));
 
@@ -69,7 +71,8 @@ export default function HubLayout({ children }: { children: ReactNode }) {
   }, [user]);
 
   if (pathname.startsWith("/hub/login") || pathname.startsWith("/hub/expert-login")) return <div className="hub min-h-screen">{children}</div>;
-  if (!user) return <Navigate to={`/hub/login?next=${encodeURIComponent(pathname)}`} replace />;
+  // Signing in needs the internet: offline, go to the scanner that works without an account.
+  if (!user) return <Navigate to={online ? `/hub/login?next=${encodeURIComponent(pathname)}` : "/scan"} replace />;
 
   const initials = user.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "K";
   const UserCard = () => (
@@ -92,10 +95,10 @@ export default function HubLayout({ children }: { children: ReactNode }) {
         <Logo />
         <nav className="mt-8 flex-1 space-y-1" aria-label="Kisan Hub">
           {HUB_NAV.map((n) => (
-            <NavLink key={n.to} to={n.to} end={n.to === "/hub"} className={`relative flex min-h-[44px] items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${active(n.to) ? "text-white" : "text-slate-400 hover:text-white"}`}>
+            <NavLink key={n.to} to={n.to} end={n.to === "/hub"} className={`relative flex min-h-[44px] items-center gap-3 rounded-xl px-3 text-sm font-semibold transition ${active(n.to) ? "text-white" : "text-slate-400 hover:text-white"} ${!online && !worksOffline(n.to) ? "opacity-35" : ""}`}>
               {active(n.to) && <motion.span layoutId="hub-nav" className="absolute inset-0 rounded-xl border border-neon-cyan/30 bg-neon-cyan/10 shadow-[inset_3px_0_0_#22D3EE]" transition={{ type: "spring", stiffness: 400, damping: 34 }} />}
               <n.icon className={`relative h-5 w-5 ${active(n.to) ? "text-neon-cyan" : ""}`} aria-hidden />
-              <span className="relative">{n.label}</span>
+              <span className="relative">{n.label}</span>{!online && !worksOffline(n.to) && <span className="relative ml-auto text-[10px] font-bold uppercase text-slate-500">online</span>}
             </NavLink>
           ))}
         </nav>
@@ -113,11 +116,11 @@ export default function HubLayout({ children }: { children: ReactNode }) {
       {/* No z-index here: page dialogs (z-[60]) must stack above the fixed bars. */}
       <SyncBadge className="px-4 pt-3 lg:hidden" />
       <main className="relative px-4 pb-28 pt-5 md:px-8 md:pt-8 lg:ml-64 lg:pb-12">
-        <div className="mx-auto max-w-6xl">{children}</div>
+        <div className="mx-auto max-w-6xl"><OfflineGate dark>{children}</OfflineGate></div>
       </main>
 
       {/* Kisan Vani has its own big microphone. */}
-      {!pathname.startsWith("/hub/vani") && <VoiceAgent />}
+      {online && !pathname.startsWith("/hub/vani") && <VoiceAgent />}
 
       {/* phone bottom bar */}
       <nav className="pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-navy-950/90 backdrop-blur-xl lg:hidden" aria-label="Kisan Hub">

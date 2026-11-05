@@ -7,6 +7,7 @@ import AgentPanel from "../components/AgentPanel";
 import Footer from "../components/Footer";
 import VoiceAgent from "../components/VoiceAgent";
 import HubLayout from "../hub/HubLayout";
+import { ConnectionPill, OfflineGate, useOnline, worksOffline } from "../components/OfflineGate";
 import { BottomSheet, Button } from "../components/ui";
 import { db, getSetting } from "../lib/db";
 import { LANGS, useI18n } from "../lib/i18n";
@@ -51,6 +52,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const { t, sheetOpen, setSheetOpen } = useI18n();
   const [moreOpen, setMoreOpen] = useState(false);
   const { pathname } = useLocation();
+  const online = useOnline();
   const { scrollYProgress } = useScroll();
   const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
   useEffect(() => setMoreOpen(false), [pathname]);
@@ -89,9 +91,10 @@ export default function Layout({ children }: { children: ReactNode }) {
           <Link to="/" className="flex min-h-[44px] items-center gap-2 font-heading text-lg font-extrabold text-forest">
             <img src="/logo.svg" alt="" className="h-8 w-8" />Patra Lens
           </Link>
+          <ConnectionPill className="lg:hidden" />
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
             {ITEMS.map((it) => (
-              <NavLink key={it.to} to={it.to} end={it.to === "/"} className={`relative flex min-h-[44px] items-center rounded-full px-4 text-[15px] font-semibold ${isActive(it.to) ? "text-forest" : "text-muted hover:text-forest"}`}>
+              <NavLink key={it.to} to={it.to} end={it.to === "/"} className={`relative flex min-h-[44px] items-center rounded-full px-4 text-[15px] font-semibold ${isActive(it.to) ? "text-forest" : "text-muted hover:text-forest"} ${!online && !worksOffline(it.to) ? "opacity-40" : ""}`}>
                 {isActive(it.to) && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-full bg-green-tint" transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
                 <span className="relative">{it.label ?? t(it.key)}</span>
               </NavLink>
@@ -99,6 +102,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <button onClick={() => setMoreOpen(true)} className="flex min-h-[44px] items-center rounded-full px-4 text-[15px] font-semibold text-muted hover:text-forest">More</button>
           </nav>
           <div className="hidden items-center gap-3 lg:flex">
+            <ConnectionPill />
             <LanguageSwitch />
             <Link to="/hub/expert-login" className="flex min-h-[44px] items-center rounded-full px-3 text-[15px] font-semibold text-muted hover:text-forest">Lab login</Link>
             <Button to="/hub" className="!text-[15px]"><Zap className="h-4 w-4" aria-hidden />Open Kisan Hub</Button>
@@ -107,10 +111,11 @@ export default function Layout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main id="main" className="flex-1">{children}</main>
+      <main id="main" className="flex-1"><OfflineGate>{children}</OfflineGate></main>
       <div className="pb-20 lg:pb-0"><Footer /></div>
-      <AgentPanel />
-      <VoiceAgent lift />
+      {/* Offline = scan only: the AI chat and voice need the internet. */}
+      {online && <AgentPanel />}
+      {online && <VoiceAgent lift />}
 
       <nav className="pb-safe fixed inset-x-0 bottom-0 z-[500] border-t border-line bg-white lg:hidden" aria-label="Main">
         <ul className="mx-auto grid max-w-lg grid-cols-5">
