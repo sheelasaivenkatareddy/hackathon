@@ -33,7 +33,7 @@ export function listenError(code: string): string {
     case "not-allowed": case "service-not-allowed":
       return "Microphone not allowed. Tap the lock icon in the address bar → Microphone → Allow. Or type your question below.";
     case "audio-capture": return "No microphone was found. Plug in a headset or check the Windows sound settings.";
-    case "network": return "Speech recognition needs the internet. Check the connection and try again.";
+    case "network": return "This browser could not reach its voice-typing service. Use Google Chrome (Edge and Brave often block it), check the internet, or type your question below.";
     case "language-not-supported": return "This browser cannot understand this language by voice. Try English, or use Chrome.";
     case "unsupported": return "This browser cannot hear speech. Use Google Chrome or Microsoft Edge.";
     default: return `Voice input stopped (${code}). Tap the microphone and try again.`;

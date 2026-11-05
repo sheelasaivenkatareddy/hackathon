@@ -77,14 +77,21 @@ export default function VoiceAgent({ lift = false }: { lift?: boolean }) {
     if (!live.current) return;
     setPhase("listening"); setHeard(""); setErr("");
     let q = "";
-    try {
-      const l = listen(langRef.current, setHeard);
-      stopRef.current = l.stop;
-      q = await l.done;
-    } catch (e) {
-      live.current = false; setPhase("idle");
-      setErr(listenError((e as Error).message));
-      return;
+    // "network" is often a passing hiccup, or the browser lacking this language: retry once, then try English.
+    const tries: VoiceLang[] = [langRef.current, langRef.current, ...(langRef.current === "en" ? [] : ["en" as VoiceLang])];
+    for (let t = 0; t < tries.length; t++) {
+      try {
+        const l = listen(tries[t], setHeard);
+        stopRef.current = l.stop;
+        q = await l.done;
+        break;
+      } catch (e) {
+        const code = (e as Error).message;
+        if (code === "network" && t < tries.length - 1 && live.current) continue;
+        live.current = false; setPhase("idle");
+        setErr(listenError(code));
+        return;
+      }
     }
     if (!live.current) return;
     if (!q) {
