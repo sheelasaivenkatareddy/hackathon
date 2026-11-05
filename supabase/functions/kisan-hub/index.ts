@@ -20,7 +20,8 @@ const json = (body: unknown, status = 200) =>
 const clean = (v: unknown, max = 120) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const GEMINI_MODEL = "gemini-flash-latest";
+// Tried in order: when one model is busy (503/429), the next one answers.
+const GEMINI_MODELS = ["gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-flash-latest", "gemini-2.5-flash"]; // fastest first
 const MAX_CHATS_PER_HOUR = 60; // per device, so one phone cannot use up the shared free quota
 const chatHits = new Map<string, number[]>(); // per warm instance; good enough for a soft limit
 
@@ -100,22 +101,33 @@ Deno.serve(async (req) => {
       .filter((m: any) => (m?.role === "user" || m?.role === "assistant") && typeof m.content === "string")
       .map((m: any) => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content.slice(0, 2000) }] }));
     if (!msgs.length) return json({ error: "messages are required." }, 400);
-    try {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-        signal: AbortSignal.timeout(25_000),
-        body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: msgs, generationConfig: { maxOutputTokens: 800, temperature: 0.4 } }),
-      });
-      if (!r.ok) { console.error("gemini", r.status, (await r.text()).slice(0, 300)); return json({ error: "The AI could not answer.", code: "ai_failed" }, 502); }
-      const j = await r.json();
-      const answer = (j?.candidates?.[0]?.content?.parts ?? []).map((p: any) => p.text ?? "").join("").trim();
-      if (!answer) return json({ error: "The AI sent no answer.", code: "ai_failed" }, 502);
-      return json({ answer });
-    } catch (e) {
-      console.error("gemini failed", e);
-      return json({ error: "The AI could not answer.", code: "ai_failed" }, 502);
+    let lastDetail = "";
+    for (const model of GEMINI_MODELS) {
+      try {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+          signal: AbortSignal.timeout(9_000),
+          body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: msgs, generationConfig: { maxOutputTokens: 800, temperature: 0.4 } }),
+        });
+        if (!r.ok) {
+          const detail = (await r.text()).slice(0, 300);
+          lastDetail = `${model}: ${r.status} ${detail.match(/"message":\s*"([^"]+)/)?.[1] ?? ""}`;
+          console.error("gemini", lastDetail);
+          if (r.status === 503 || r.status === 429 || r.status === 404) continue; // busy or not available: next model
+          break;
+        }
+        const j = await r.json();
+        const answer = (j?.candidates?.[0]?.content?.parts ?? []).map((p: any) => p.text ?? "").join("").trim();
+        if (answer) return json({ answer, model });
+        lastDetail = `${model}: empty answer`;
+      } catch (e) {
+        lastDetail = `${model}: ${String(e).slice(0, 150)}`;
+        console.error("gemini failed", lastDetail);
+      }
     }
+    // Google's message (never the key) helps fix setup problems such as a wrong key.
+    return json({ error: "The AI could not answer.", code: "ai_failed", detail: lastDetail }, 502);
   }
 
   return json({ error: "Unknown action." }, 400);
