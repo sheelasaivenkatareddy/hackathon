@@ -38,7 +38,7 @@ export default function HubLayout({ children }: { children: ReactNode }) {
   useEffect(() => setMore(false), [pathname]);
   const active = (to: string) => (to === "/hub" ? pathname === "/hub" || pathname === "/hub/" : pathname.startsWith(to));
 
-  if (pathname.startsWith("/hub/login")) return <div className="hub min-h-screen">{children}</div>;
+  if (pathname.startsWith("/hub/login") || pathname.startsWith("/hub/expert-login")) return <div className="hub min-h-screen">{children}</div>;
   if (!user) return <Navigate to={`/hub/login?next=${encodeURIComponent(pathname)}`} replace />;
 
   const initials = user.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase() || "K";

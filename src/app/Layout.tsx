@@ -13,19 +13,21 @@ import { LANGS, useI18n } from "../lib/i18n";
 import { daysUntil, nextCheckDate, plantVisits } from "../lib/watch";
 import { scoutEveryDays } from "../lib/weather";
 
-const ITEMS = [
+// Kisan Hub comes first after Home: it is the farmer's main app (voice AI, scanner, mandi, labs).
+const ITEMS: { to: string; key: string; label?: string; icon: typeof Home }[] = [
   { to: "/", key: "nav.home", icon: Home },
-  { to: "/watch", key: "nav.watch", icon: Sprout },
+  { to: "/hub", key: "nav.hub", label: "Kisan Hub", icon: Zap },
   { to: "/scan", key: "nav.scan", icon: ScanLine },
+  { to: "/watch", key: "nav.watch", icon: Sprout },
   { to: "/risk", key: "nav.risk", icon: CloudSun },
-  { to: "/radar", key: "nav.radar", icon: RadioTower },
 ];
 const MORE = [
-  { to: "/hub", label: "Kisan Hub (mandi, voice AI, labs)", icon: Zap },
+  { to: "/radar", label: "Disease radar", icon: RadioTower },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/history", label: "My scans", icon: History },
   { to: "/diseases", label: "Disease library", icon: BookOpen },
   { to: "/expert", label: "Expert", icon: UserCheck },
+  { to: "/hub/expert-login", label: "Lab / scientist login", icon: UserCheck },
   { to: "/admin", label: "Admin", icon: ShieldCheck },
   { to: "/settings", label: "Settings", icon: Settings },
   { to: "/about", label: "About", icon: Info },
@@ -91,15 +93,15 @@ export default function Layout({ children }: { children: ReactNode }) {
             {ITEMS.map((it) => (
               <NavLink key={it.to} to={it.to} end={it.to === "/"} className={`relative flex min-h-[44px] items-center rounded-full px-4 text-[15px] font-semibold ${isActive(it.to) ? "text-forest" : "text-muted hover:text-forest"}`}>
                 {isActive(it.to) && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-full bg-green-tint" transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
-                <span className="relative">{t(it.key)}</span>
+                <span className="relative">{it.label ?? t(it.key)}</span>
               </NavLink>
             ))}
             <button onClick={() => setMoreOpen(true)} className="flex min-h-[44px] items-center rounded-full px-4 text-[15px] font-semibold text-muted hover:text-forest">More</button>
           </nav>
           <div className="hidden items-center gap-3 lg:flex">
             <LanguageSwitch />
-            <Link to="/hub" className="flex min-h-[44px] items-center gap-1.5 rounded-full bg-[#040A18] px-4 text-[15px] font-bold text-[#22D3EE] shadow-[0_0_16px_rgba(34,211,238,0.35)] hover:brightness-125"><Zap className="h-4 w-4" aria-hidden />Kisan Hub</Link>
-            <Button to="/watch" className="!text-[15px]">Start Leaf Watch</Button>
+            <Link to="/hub/expert-login" className="flex min-h-[44px] items-center rounded-full px-3 text-[15px] font-semibold text-muted hover:text-forest">Lab login</Link>
+            <Button to="/hub" className="!text-[15px]"><Zap className="h-4 w-4" aria-hidden />Open Kisan Hub</Button>
           </div>
           <button onClick={() => setMoreOpen(true)} className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface lg:hidden" aria-label="More"><Menu className="h-6 w-6 text-forest" aria-hidden /></button>
         </div>
@@ -119,7 +121,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <li key={it.to} className="flex justify-center">
                   <NavLink to={it.to} className="flex flex-col items-center">
                     <span className={`scan-glow -mt-6 flex h-14 w-14 items-center justify-center rounded-full ${active ? "bg-deep lit" : "bg-green"} text-white`}><Icon className="h-7 w-7" aria-hidden /></span>
-                    <span className={`pb-1 text-xs font-semibold ${active ? "text-forest" : "text-muted"}`}>{t(it.key)}</span>
+                    <span className={`pb-1 text-xs font-semibold ${active ? "text-forest" : "text-muted"}`}>{it.label ?? t(it.key)}</span>
                   </NavLink>
                 </li>
               );
@@ -129,7 +131,7 @@ export default function Layout({ children }: { children: ReactNode }) {
                 <NavLink to={it.to} end={it.to === "/"} className={`relative flex h-16 flex-col items-center justify-center gap-0.5 text-xs font-semibold ${active ? "text-forest" : "text-muted"}`}>
                   {active && <motion.span layoutId="tab-pill-mobile" className="absolute top-1.5 h-7 w-12 rounded-full bg-green-tint" transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
                   <Icon className="relative h-5 w-5" aria-hidden />
-                  <span className="relative">{t(it.key)}</span>
+                  <span className="relative">{it.label ?? t(it.key)}</span>
                 </NavLink>
               </li>
             );

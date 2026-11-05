@@ -95,6 +95,43 @@ function LabRequests() {
   );
 }
 
+interface ExpertRow { user_id: string; created_at: string; email: string; name: string | null; phone: string | null; organisation: string | null; approved: boolean }
+
+/** Admin: approve or remove lab staff and scientists who signed up with their email. */
+function Experts() {
+  const toast = useToast();
+  const [rows, setRows] = useState<ExpertRow[] | null>(null);
+  const load = useCallback(() => {
+    supabase!.from("experts").select("*").order("created_at", { ascending: false })
+      .then(({ data, error }) => { if (error) toast(error.message); else setRows((data ?? []) as ExpertRow[]); });
+  }, [toast]);
+  useEffect(load, [load]);
+  const setApproved = async (r: ExpertRow, approved: boolean) => {
+    const { error } = await supabase!.from("experts").update({ approved }).eq("user_id", r.user_id);
+    if (error) toast(error.message); else { toast(approved ? "Approved." : "Access removed."); load(); }
+  };
+  if (!rows) return <p className="mt-6" role="status">Loading…</p>;
+  if (!rows.length) return <p className="mt-8 text-center">No experts yet. Labs and scientists sign up at <a className="underline" href="/hub/expert-login">/hub/expert-login</a>.</p>;
+  return (
+    <ul className="mt-6 space-y-3">
+      {rows.map((r) => (
+        <li key={r.user_id} className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-line bg-white p-4">
+          <div>
+            <p className="font-semibold text-forest">{r.name || "No name"} <span className="small">· {r.organisation || "No organisation"}</span></p>
+            <p className="small">{r.email}{r.phone ? ` · ${r.phone}` : ""} · joined {fmt(r.created_at)}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Chip tone={r.approved ? "green" : "amber"}>{r.approved ? "Approved" : "Waiting"}</Chip>
+            {r.approved
+              ? <Button variant="secondary" onClick={() => setApproved(r, false)}>Remove access</Button>
+              : <Button onClick={() => setApproved(r, true)}>Approve</Button>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function toCsv(rows: CloudScan[]) {
   const cols: (keyof CloudScan)[] = ["created_at", "user_name", "phone", "village", "device_id", "source", "is_plant", "plant", "is_tomato", "disease", "severity", "confidence", "feedback", "admin_note", "photo_path", "id"];
   const esc = (v: unknown) => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
@@ -111,7 +148,7 @@ export default function Admin() {
   const [more, setMore] = useState(true);
   const [q, setQ] = useState(""), [filter, setFilter] = useState<"all" | "diseased" | "healthy" | "not-tomato" | "not-plant">("all");
   const [open, setOpen] = useState<CloudScan | null>(null);
-  const [tab, setTab] = useState<"scans" | "questions" | "labs">("scans");
+  const [tab, setTab] = useState<"scans" | "questions" | "labs" | "experts">("scans");
   const [note, setNote] = useState("");
 
   useEffect(() => {
@@ -121,6 +158,14 @@ export default function Admin() {
     return () => data.subscription.unsubscribe();
   }, []);
   const admin = isAdminSession(session);
+  // Lab staff and scientists: approved experts see scans and lab requests (read, reply), nothing else.
+  const [expert, setExpert] = useState<"unknown" | "approved" | "pending" | "none">("unknown");
+  useEffect(() => {
+    if (!supabase || !session || admin) { setExpert("none"); return; }
+    supabase.from("experts").select("approved").eq("user_id", session.user.id).maybeSingle()
+      .then(({ data }) => setExpert(data ? (data.approved ? "approved" : "pending") : "none"));
+  }, [session, admin]);
+  const staff = admin || expert === "approved";
 
   const load = useCallback(async (reset: boolean) => {
     if (!supabase) return;
@@ -141,7 +186,7 @@ export default function Admin() {
     }
   }, [rows.length, toast]);
 
-  useEffect(() => { if (admin) load(true); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [admin]);
+  useEffect(() => { if (staff) load(true); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [staff]);
 
   const shown = useMemo(() => {
     const term = q.trim().toLowerCase();
@@ -170,14 +215,25 @@ export default function Admin() {
   if (!cloudConfigured || !supabase) {
     return <div className="wrap py-10"><h1 className="page-title">Admin</h1><p className="mt-3">The cloud database is not connected yet. Run <code>npm run setup:supabase</code> once, then rebuild the site.</p></div>;
   }
-  if (!ready) return <div className="wrap py-10" role="status">Loading…</div>;
-  if (!session || !admin) {
+  if (!ready || (session && !admin && expert === "unknown")) return <div className="wrap py-10" role="status">Loading…</div>;
+  if (session && expert === "pending") {
+    return (
+      <div className="wrap max-w-xl py-14 text-center">
+        <p className="eyebrow">Expert console</p>
+        <h1 className="page-title">Waiting for approval</h1>
+        <p className="mt-3">Your email ({session.user.email}) is verified. The Patra Lens admin will approve your account, then this page shows farmers' scans and lab requests.</p>
+        <div className="mt-5"><Button variant="ghost" onClick={() => supabase!.auth.signOut()}><LogOut className="h-4 w-4" aria-hidden />Sign out</Button></div>
+      </div>
+    );
+  }
+  if (!session || !staff) {
     return (
       <div className="wrap py-10">
         <h1 className="page-title text-center">Admin sign-in</h1>
         <p className="mt-2 text-center">See every scan your users have taken.</p>
-        <SignIn onError={session && !admin ? "This account is not an admin." : ""} />
-        {session && !admin && <div className="mt-3 text-center"><Button variant="ghost" onClick={() => supabase!.auth.signOut()}>Sign out</Button></div>}
+        <SignIn onError={session && !staff ? "This account is not an admin or approved expert." : ""} />
+        {session && !staff && <div className="mt-3 text-center"><Button variant="ghost" onClick={() => supabase!.auth.signOut()}>Sign out</Button></div>}
+        <p className="mt-6 text-center small">Lab, KVK or scientist? <a href="/hub/expert-login" className="font-semibold text-green-dark underline">Sign in with your email</a></p>
       </div>
     );
   }
@@ -205,7 +261,7 @@ export default function Admin() {
   return (
     <div className="wrap py-8 md:py-12">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><p className="eyebrow">Admin</p><h1 className="page-title">All scans</h1><p className="small">Signed in as {session.user.email}</p></div>
+        <div><p className="eyebrow">{admin ? "Admin" : "Expert console"}</p><h1 className="page-title">{admin ? "All scans" : "Farmers' scans"}</h1><p className="small">Signed in as {session.user.email}</p></div>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={() => load(true)} loading={loading}><RefreshCw className="h-4 w-4" aria-hidden />Refresh</Button>
           <Button variant="secondary" onClick={exportCsv} disabled={!shown.length}><Download className="h-4 w-4" aria-hidden />CSV</Button>
@@ -213,12 +269,12 @@ export default function Admin() {
         </div>
       </div>
 
-      <div role="tablist" aria-label="Admin sections" className="mt-6 inline-grid grid-cols-3 gap-1 rounded-xl bg-surface p-1">
-        {([["scans", "Scans"], ["questions", "Farmer questions"], ["labs", "Lab requests"]] as const).map(([id, label]) => (
+      <div role="tablist" aria-label="Admin sections" className="mt-6 inline-flex flex-wrap gap-1 rounded-xl bg-surface p-1">
+        {((admin ? [["scans", "Scans"], ["labs", "Lab requests"], ["questions", "Farmer questions"], ["experts", "Experts"]] : [["scans", "Scans"], ["labs", "Lab requests"]]) as [typeof tab, string][]).map(([id, label]) => (
           <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`min-h-[44px] rounded-lg px-4 text-sm font-semibold ${tab === id ? "bg-white text-forest shadow-soft" : "text-muted hover:text-forest"}`}>{label}</button>
         ))}
       </div>
-      {tab === "questions" ? <Questions /> : tab === "labs" ? <LabRequests /> : <>
+      {tab === "questions" ? <Questions /> : tab === "labs" ? <LabRequests /> : tab === "experts" ? <Experts /> : <>
       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-5">
         {[["Scans loaded", stats.total], ["Users (phones)", stats.users], ["Today", stats.today], ["With a problem", stats.diseased], ["Not tomato", stats.notTomato]].map(([l, v]) => (
           <div key={l} className="rounded-card border border-line bg-white p-4"><p className="small">{l}</p><p className="font-heading text-3xl font-extrabold text-forest">{v}</p></div>
@@ -265,11 +321,14 @@ export default function Admin() {
           <div className="space-y-4">
             <p className="small">Phone: {open.phone || "–"} · Village: {open.village || "–"} · Device: {open.device_id.slice(0, 8)}{open.feedback ? ` · Farmer said: ${open.feedback}` : ""}</p>
             {urls[open.photo_path] && <LeafReport url={urls[open.photo_path]} result={open.result} source={open.source} />}
-            <label className="block"><span className="field-label">Admin note</span><textarea className="field-input min-h-[80px]" value={note} onChange={(e) => setNote(e.target.value)} /></label>
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={saveNote}>Save note</Button>
-              <Button variant="danger" onClick={() => remove(open)}><Trash2 className="h-4 w-4" aria-hidden />Delete</Button>
-            </div>
+            {admin && <>
+              <label className="block"><span className="field-label">Admin note</span><textarea className="field-input min-h-[80px]" value={note} onChange={(e) => setNote(e.target.value)} /></label>
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={saveNote}>Save note</Button>
+                <Button variant="danger" onClick={() => remove(open)}><Trash2 className="h-4 w-4" aria-hidden />Delete</Button>
+              </div>
+            </>}
+            {!admin && open.admin_note && <p className="rounded-xl bg-surface p-3 text-sm"><strong>Admin note:</strong> {open.admin_note}</p>}
           </div>
         )}
       </BottomSheet>

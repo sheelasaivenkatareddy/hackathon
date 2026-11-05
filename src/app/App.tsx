@@ -24,6 +24,7 @@ const Terms = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Term
 const Methodology = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Methodology })));
 const NotFound = lazy(() => import("../pages/NotFound"));
 const HubLogin = lazy(() => import("../hub/pages/HubLogin"));
+const ExpertLogin = lazy(() => import("../hub/pages/ExpertLogin"));
 const HubDashboard = lazy(() => import("../hub/pages/HubDashboard"));
 const KisanVani = lazy(() => import("../hub/pages/KisanVani"));
 const HubScanner = lazy(() => import("../hub/pages/HubScanner"));
@@ -69,6 +70,7 @@ export default function App() {
               <Route path="/about" element={<About />} />
               <Route path="/hub" element={<HubDashboard />} />
               <Route path="/hub/login" element={<HubLogin />} />
+              <Route path="/hub/expert-login" element={<ExpertLogin />} />
               <Route path="/hub/vani" element={<KisanVani />} />
               <Route path="/hub/scan" element={<HubScanner />} />
               <Route path="/hub/mandi" element={<Mandi />} />

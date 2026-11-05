@@ -96,7 +96,7 @@ export default function HubLogin() {
                   <p className="hub-label">I am a</p>
                   <div className="grid grid-cols-2 gap-2">
                     {([["farmer", "Farmer", Wheat], ["expert", "Expert / Lab", ShieldCheck]] as const).map(([id, label, Icon]) => (
-                      <button type="button" key={id} onClick={() => setRole(id)} aria-pressed={role === id}
+                      <button type="button" key={id} onClick={() => (id === "expert" ? nav("/hub/expert-login") : setRole(id))} aria-pressed={role === id}
                         className={`flex min-h-[56px] items-center justify-center gap-2 rounded-xl border text-sm font-bold transition ${role === id ? "border-neon-cyan bg-neon-cyan/10 text-neon-cyan shadow-[0_0_16px_rgba(34,211,238,0.25)]" : "border-white/10 text-slate-300 hover:border-white/30"}`}>
                         <Icon className="h-5 w-5" aria-hidden />{label}
                       </button>

@@ -1,6 +1,6 @@
 // The home page: what Patra Lens is, how it works, and how well it does.
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { Aperture, BookOpen, Camera, ChevronDown, CloudSun, HeartPulse, ImageOff, Languages, Microscope, RadioTower, ScanLine, Sprout, TriangleAlert, UserCheck, Wheat } from "lucide-react";
+import { Aperture, BookOpen, Building2, Calculator, Camera, ChevronDown, CloudSun, FlaskConical, Gift, HeartPulse, ImageOff, Languages, Mic, Microscope, RadioTower, ScanLine, Sprout, TrendingUp, TriangleAlert, UserCheck, Wheat, Zap } from "lucide-react";
 import { ReactNode, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, Chip, CountUp, Reveal } from "../components/ui";
@@ -247,6 +247,64 @@ function MeasuredValues() {
   );
 }
 
+
+// Kisan Hub, the farmer's main app, shown first: every module one tap away, plus the way in for labs and scientists.
+const HUB_MODULES = [
+  { to: "/hub/vani", icon: Mic, title: "Kisan Vani voice AI", text: "Ask in Telugu, Hindi, Tamil, Kannada, Malayalam or English and hear the answer.", tone: "text-[#F472B6]" },
+  { to: "/hub/scan", icon: ScanLine, title: "Crop disease scanner", text: "Tomato and paddy. Red circles on infected spots, yellow on dry leaf, with sprays and doses.", tone: "text-[#22D3EE]" },
+  { to: "/hub/mandi", icon: TrendingUp, title: "Mandi prices", text: "APMC rates in AP, Telangana and Karnataka, with rising/falling trends and MSP alerts.", tone: "text-[#A3E635]" },
+  { to: "/hub/labs", icon: Building2, title: "Labs & RBK connect", text: "Call or WhatsApp ICAR institutes, KVKs, RBKs and officers, or send a scan for review.", tone: "text-[#FBBF24]" },
+  { to: "/hub/weather", icon: CloudSun, title: "Weather & spray planner", text: "7-day forecast, rain and disease-weather alerts, and the safe hours to spray.", tone: "text-[#2DD4BF]" },
+  { to: "/hub/schemes", icon: Gift, title: "Schemes & insurance", text: "Check PM-KISAN, PMFBY, KCC and state schemes in six quick questions.", tone: "text-[#F472B6]" },
+  { to: "/hub/npk", icon: Calculator, title: "NPK calculator", text: "Bags of DAP, urea and potash for your acres and soil, with timing and cost.", tone: "text-[#A3E635]" },
+  { to: "/watch", icon: Sprout, title: "Leaf Watch", text: "Photograph the same leaves every few days and see new spots ringed early.", tone: "text-[#22D3EE]" },
+];
+
+function KisanHubSection() {
+  return (
+    <section className="section">
+      <div className="wrap">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow mb-2">Kisan Hub</p>
+            <h2 className="h2 max-w-3xl">Everything a farmer needs, in one app</h2>
+            <p className="mt-3 max-w-2xl text-muted">Sign in with your mobile number. Your scans, prices and advice stay on your phone and in your language.</p>
+          </div>
+          <Button to="/hub" variant="lime"><Zap className="h-5 w-5" aria-hidden />Open Kisan Hub</Button>
+        </div>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {HUB_MODULES.map((m, i) => (
+            <Reveal key={m.to} delay={i}>
+              <Link to={m.to} className="lift-card flex h-full flex-col rounded-card border border-line bg-white p-5">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-line bg-surface"><m.icon className={`h-6 w-6 ${m.tone}`} aria-hidden /></span>
+                <h3 className="h3 mt-4">{m.title}</h3>
+                <p className="small mt-1 flex-1">{m.text}</p>
+                <span className="mt-4 text-sm font-bold text-green-dark">Open →</span>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal>
+          <div className="hero-mesh mt-8 flex flex-col gap-5 overflow-hidden rounded-3xl p-6 text-white md:flex-row md:items-center md:justify-between md:p-8">
+            <div className="flex items-start gap-4">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10"><FlaskConical className="h-6 w-6 text-[#F472B6]" aria-hidden /></span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#F472B6]">For labs & scientists</p>
+                <h3 className="mt-1 font-heading text-2xl font-extrabold">Review farmers' cases from your lab</h3>
+                <p className="mt-1 max-w-xl text-white/80">Pathology labs, ICAR and KVK scientists and agriculture officers sign in with their email and phone. After approval, see every scan with its photo and answer lab requests.</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button to="/hub/expert-login" variant="lime">Lab / scientist login</Button>
+              <Button to="/admin" variant="outline-light">Expert console</Button>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const { setSheetOpen } = useI18n();
   const reduce = useReducedMotion();
@@ -258,18 +316,18 @@ export default function Home() {
         <div aria-hidden className="hero-dots pointer-events-none absolute inset-0 -z-[1]" />
         <div className="wrap grid min-h-[640px] items-center gap-10 pb-24 pt-12 md:pb-28 lg:min-h-[calc(100vh-4rem)] lg:grid-cols-[1.2fr_1fr]">
           <div>
-            <Chip tone="lime">Free · Works offline · 13 plants</Chip>
+            <Chip tone="lime">Free · Voice AI in 6 languages · Tomato & paddy</Chip>
             <h1 className="display mt-5" aria-label="Catch the first spot.">
               {["Catch", "the"].map((w, i) => <HeroWord key={w} delay={i * 0.12}>{w}</HeroWord>)}
               <HeroWord delay={0.24} className="text-glow">first</HeroWord>
               <HeroWord delay={0.36} className="text-glow">spot.</HeroWord>
             </h1>
-            <p className="mt-5 max-w-xl text-lg text-white/90 md:text-xl">Patra Lens turns any smartphone into an early-warning system for crop pests and diseases. It photographs the same leaves every few days and flags new spots the moment they appear.</p>
+            <p className="mt-5 max-w-xl text-lg text-white/90 md:text-xl">Patra Lens is every farmer's AI crop doctor. Photograph a leaf to find disease early, ask Kisan Vani in Telugu or Hindi, check today's mandi price, and send the case to a lab or RBK, all from one phone.</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button to="/watch" variant="lime">Start Leaf Watch</Button>
-              <Button to="/scan" variant="outline-light">Scan a leaf</Button>
+              <Button to="/hub" variant="lime">Open Kisan Hub</Button>
+              <Button to="/hub/scan" variant="outline-light">Scan a leaf</Button>
             </div>
-            <p className="mt-6 text-sm text-white/75">Runs on your phone · No app to install · Free to use</p>
+            <p className="mt-6 text-sm text-white/75">Runs on your phone · No app to install · Free to use · <a href="/hub/expert-login" className="underline">Lab / scientist login</a></p>
           </div>
           <div className="relative text-center">
             <motion.div style={{ y: phoneY }}>
@@ -286,6 +344,7 @@ export default function Home() {
       </section>
 
       <StatsBand />
+      <KisanHubSection />
       <PlantStrip />
 
       <Section tint>
@@ -419,8 +478,8 @@ export default function Home() {
             <h2 className="font-heading text-[28px] font-extrabold leading-tight tracking-tight md:text-[40px]">See it on a real leaf.</h2>
             <p className="mx-auto mt-3 max-w-xl text-white/85">Scan a photo now. There is nothing to install and no account to create.</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Button to="/scan" variant="lime">Scan a leaf</Button>
-              <Button to="/watch" variant="outline-light">Start Leaf Watch</Button>
+              <Button to="/hub" variant="lime">Open Kisan Hub</Button>
+              <Button to="/hub/scan" variant="outline-light">Scan a leaf</Button>
             </div>
           </div>
         </Reveal>
