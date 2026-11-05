@@ -23,6 +23,7 @@ const Privacy = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Pr
 const Terms = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Terms })));
 const Methodology = lazy(() => import("../pages/Legal").then((m) => ({ default: m.Methodology })));
 const NotFound = lazy(() => import("../pages/NotFound"));
+const OpenData = lazy(() => import("../pages/OpenData"));
 const HubLogin = lazy(() => import("../hub/pages/HubLogin"));
 const ExpertLogin = lazy(() => import("../hub/pages/ExpertLogin"));
 const HubDashboard = lazy(() => import("../hub/pages/HubDashboard"));
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="/diseases" element={<Diseases />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/about" element={<About />} />
+              <Route path="/data" element={<OpenData />} />
               <Route path="/hub" element={<HubDashboard />} />
               <Route path="/hub/login" element={<HubLogin />} />
               <Route path="/hub/expert-login" element={<ExpertLogin />} />

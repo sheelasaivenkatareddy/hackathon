@@ -17,7 +17,7 @@ export const PHOTO_CREDIT = "Leaf photos: PlantDoc dataset (Singh et al., 2020, 
 
 const COLUMNS: { title: string; links: [string, string][] }[] = [
   { title: "Product", links: [["Dashboard", "/dashboard"], ["Leaf Watch", "/watch"], ["Scan a leaf", "/scan"], ["Risk Score", "/risk"], ["Disease Radar", "/radar"]] },
-  { title: "Learn", links: [["Disease library", "/diseases"], ["How it works", "/how-it-works"], ["My scans", "/history"], ["Expert", "/expert"]] },
+  { title: "Learn", links: [["Disease library", "/diseases"], ["How it works", "/how-it-works"], ["My scans", "/history"], ["Expert", "/expert"], ["Open data for scientists", "/data"]] },
   { title: "Legal", links: [["Privacy", "/privacy"], ["Terms of use", "/terms"], ["Credits and licences", "/about"], ["Settings", "/settings"]] },
 ];
 

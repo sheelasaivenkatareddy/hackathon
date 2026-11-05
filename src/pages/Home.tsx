@@ -297,6 +297,7 @@ function KisanHubSection() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Button to="/hub/expert-login" variant="lime">Lab / scientist login</Button>
+              <Button to="/data" variant="outline-light">Open data</Button>
               <Button to="/admin" variant="outline-light">Expert console</Button>
             </div>
           </div>
