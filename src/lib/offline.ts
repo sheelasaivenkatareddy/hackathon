@@ -9,7 +9,7 @@ import { TEST_PAIR_URLS } from "./watch";
 
 export const OFFLINE_URLS = [
   FIELD_MODEL, FIELD_HEAD, FIELD_REPORT, "/opencv/opencv.js", "/ort/ort-wasm-simd-threaded.mjs", "/ort/ort-wasm-simd-threaded.wasm",
-  "/model/labels.json", "/model/calibration.json", ...SAMPLES.map((s) => `/samples/${s.file}`), "/samples/field-row.jpg",
+  "/model/labels.json", "/model/calibration.json", "/model/accuracy.json", ...SAMPLES.map((s) => `/samples/${s.file}`), "/samples/field-row.jpg",
   "/samples/busy-background.jpg", "/samples/timeline/manifest.json", ...TEST_PAIR_URLS,
 ];
 

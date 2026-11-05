@@ -90,17 +90,18 @@ export const CONFIG = {
   // Real numbers only. Field values: field-tuned model on the 236 PlantDoc test photos (ml/field-head/train_head.py).
   // If you replace the model, replace these too. Anything still null shows "To be measured".
   measured: {
-    fieldAccuracy: 0.716 as number | null,
-    fieldAccuracyLow: 0.657 as number | null, // 95% interval
-    fieldAccuracyHigh: 0.771 as number | null,
-    fieldTop3: 0.958 as number | null,
-    fieldMacroF1: 0.699 as number | null,
-    tomatoFieldAccuracy: 0.536 as number | null,
+    fieldAccuracy: 0.678 as number | null,
+    fieldAccuracyLow: 0.619 as number | null, // 95% interval
+    fieldAccuracyHigh: 0.733 as number | null,
+    fieldTop3: 0.945 as number | null,
+    fieldMacroF1: 0.658 as number | null,
+    tomatoFieldAccuracy: 0.509 as number | null,
     offTheShelfFieldAccuracy: 0.403 as number | null, // the same model before retraining, all 38 of its classes
     fieldTestPhotos: 236 as number | null,
     labMacroF1: null as number | null,
     labToFieldGap: null as number | null,
-    eceAfterCalibration: 0.041 as number | null,
+    eceAfterCalibration: 0.055 as number | null,
+    closeupTomatoAccuracy: 0.927 as number | null, // the user's tomato dataset, 990 held-out photos
     secondsPerPhoto: 3 as number | null, // about 2.4-3.9 s in Edge on a laptop. Phones not measured yet.
   },
 } as const;

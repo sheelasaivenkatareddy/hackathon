@@ -5,6 +5,7 @@ import { Database, Download, FlaskConical, Lock, RefreshCw } from "lucide-react"
 import { Fragment, ReactNode, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { cloudConfigured, supabase } from "../lib/cloud";
+import AccuracyPanel from "../components/AccuracyPanel";
 
 interface Row {
   scanned_at: string; plant: string; is_tomato: boolean | null; disease: string; severity: string; confidence: number;
@@ -172,6 +173,8 @@ export default function OpenData() {
             <PerDay rows={rows} />
           </section>
           <p className="tiny mt-2">How the AI answered: {stats.ai.map(([k, v]) => `${k} ${v}`).join(" · ")}. Hover a bar for the exact count and share.</p>
+
+          <section aria-label="AI accuracy" className="mt-6"><AccuracyPanel open /></section>
 
           {/* 4. The records */}
           <section aria-label="All records" className="mt-8">

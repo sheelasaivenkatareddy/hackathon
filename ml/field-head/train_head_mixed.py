@@ -58,25 +58,30 @@ def softmax(z):
     return e / e.sum(axis=1, keepdims=True)
 
 
-def fit(Xa, ya, C):
+def fit(Xa, ya, C, wa=None):
     sc = StandardScaler().fit(Xa)
-    return sc, LogisticRegression(C=C, max_iter=3000, solver="lbfgs").fit(sc.transform(Xa), ya)
+    return sc, LogisticRegression(C=C, max_iter=3000, solver="lbfgs").fit(sc.transform(Xa), ya, sample_weight=wa)
 
 
 Xk, yk, gk, fk, pdk = X[keep], y[keep], name[keep], flip[keep], is_pd[keep]
+# Close-up photos get a weight below 1 so they cannot crowd out the field photos. The weight and C are chosen
+# on the training photos only: best cross-validated FIELD accuracy, with close-up accuracy at least 0.85.
 best = None
-for C in (0.001, 0.003, 0.01, 0.03):
-    oof = np.zeros((len(yk), len(classes)))
-    for a, b in StratifiedGroupKFold(5, shuffle=True, random_state=0).split(Xk, yk, gk):
-        sc, m = fit(Xk[a], yk[a], C)
-        oof[b] = m.decision_function(sc.transform(Xk[b]))
-    v = ~fk
-    acc_field = (oof[v & pdk].argmax(1) == yk[v & pdk]).mean()
-    acc_close = (oof[v & ~pdk].argmax(1) == yk[v & ~pdk]).mean()
-    print(f"C={C}: cross-validated field {acc_field:.3f}, close-up {acc_close:.3f}")
-    if best is None or acc_field > best[0]:
-        best = (acc_field, C, oof.copy())
-cv_field, C, oof = best
+for w_pv in (0.15, 0.3, 0.6, 1.0):
+    wk = np.where(pdk, 1.0, w_pv)
+    for C in (0.003, 0.01, 0.03):
+        oof = np.zeros((len(yk), len(classes)))
+        for a, b in StratifiedGroupKFold(5, shuffle=True, random_state=0).split(Xk, yk, gk):
+            sc, m = fit(Xk[a], yk[a], C, wk[a])
+            oof[b] = m.decision_function(sc.transform(Xk[b]))
+        v = ~fk
+        acc_field = (oof[v & pdk].argmax(1) == yk[v & pdk]).mean()
+        acc_close = (oof[v & ~pdk].argmax(1) == yk[v & ~pdk]).mean()
+        print(f"weight={w_pv} C={C}: cross-validated field {acc_field:.3f}, close-up {acc_close:.3f}")
+        if acc_close >= 0.85 and (best is None or acc_field > best[0]):
+            best = (acc_field, C, oof.copy(), w_pv)
+cv_field, C, oof, W_PV = best
+print(f"chosen close-up weight {W_PV}")
 v = ~fk & pdk  # temperature is set on field photos, where confidence matters most
 
 
@@ -89,7 +94,7 @@ Ts = np.exp(np.linspace(np.log(0.3), np.log(5), 200))
 T = float(Ts[np.argmin([nll(t) for t in Ts])])
 print(f"chosen C={C}, temperature={T:.3f}")
 
-sc, m = fit(Xk, yk, C)
+sc, m = fit(Xk, yk, C, np.where(pdk, 1.0, W_PV))
 W = m.coef_ / sc.scale_
 b = m.intercept_ - (W * sc.mean_).sum(axis=1)
 

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DiagnosisResult from "../components/DiagnosisResult";
 import { SymptomChecklist } from "../components/Guidance";
+import AccuracyPanel from "../components/AccuracyPanel";
 import LeafReport from "../components/LeafReport";
 import { LiveConditions, ScanReport, SummaryBar, humanSummary } from "../components/ScanInsights";
 import { AcceptedPhoto, PhotoFlow } from "../components/PhotoFlow";
@@ -191,6 +192,7 @@ export default function Scan() {
               <LiveConditions />
             </div>
           )}
+          <div className="mt-5"><AccuracyPanel /></div>
           <p className="small mt-3">Photo checks: Sharpness {Math.round(accepted.coach.sharpness.value)} · Light {Math.round(accepted.coach.light.value)} · Leaf in frame {Math.round(accepted.coach.leafInFrame.value)}%</p>
           <div className="mt-5 flex flex-wrap gap-2">
             {canConfirm && <Button onClick={confirm} disabled={!scan || scan.confirmed}><CheckCircle2 className="h-5 w-5" aria-hidden />{scan?.confirmed ? "Confirmed" : "Confirm"}</Button>}

@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, Camera, CheckCircle2, CloudOff, Database, Droplets, FlaskConical, ImagePlus, Leaf, MapPin, Mic, RotateCcw, Send, ShieldAlert, Sprout, Volume2 } from "lucide-react";
 import { DragEvent, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import AccuracyPanel from "../../components/AccuracyPanel";
 import { SpotCircles } from "../../components/LeafReport";
 import { SAMPLES } from "../../components/PhotoFlow";
 import { shareScanWithAgent } from "../../lib/agent";
@@ -333,6 +334,8 @@ export default function HubScanner() {
                 )}
               </div>
             )}
+
+            <AccuracyPanel />
 
             <div className="flex flex-wrap gap-2">
               {r.is_plant && <button className="hub-btn-primary" onClick={() => nav(`/hub/labs?scan=${done.scan.id}`)}><Send className="h-5 w-5" aria-hidden />Send to a lab / RBK</button>}

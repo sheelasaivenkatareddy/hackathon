@@ -33,7 +33,9 @@ export function getOnDeviceModel(): Promise<OnDeviceModel | null> {
 // DINOv2-small (rodynaemad/plant-disease-dinov2-small, CC BY-SA 4.0) gives 768 features.
 // A linear head trained on PlantDoc field photos turns them into 27 plant conditions.
 export const FIELD_MODEL = "/model/field-dino-int8.onnx";
-export const FIELD_HEAD = "/model/field-head.json";
+// v2: retrained on PlantDoc field photos plus the close-up tomato dataset. New file names, so phones that saved
+// the old head for offline use download the new one. The old head is kept as field-head-plantdoc-only.json.
+export const FIELD_HEAD = "/model/field-head-v2.json";
 export const PLANTS = ["Tomato", "Apple", "Bell pepper", "Blueberry", "Cherry", "Corn", "Grape", "Peach", "Potato", "Raspberry", "Soybean", "Squash", "Strawberry"];
 
 export interface FieldHead {
@@ -55,7 +57,7 @@ export interface FieldReport {
   levels: Record<string, { photos: number; top1: number; top3: number }>;
   conditions: Record<string, { photos: number; right: number }>;
 }
-export const FIELD_REPORT = "/model/field-report.json";
+export const FIELD_REPORT = "/model/field-report-v2.json";
 let reportLoad: Promise<FieldReport | null> | null = null;
 export function getFieldReport(): Promise<FieldReport | null> {
   if (!reportLoad) {
