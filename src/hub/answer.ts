@@ -1,6 +1,7 @@
 // One answer flow for Kisan Vani, the voice agent and the Ask AI panel:
 // 1. Claude (ask-agent), when the key is set  2. the free open AI, with the last scan as context
 // 3. the app's own data (prices, weather, fertilizer, last scan)  4. Wikipedia, for general facts.
+import { isOnlineMode } from "../lib/mode";
 import { ChatMsg, askAgent, getLatestScan } from "../lib/agent";
 import { cloudConfigured } from "../lib/cloud";
 import { askFreeAI, scanContext } from "../lib/freeAI";
@@ -44,7 +45,7 @@ export async function answerQuestion(history: ChatMsg[], chosen: VoiceLang, voic
   const key = cacheKey(q, lang, hub?.id ?? "none");
   const hit = firstTurn ? cached(key) : null;
   if (hit) return hit;
-  const online = typeof navigator === "undefined" || navigator.onLine;
+  const online = isOnlineMode();
   if (cloudConfigured && online) {
     const res = await askAgent(history, lang, true, voice);
     if (res.ok && !res.offline) { const a: Answer = { text: res.answer, lang, source: "Claude AI" }; if (firstTurn) remember(key, a); return a; }

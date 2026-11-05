@@ -1,4 +1,5 @@
 // Scan a leaf: capture -> Photo Coach -> diagnosis. Scans are saved so unsure cases reach the expert queue.
+import { isOnlineMode } from "../lib/mode";
 import { CheckCircle2, Plus, RotateCcw, Save, UserCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -67,7 +68,7 @@ export default function Scan() {
     setAccepted(a);
     setCloudNote("");
     const started = performance.now();
-    const cloud = cloudConfigured ? analyzeInCloud(a.photo) : null;
+    const cloud = cloudConfigured && isOnlineMode() ? analyzeInCloud(a.photo) : null;
     const d = await diagnose(a.photo, a.work, a.coach, a.usedAnyway, a.sampleFile);
     const seconds = (performance.now() - started) / 1000;
     const affectedPct = leafMasks(a.work).affectedPct;

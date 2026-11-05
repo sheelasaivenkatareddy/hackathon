@@ -1,6 +1,7 @@
 // Crop disease scanner for tomato and paddy: drag and drop or camera, then the same pipeline as /scan
 // (Claude vision in the cloud, the on-device model as backup), red/yellow circles with box coordinates,
 // and every scan saved with the farmer's contact, time and location for lab follow-up.
+import { isOnlineMode } from "../../lib/mode";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, Camera, CheckCircle2, CloudOff, Database, Droplets, FlaskConical, ImagePlus, Leaf, MapPin, Mic, RotateCcw, Send, ShieldAlert, Sprout, Volume2 } from "lucide-react";
 import { DragEvent, useRef, useState } from "react";
@@ -75,7 +76,7 @@ export default function HubScanner() {
       const photo = await shrinkForStorage(blob);
       setBusy({ url: preview, step: 1 });
       const place = await approxLocation(districtOf(user));
-      const cloud = cloudConfigured ? analyzeInCloud(photo, place) : null;
+      const cloud = cloudConfigured && isOnlineMode() ? analyzeInCloud(photo, place) : null;
       setBusy({ url: preview, step: 2 });
       const d = await diagnose(photo, work, coach, !coach.pass, sampleFile);
       const kind = photoKind(work), regions = spotRegions(work);
@@ -99,7 +100,7 @@ export default function HubScanner() {
       else if (ai && ai.code !== "off") {
         const saved = ai.code === "limit" ? ai : await saveToCloud(photo, local, place);
         if (saved.ok) cloudId = saved.id; else note = saved.message;
-      } else note = "Cloud database is not connected yet, so this scan is saved on this phone.";
+      } else note = isOnlineMode() ? "Cloud database is not connected yet, so this scan is saved on this phone." : "Offline mode: saved on this phone. It uploads by itself in online mode.";
       shareScanWithAgent(result);
       const thumb = await toDataUrl(await shrinkForStorage(photo, 160, 0.7));
       const scan: HubScan = { id: uid(), cloudId, date: new Date().toISOString(), crop, thumb, source, result, lat: place.lat, lon: place.lon };

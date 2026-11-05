@@ -5,6 +5,7 @@ import { ReactNode, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button, Card, Chip, CountUp, Reveal } from "../components/ui";
 import LiveDemo from "../components/LiveDemo";
+import { ModeSwitch, useOnline } from "../components/OfflineGate";
 import { CompareSlider, HeroLeaf, LeafIllustration, Viewfinder } from "../components/viz";
 import type { SpotState } from "../components/viz/LeafIllustration";
 import { CONFIG } from "../config";
@@ -306,12 +307,16 @@ function KisanHubSection() {
 }
 
 export default function Home() {
+  const online = useOnline();
   const { setSheetOpen } = useI18n();
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
   const phoneY = useTransform(scrollY, [0, 700], [0, reduce ? 0 : -70]);
+  // Offline: the front page shows only the mode choice and the way to the scanner.
+  if (!online) return <ModeSwitch />;
   return (
     <>
+      <ModeSwitch />
       <section className="hero-mesh text-white lg:min-h-[calc(100vh-4rem)]">
         <div aria-hidden className="hero-dots pointer-events-none absolute inset-0 -z-[1]" />
         <div className="wrap grid min-h-[640px] items-center gap-10 pb-24 pt-12 md:pb-28 lg:min-h-[calc(100vh-4rem)] lg:grid-cols-[1.2fr_1fr]">

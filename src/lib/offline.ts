@@ -1,6 +1,7 @@
 // Offline pack: the AI model, OpenCV, the ONNX runtime and sample photos, saved in the browser cache so scans work
 // with no internet. Kisan Hub saves it by itself right after sign-in (about 23 MB, once) and shows the progress,
 // because a farmer who goes offline before it finishes would otherwise get no AI diagnosis.
+import { isOnlineMode } from "./mode";
 import { useEffect, useState } from "react";
 import { SAMPLES } from "../components/PhotoFlow";
 import { FIELD_HEAD, FIELD_MODEL, FIELD_REPORT } from "./diagnose";
@@ -46,7 +47,7 @@ export async function cacheOfflinePack(): Promise<number> {
 /** Saves the pack once per session when online; skipped only in the phone's data-saver mode. */
 let ensuring = false;
 export async function ensureOfflinePack() {
-  if (ensuring || typeof navigator === "undefined" || !navigator.onLine) return;
+  if (ensuring || !isOnlineMode()) return;
   ensuring = true;
   try {
     if (await offlinePackReady()) return;

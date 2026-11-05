@@ -1,7 +1,9 @@
 // Offline-first sync for Kisan Hub. Everything works on the phone first: a scan taken with no internet is saved
 // locally (photo in IndexedDB, result in the hub list). When the phone is online again, this uploads the waiting
 // scans and sends the lab requests that were saved on the phone. Safe to run often: it only touches what is pending.
+import { isOnlineMode } from "../lib/mode";
 import { useEffect, useState } from "react";
+import { useOnline } from "../components/OfflineGate";
 import { cloudConfigured, escalateInCloud, saveToCloud } from "../lib/cloud";
 import { db } from "../lib/db";
 import { getEscalations, getHubScans, updateEscalation, updateHubScan, useEscalations, useHubScans } from "./store";
@@ -14,7 +16,7 @@ export interface SyncResult { scans: number; requests: number; failed: boolean }
 
 export async function syncNow(): Promise<SyncResult> {
   const out: SyncResult = { scans: 0, requests: 0, failed: false };
-  if (running || !cloudConfigured || typeof navigator === "undefined" || !navigator.onLine) return out;
+  if (running || !cloudConfigured || !isOnlineMode()) return out;
   setRunning(true);
   try {
     // 1. Scans that were saved only on the phone: upload the photo and result.
@@ -47,20 +49,18 @@ export function startSync() {
   if (started || typeof window === "undefined") return;
   started = true;
   window.addEventListener("online", () => { syncNow(); });
-  setInterval(() => { if (navigator.onLine) syncNow(); }, 60_000);
+  setInterval(() => { if (isOnlineMode()) syncNow(); }, 60_000);
   syncNow();
 }
 
 /** Connection and queue state for the badge. */
 export function useSyncState() {
   const scans = useHubScans(), esc = useEscalations();
-  const [online, setOnline] = useState(typeof navigator === "undefined" ? true : navigator.onLine);
+  const online = useOnline();
   const [syncing, setSyncing] = useState(running);
   useEffect(() => {
-    const on = () => setOnline(true), off = () => setOnline(false);
-    window.addEventListener("online", on); window.addEventListener("offline", off);
     listeners.add(setSyncing);
-    return () => { window.removeEventListener("online", on); window.removeEventListener("offline", off); listeners.delete(setSyncing); };
+    return () => { listeners.delete(setSyncing); };
   }, []);
   const waitingScans = cloudConfigured ? scans.filter((s) => !s.cloudId).length : 0;
   const waitingRequests = esc.filter((e) => e.status === "saved-on-phone").length;
