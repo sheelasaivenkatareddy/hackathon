@@ -40,3 +40,10 @@ create policy "experts update escalations" on public.escalations for update to a
 drop policy if exists "experts read scan photos" on storage.objects;
 create policy "experts read scan photos" on storage.objects for select to authenticated
   using (bucket_id = 'scan-photos' and public.is_expert());
+
+-- Table access for signed-in users; the row-level policies above still decide which rows each person sees.
+grant select, insert, update, delete on public.experts to authenticated;
+grant select, update, delete on public.scans to authenticated;
+grant select, update, delete on public.escalations to authenticated;
+grant select, delete on public.agent_chats to authenticated;
+grant execute on function public.is_expert() to authenticated;

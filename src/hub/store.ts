@@ -24,7 +24,7 @@ export const STATES: Record<StateId, { name: string; te: string; districts: Dist
 };
 
 export interface HubUser {
-  phone: string; name: string; role: Role; state: StateId; district: string; village: string;
+  phone: string; email?: string; name: string; role: Role; state: StateId; district: string; village: string;
   acres: number; crops: string[]; since: string;
 }
 
