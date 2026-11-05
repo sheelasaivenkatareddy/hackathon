@@ -8,7 +8,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { SpotCircles } from "../../components/LeafReport";
 import { SAMPLES } from "../../components/PhotoFlow";
 import { shareScanWithAgent } from "../../lib/agent";
-import { localResult } from "../../lib/careplan";
+import { GENERAL_CARE, localResult } from "../../lib/careplan";
+import { calculate } from "../npk";
 import { LeafResult, Place, analyzeInCloud, cloudConfigured, saveToCloud } from "../../lib/cloud";
 import { diagnose } from "../../lib/diagnose";
 import { db, uid } from "../../lib/db";
@@ -83,6 +84,8 @@ export default function HubScanner() {
           ...base, plant: crop === "Paddy" ? "Rice (paddy)" : "Unknown", is_tomato: false,
           plant_note: `You chose ${crop.toLowerCase()}. The phone's own model is trained on other crops, so only discoloured areas are marked. The online AI gives the ${crop.toLowerCase()} diagnosis.`,
           disease: { ...base.disease, name: "Needs the online AI check", confidence: 0 },
+          // The phone model was not trained on this crop, so its disease guess (and that plan) would be wrong.
+          care: { ...GENERAL_CARE, fertilizer: crop === "Paddy" ? paddyFeed() : GENERAL_CARE.fertilizer },
         };
       }
       setBusy({ url: preview, step: 3 });
@@ -325,4 +328,11 @@ export default function HubScanner() {
       </AnimatePresence>
     </div>
   );
+}
+
+/** Paddy's main feed for one acre, from the NPK calculator (medium soil). */
+function paddyFeed() {
+  const r = calculate({ crop: "Paddy", acres: 1, soil: { n: "medium", p: "medium", k: "medium" }, organic: false });
+  const [dap, urea, mop] = r.products;
+  return [{ product: "Main feed for 1 acre of paddy (whole season)", dose: `DAP ${dap.kg} kg + Urea ${urea.kg} kg + Potash (MOP) ${mop.kg} kg`, when: r.rdf.splits }];
 }

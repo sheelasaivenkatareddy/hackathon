@@ -8,7 +8,7 @@ export interface CropRdf { crop: string; n: number; p: number; k: number; splits
 const tomato = CROP_DOSES.find((c) => c.crop === "Tomato")!;
 export const RDF: CropRdf[] = [
   { crop: "Paddy", n: 120, p: 60, k: 40, splits: "N in 3 equal splits: at planting, at tillering (about 25 days) and at panicle initiation (about 50 days). All P at planting. K half at planting, half at panicle initiation.", source: "General irrigated kharif recommendation, AP & Telangana" },
-  { crop: "Tomato", n: tomato.n, p: tomato.p, k: tomato.k, splits: tomato.timing, source: "TNAU, hybrid tomato" },
+  { crop: "Tomato", n: tomato.n, p: tomato.p, k: tomato.k, splits: "Give all the DAP, a quarter of the urea and 2 parts in 5 of the potash at planting. Split the rest over 30, 45 and 60 days after planting.", source: "TNAU, hybrid tomato" },
   { crop: "Cotton", n: 120, p: 60, k: 60, splits: "N in 3 splits at 30, 60 and 90 days. All P and half the K at sowing, the rest of the K at flowering.", source: "General Bt cotton recommendation" },
   { crop: "Dry Chilli", n: 150, p: 75, k: 75, splits: "All P and a quarter of N and K at transplanting. The rest in 3 splits at 30, 60 and 90 days.", source: "General irrigated chilli guide" },
   { crop: "Maize", n: 150, p: 75, k: 75, splits: "A third of N, all P and half K at sowing. N at knee-high stage and at tasselling, the rest of K at tasselling.", source: "TNAU, hybrid maize" },

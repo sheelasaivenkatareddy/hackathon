@@ -4,6 +4,7 @@ import type { Advice, Detection, LeafResult } from "./cloud";
 import type { Diagnosis } from "./diagnose";
 import { plantOf } from "./nutrition";
 import type { PhotoKind } from "./vision/regions";
+import { RDF, calculate } from "../hub/npk";
 
 type Care = LeafResult["care"];
 type Group = "lateBlight" | "fungalSpot" | "leafMold" | "bacterial" | "virus" | "mites" | "mildew" | "healthy" | "unknown";
@@ -222,6 +223,9 @@ const NOT_A_LEAF: Record<"flower" | "not_plant", { en: string; te: string; hi: s
 const EMPTY_CARE: Care = { do_today: [], precautions: [], watering: [], fertilizer: [], chemical: [], organic: [], recovery: "" };
 
 /** Builds the same answer shape as the AI, from the on-device model and the colour masks. */
+/** General care, for crops the phone model does not know (paddy, chilli): no disease-specific sprays. */
+export const GENERAL_CARE: Care = CARE.unknown;
+
 export function localResult(d: Diagnosis, kind: PhotoKind, detections: Detection[]): LeafResult {
   if (kind !== "leaf") {
     const msg = NOT_A_LEAF[kind];
@@ -234,11 +238,19 @@ export function localResult(d: Diagnosis, kind: PhotoKind, detections: Detection
   }
   const top = d.prediction.top3[0];
   const sure = d.level === "CLEAR";
-  const group = sure ? groupOf(top?.name) : "unknown";
+  // When the model is not fully sure, still give the plan for its most likely answer, clearly marked "likely",
+  // instead of generic advice: a farmer needs to know what to do today.
+  const group = groupOf(top?.name);
   const plant = plantOf(top) ?? "Unknown";
-  const healthy = group === "healthy";
+  const healthy = group === "healthy" && sure;
   const name = top ? top.name.replace(/^[^:]+: /, "") : "Unknown";
-  const care = CARE[group];
+  const base = CARE[healthy || group !== "healthy" ? group : "unknown"];
+  const confirm = sure ? [] : [`The AI is ${Math.round((top?.p ?? 0) * 100)}% sure this is ${name}. Check the signs below before spraying, or send the scan to a lab.`];
+  const care: Care = { ...base, precautions: [...confirm, ...base.precautions], fertilizer: [...cropFeed(plant), ...base.fertilizer] };
+  // Severity from how much of the photo the marked areas cover (0-1000 boxes), not just how many there are.
+  const coverPct = detections.reduce((a, b) => a + (b.xmax - b.xmin) * (b.ymax - b.ymin), 0) / 10_000;
+  const severity = healthy ? "None" : coverPct > 15 || detections.length > 15 ? "Severe" : coverPct > 5 || detections.length > 5 ? "Moderate" : "Mild";
+  const shown = sure ? name : `Likely ${name}`;
   return {
     subject: "leaf",
     is_plant: true,
@@ -247,15 +259,31 @@ export function localResult(d: Diagnosis, kind: PhotoKind, detections: Detection
     plant_note: plant === "Tomato" ? "The on-device model reads this as a tomato leaf." : plant === "Unknown" ? "The on-device model could not tell which plant this is." : `The on-device model reads this as a ${plant} leaf, not tomato.`,
     healthy,
     disease: {
-      name: sure ? (healthy ? "Healthy" : name) : `Not sure (maybe ${name})`, latin: "", kind: "unknown",
-      severity: healthy ? "None" : detections.length > 6 ? "Severe" : detections.length > 2 ? "Moderate" : "Mild",
-      confidence: top?.p ?? 0, symptoms_seen: [], cause: "", look_alikes: d.prediction.top3[1]?.name ?? "", confirm_by: "",
+      name: healthy ? "Healthy" : sure ? name : `Likely ${name} (not fully sure)`, latin: "", kind: "unknown",
+      severity, confidence: top?.p ?? 0, symptoms_seen: [], cause: "", look_alikes: d.prediction.top3[1]?.name ?? "", confirm_by: "",
     },
     detections: healthy ? [] : detections,
     care,
     languages: {
-      en: { problem: sure ? name : "Not sure", reason: healthy ? "No spots were found." : "Circles mark discoloured or dried parts of the leaf.", steps: [...care.do_today, ...care.chemical.slice(0, 1).map((c) => `${c.product}: ${c.dose}`)] },
-      ...LANG[group],
+      en: {
+        problem: healthy ? "Healthy leaf" : shown,
+        reason: healthy ? "No spots were found." : `${detections.length} affected areas are circled: red for spots, yellow for dried tissue.`,
+        steps: [...care.do_today, ...care.fertilizer.slice(0, 2).map((f) => `${f.product}: ${f.dose} (${f.when})`), ...care.chemical.slice(0, 1).map((c) => `${c.product}: ${c.dose}, ${c.interval}`)],
+      },
+      ...LANG[healthy || group !== "healthy" ? group : "unknown"],
     },
   };
+}
+
+/** The season's main fertilizer for one acre of this crop (state guide doses, medium soil), first in the plan. */
+function cropFeed(plant: string): Care["fertilizer"] {
+  const crop = plant === "Corn" ? "Maize" : plant;
+  if (!RDF.some((r) => r.crop === crop)) return [];
+  const r = calculate({ crop, acres: 1, soil: { n: "medium", p: "medium", k: "medium" }, organic: false });
+  const [dap, urea, mop] = r.products;
+  return [{
+    product: `Main feed for 1 acre of ${crop.toLowerCase()} (whole season)`,
+    dose: `DAP ${dap.kg} kg + Urea ${urea.kg} kg + Potash (MOP) ${mop.kg} kg`,
+    when: r.rdf.splits,
+  }];
 }
