@@ -5,7 +5,7 @@ import { ArrowLeft, Building2, Calculator, CloudSun, Gift, LayoutDashboard, LogO
 import { ReactNode, useEffect, useState } from "react";
 import { Link, NavLink, Navigate, useLocation } from "react-router-dom";
 import VoiceAgent from "../components/VoiceAgent";
-import { cacheOfflinePack, offlinePackReady, onUnmeteredConnection } from "../lib/offline";
+import { cacheOfflinePack, ensureOfflinePack, usePackState } from "../lib/offline";
 import { signOut, useUser } from "./store";
 import { startSync, syncNow, useSyncState } from "./sync";
 
@@ -37,9 +37,7 @@ const Logo = () => (
 /** Online / offline and what is waiting to upload. Tapping it syncs now. */
 function SyncBadge({ className = "" }: { className?: string }) {
   const { online, syncing, waiting } = useSyncState();
-  const [pack, setPack] = useState<"unknown" | "ready" | "missing" | "busy">("unknown");
-  useEffect(() => { offlinePackReady().then((ok) => setPack(ok ? "ready" : "missing")).catch(() => setPack("missing")); }, []);
-  const getPack = async () => { setPack("busy"); const missing = await cacheOfflinePack(); setPack(missing ? "missing" : "ready"); };
+  const pack = usePackState();
   const tone = !online ? "border-neon-amber/40 bg-neon-amber/10 text-neon-amber" : waiting ? "border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan" : "border-neon-lime/30 bg-neon-lime/10 text-neon-lime";
   const label = !online ? `Offline${waiting ? ` · ${waiting} waiting to upload` : " · scans still work"}` : syncing ? "Uploading…" : waiting ? `${waiting} waiting · tap to upload` : "Online · all saved";
   return (
@@ -48,8 +46,9 @@ function SyncBadge({ className = "" }: { className?: string }) {
         className={`flex min-h-[32px] items-center gap-1.5 rounded-full border px-3 text-xs font-bold ${tone}`}>
         {online ? <Wifi className="h-3.5 w-3.5" aria-hidden /> : <WifiOff className="h-3.5 w-3.5" aria-hidden />}{label}
       </button>
-      {pack === "missing" && online && <button onClick={getPack} className="text-left text-[11px] font-semibold text-slate-400 underline hover:text-white">Save the AI for offline use (23 MB)</button>}
-      {pack === "busy" && <span className="text-[11px] text-slate-400">Saving the AI for offline use…</span>}
+      {pack.phase === "busy" && <span className="px-1 text-[11px] font-semibold text-neon-cyan">Saving the AI for offline use… {pack.done}/{pack.total}</span>}
+      {pack.phase === "missing" && online && <button onClick={() => cacheOfflinePack()} className="text-left text-[11px] font-semibold text-neon-amber underline">Offline AI not saved yet: tap to save (23 MB)</button>}
+      {pack.phase === "ready" && <span className="px-1 text-[11px] font-semibold text-neon-lime">✓ Offline AI saved on this phone</span>}
     </div>
   );
 }
@@ -61,12 +60,11 @@ export default function HubLayout({ children }: { children: ReactNode }) {
   useEffect(() => setMore(false), [pathname]);
   const active = (to: string) => (to === "/hub" ? pathname === "/hub" || pathname === "/hub/" : pathname.startsWith(to));
 
-  // Sync waiting scans and lab requests, and (on Wi-Fi) quietly save the offline pack so scans work with no internet.
+  // Sync waiting scans and lab requests, and save the offline pack so scans work with no internet.
   useEffect(() => {
     if (!user) return;
     startSync();
-    if (!navigator.onLine || !onUnmeteredConnection()) return;
-    const t = setTimeout(() => { offlinePackReady().then((ok) => { if (!ok) cacheOfflinePack(); }).catch(() => undefined); }, 5000);
+    const t = setTimeout(() => { ensureOfflinePack(); }, 2500);
     return () => clearTimeout(t);
   }, [user]);
 

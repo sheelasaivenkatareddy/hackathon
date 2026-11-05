@@ -18,6 +18,8 @@ import { photoCoach } from "../../lib/vision/coach";
 import { leafMasks } from "../../lib/vision/masks";
 import { photoKind, spotRegions } from "../../lib/vision/regions";
 import { HubScan, addHubScan, districtOf, useHubLang, useUser } from "../store";
+import { usePackState } from "../../lib/offline";
+import { useSyncState } from "../sync";
 import { Glass, PageHead, Pill } from "../ui";
 import { speak, stopSpeaking } from "../voice";
 
@@ -60,6 +62,7 @@ export default function HubScanner() {
   const [picked, setPicked] = useState<number | null>(null);
   const [tab, setTab] = useState<"en" | "te" | "hi">(lang === "te" || lang === "hi" ? lang : "en");
   const fileRef = useRef<HTMLInputElement>(null), camRef = useRef<HTMLInputElement>(null);
+  const pack = usePackState(), net = useSyncState();
 
   const run = async (blob: Blob, sampleFile?: string) => {
     if (!blob.type.startsWith("image/")) { setError("Please choose a photo (JPG or PNG)."); return; }
@@ -130,6 +133,18 @@ export default function HubScanner() {
         sub="Photograph one leaf in daylight. Red circles mark infected lesions, yellow circles mark dried or nutrient-starved tissue."
         right={<Pill tone={cloudConfigured ? "lime" : "amber"}>{cloudConfigured ? <><Database className="h-3 w-3" aria-hidden />Cloud sync on</> : <><CloudOff className="h-3 w-3" aria-hidden />Phone only</>}</Pill>} />
 
+      {!done && !busy && pack.phase !== "unknown" && pack.phase !== "ready" && (
+        <p role="status" className="mb-4 rounded-xl border border-neon-amber/40 bg-neon-amber/10 px-4 py-3 text-sm text-slate-100">
+          {pack.phase === "busy"
+            ? <>Saving the AI on this phone so scans work with <strong className="text-neon-amber">no internet</strong>: {pack.done} of {pack.total} files. Keep the app open for a minute.</>
+            : net.online
+              ? <>The offline AI is not saved on this phone yet. It saves by itself; you can also tap <strong className="text-neon-amber">"Offline AI not saved yet"</strong> in the menu.</>
+              : <>You are offline and the AI was not saved on this phone before. Scans will only mark spots by leaf colour. Connect once to save the AI (23 MB).</>}
+        </p>
+      )}
+      {!done && !busy && pack.phase === "ready" && !net.online && (
+        <p role="status" className="mb-4 rounded-xl border border-neon-lime/30 bg-neon-lime/10 px-4 py-3 text-sm text-slate-100">You are offline. The AI is saved on this phone, so you can scan as normal. Results upload by themselves when you are back online.</p>
+      )}
       {!done && !busy && (
         <>
           <div className="mb-4 grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Crop">
