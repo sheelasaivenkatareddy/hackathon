@@ -51,7 +51,7 @@ async function askPollinations(messages: ChatMsg[], system: string): Promise<str
   const body = JSON.stringify({ model: "openai", messages: [{ role: "system", content: system }, ...messages.slice(-10).map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }))] });
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const r = await fetch(URL_, { method: "POST", headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(30_000), body });
+      const r = await fetch(URL_, { method: "POST", headers: { "Content-Type": "application/json" }, signal: AbortSignal.timeout(15_000), body });
       if (r.ok) {
         const text = String((await r.json())?.choices?.[0]?.message?.content ?? "").trim();
         return text || null;
@@ -59,7 +59,7 @@ async function askPollinations(messages: ChatMsg[], system: string): Promise<str
       if (r.status !== 402 && r.status !== 429) return null;
       const msg = await r.text();
       const secs = Number(msg.match(/retry after (\d+)\s*s/i)?.[1] ?? 15);
-      if (secs > 50) return null;
+      if (secs > 8) return null; // a person will not wait longer: answer from the app instead
       await wait((secs + 1) * 1000);
     } catch { return null; }
   }
