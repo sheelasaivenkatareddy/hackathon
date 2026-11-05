@@ -73,9 +73,12 @@ export const districtOf = (u: HubUser | null): District => STATES[u?.state ?? "K
 
 export const useHubScans = () => useStored<HubScan[]>(SCANS, []);
 export const getHubScans = () => read<HubScan[]>(SCANS, []);
+export function updateHubScan(id: string, patch: Partial<HubScan>) { write(SCANS, getHubScans().map((x) => (x.id === id ? { ...x, ...patch } : x))); }
 export function addHubScan(s: HubScan) { write(SCANS, [s, ...getHubScans().filter((x) => x.id !== s.id)].slice(0, 25)); }
 
 export const useEscalations = () => useStored<Escalation[]>(ESC, []);
+export const getEscalations = () => read<Escalation[]>(ESC, []);
+export function updateEscalation(id: string, patch: Partial<Escalation>) { write(ESC, getEscalations().map((x) => (x.id === id ? { ...x, ...patch } : x))); }
 export function addEscalation(e: Escalation) { write(ESC, [e, ...read<Escalation[]>(ESC, [])].slice(0, 50)); }
 
 export type VoiceLang = "te" | "hi" | "en" | "ta" | "kn" | "ml";

@@ -12,7 +12,7 @@ export default function Mandi() {
   const [crop, setCrop] = useState<Commodity | "All">("All");
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<"modal" | "trend" | "market">("trend");
-  const [data, setData] = useState<{ rows: PriceRow[]; live: boolean } | null>(null);
+  const [data, setData] = useState<{ rows: PriceRow[]; live: boolean; cachedAt?: number } | null>(null);
   const [loading, setLoading] = useState(false);
 
   const load = () => { setLoading(true); loadPrices(state).then((d) => { setData(d); setLoading(false); }); };
@@ -35,9 +35,10 @@ export default function Mandi() {
     <div>
       <PageHead eyebrow="Live market intelligence" title={<>Mandi <span className="neon-text">price tracker</span></>}
         sub="APMC prices in ₹ per quintal (100 kg). Modal price is the rate most lots sold at."
-        right={<div className="flex items-center gap-2">{data && (data.live ? <Pill tone="lime">● Live · Agmarknet</Pill> : <SamplePill>Sample prices</SamplePill>)}<button onClick={load} className="hub-btn-ghost !min-h-[36px]" aria-label="Refresh"><RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} aria-hidden /></button></div>} />
+        right={<div className="flex items-center gap-2">{data && (data.live ? <Pill tone="lime">● Live · Agmarknet</Pill> : data.cachedAt ? <Pill tone="amber">Saved {new Date(data.cachedAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</Pill> : <SamplePill>Sample prices</SamplePill>)}<button onClick={load} className="hub-btn-ghost !min-h-[36px]" aria-label="Refresh"><RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} aria-hidden /></button></div>} />
 
-      {data && !data.live && (
+      {data && !data.live && data.cachedAt && <p role="note" className="mb-4 rounded-xl border border-neon-amber/30 bg-neon-amber/5 px-4 py-3 text-sm text-slate-200">You are offline or the price service is busy. These are the <strong className="text-neon-amber">last live prices saved on this phone</strong>. They refresh when you are online.</p>}
+      {data && !data.live && !data.cachedAt && (
         <p role="note" className="mb-4 rounded-xl border border-neon-amber/30 bg-neon-amber/5 px-4 py-3 text-sm text-slate-200">
           These are <strong className="text-neon-amber">sample prices</strong> for the demo, not today's market rates. Live Agmarknet prices appear when the data.gov.in key is added to the cloud setup.
         </p>

@@ -17,7 +17,7 @@ export default function HubDashboard() {
   const scans = useHubScans();
   const escalations = useEscalations();
   const [wx, setWx] = useState<Forecast | null>(null);
-  const [prices, setPrices] = useState<{ rows: PriceRow[]; live: boolean } | null>(null);
+  const [prices, setPrices] = useState<{ rows: PriceRow[]; live: boolean; cachedAt?: number } | null>(null);
   const place = districtOf(user);
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export default function HubDashboard() {
         <Glass delay={5}>
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 className="hub-h3">Best prices for your crops</h2>
-            <span className="flex items-center gap-2">{prices && !prices.live && <SamplePill />}<Link to="/hub/mandi" className="text-xs font-bold text-neon-cyan">All →</Link></span>
+            <span className="flex items-center gap-2">{prices && !prices.live && (prices.cachedAt ? <Pill tone="amber">Saved prices</Pill> : <SamplePill />)}<Link to="/hub/mandi" className="text-xs font-bold text-neon-cyan">All →</Link></span>
           </div>
           {!prices ? <p className="hub-muted">Loading prices…</p> : !myPrices.length ? <p className="hub-muted">No market rows for your crops in {user.state}.</p> : (
             <ul className="space-y-2">

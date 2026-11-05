@@ -208,12 +208,12 @@ export async function answerOffline(q: string, chosen: VoiceLang, user: HubUser 
       } else out.push(pick(NO_SCAN, l));
     }
     if (i === "price") {
-      const { rows, live } = await loadPrices(user?.state ?? "AP");
+      const { rows, live, cachedAt } = await loadPrices(user?.state ?? "AP");
       const crops = named ? [named] : user?.crops.length ? user.crops : ["Tomato", "Paddy"];
       const lines = crops.flatMap((c) => {
         const r = rows.filter((x) => x.commodity === c);
         return r.length ? [r.reduce((a, b) => (b.modal > a.modal ? b : a))] : [];
-      }).slice(0, 3).map((r) => priceLine(l, r.commodity, r.market, r.modal, !live));
+      }).slice(0, 3).map((r) => priceLine(l, r.commodity, r.market, r.modal, !live && !cachedAt));
       out.push(lines.length ? lines.join(". ") + "." : pick(NOT_UNDERSTOOD, l));
     }
     if (i === "weather") {

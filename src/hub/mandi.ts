@@ -126,10 +126,20 @@ async function livePrices(state: StateId): Promise<PriceRow[] | null> {
   return rows.length ? rows : null;
 }
 
-export async function loadPrices(state: StateId): Promise<{ rows: PriceRow[]; live: boolean }> {
+const lastKey = (state: StateId) => `hub:mandi-last:${state}`;
+
+/** Live rows when online; otherwise the last live rows saved on this phone; otherwise labelled sample prices. */
+export async function loadPrices(state: StateId): Promise<{ rows: PriceRow[]; live: boolean; cachedAt?: number }> {
   try {
     const live = await livePrices(state);
-    if (live) return { rows: live, live: true };
-  } catch { /* fall back to samples */ }
+    if (live) {
+      try { localStorage.setItem(lastKey(state), JSON.stringify({ at: Date.now(), rows: live })); } catch { /* storage full */ }
+      return { rows: live, live: true };
+    }
+  } catch { /* offline or the service is down: use what is saved */ }
+  try {
+    const saved = JSON.parse(localStorage.getItem(lastKey(state)) ?? "null") as { at: number; rows: PriceRow[] } | null;
+    if (saved?.rows?.length) return { rows: saved.rows, live: false, cachedAt: saved.at };
+  } catch { /* blocked */ }
   return { rows: samplePrices(state), live: false };
 }

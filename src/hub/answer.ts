@@ -44,13 +44,14 @@ export async function answerQuestion(history: ChatMsg[], chosen: VoiceLang, voic
   const key = cacheKey(q, lang, hub?.id ?? "none");
   const hit = firstTurn ? cached(key) : null;
   if (hit) return hit;
-  if (cloudConfigured) {
+  const online = typeof navigator === "undefined" || navigator.onLine;
+  if (cloudConfigured && online) {
     const res = await askAgent(history, lang, true, voice);
     if (res.ok && !res.offline) { const a: Answer = { text: res.answer, lang, source: "Claude AI" }; if (firstTurn) remember(key, a); return a; }
   }
   // The newest scan: this session's (main scanner or Kisan Hub), else the last one saved in Kisan Hub.
   const scan = getLatestScan() ?? hub?.result;
-  const free = await askFreeAI(history, lang, voice, scanContext(scan, hub?.crop));
+  const free = online ? await askFreeAI(history, lang, voice, scanContext(scan, hub?.crop)) : null;
   if (free) { const a: Answer = { text: free, lang, source: "AI" }; if (firstTurn) remember(key, a); return a; }
   const o = await answerOffline(q, lang, getUser());
   return { text: o.text, lang: o.lang, source: o.source === "wikipedia" ? "Wikipedia" : "App data" };

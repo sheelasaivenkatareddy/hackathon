@@ -1,11 +1,13 @@
 // Kisan Hub shell: sidebar on desktop, top bar and bottom bar with a glowing Scan button on phones.
 // Every hub page except login needs a signed-in user.
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Building2, Calculator, CloudSun, Gift, LayoutDashboard, LogOut, Menu, Mic, ScanLine, TrendingUp, X } from "lucide-react";
+import { ArrowLeft, Building2, Calculator, CloudSun, Gift, LayoutDashboard, LogOut, Menu, Mic, ScanLine, TrendingUp, Wifi, WifiOff, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { Link, NavLink, Navigate, useLocation } from "react-router-dom";
 import VoiceAgent from "../components/VoiceAgent";
+import { cacheOfflinePack, offlinePackReady, onUnmeteredConnection } from "../lib/offline";
 import { signOut, useUser } from "./store";
+import { startSync, syncNow, useSyncState } from "./sync";
 
 export const HUB_NAV = [
   { to: "/hub", label: "Dashboard", icon: LayoutDashboard },
@@ -31,12 +33,42 @@ const Logo = () => (
   </Link>
 );
 
+
+/** Online / offline and what is waiting to upload. Tapping it syncs now. */
+function SyncBadge({ className = "" }: { className?: string }) {
+  const { online, syncing, waiting } = useSyncState();
+  const [pack, setPack] = useState<"unknown" | "ready" | "missing" | "busy">("unknown");
+  useEffect(() => { offlinePackReady().then((ok) => setPack(ok ? "ready" : "missing")).catch(() => setPack("missing")); }, []);
+  const getPack = async () => { setPack("busy"); const missing = await cacheOfflinePack(); setPack(missing ? "missing" : "ready"); };
+  const tone = !online ? "border-neon-amber/40 bg-neon-amber/10 text-neon-amber" : waiting ? "border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan" : "border-neon-lime/30 bg-neon-lime/10 text-neon-lime";
+  const label = !online ? `Offline${waiting ? ` · ${waiting} waiting to upload` : " · scans still work"}` : syncing ? "Uploading…" : waiting ? `${waiting} waiting · tap to upload` : "Online · all saved";
+  return (
+    <div className={`flex flex-col gap-1.5 ${className}`}>
+      <button onClick={() => syncNow()} disabled={!online || syncing || !waiting} aria-live="polite"
+        className={`flex min-h-[32px] items-center gap-1.5 rounded-full border px-3 text-xs font-bold ${tone}`}>
+        {online ? <Wifi className="h-3.5 w-3.5" aria-hidden /> : <WifiOff className="h-3.5 w-3.5" aria-hidden />}{label}
+      </button>
+      {pack === "missing" && online && <button onClick={getPack} className="text-left text-[11px] font-semibold text-slate-400 underline hover:text-white">Save the AI for offline use (23 MB)</button>}
+      {pack === "busy" && <span className="text-[11px] text-slate-400">Saving the AI for offline use…</span>}
+    </div>
+  );
+}
+
 export default function HubLayout({ children }: { children: ReactNode }) {
   const user = useUser();
   const { pathname } = useLocation();
   const [more, setMore] = useState(false);
   useEffect(() => setMore(false), [pathname]);
   const active = (to: string) => (to === "/hub" ? pathname === "/hub" || pathname === "/hub/" : pathname.startsWith(to));
+
+  // Sync waiting scans and lab requests, and (on Wi-Fi) quietly save the offline pack so scans work with no internet.
+  useEffect(() => {
+    if (!user) return;
+    startSync();
+    if (!navigator.onLine || !onUnmeteredConnection()) return;
+    const t = setTimeout(() => { offlinePackReady().then((ok) => { if (!ok) cacheOfflinePack(); }).catch(() => undefined); }, 5000);
+    return () => clearTimeout(t);
+  }, [user]);
 
   if (pathname.startsWith("/hub/login") || pathname.startsWith("/hub/expert-login")) return <div className="hub min-h-screen">{children}</div>;
   if (!user) return <Navigate to={`/hub/login?next=${encodeURIComponent(pathname)}`} replace />;
@@ -69,6 +101,7 @@ export default function HubLayout({ children }: { children: ReactNode }) {
             </NavLink>
           ))}
         </nav>
+        <SyncBadge className="mb-3 px-1" />
         <Link to="/" className="mb-3 flex items-center gap-2 px-3 text-xs font-semibold text-slate-500 hover:text-slate-300"><ArrowLeft className="h-3.5 w-3.5" aria-hidden />Patra Lens website</Link>
         <UserCard />
       </aside>
@@ -80,6 +113,7 @@ export default function HubLayout({ children }: { children: ReactNode }) {
       </header>
 
       {/* No z-index here: page dialogs (z-[60]) must stack above the fixed bars. */}
+      <SyncBadge className="px-4 pt-3 lg:hidden" />
       <main className="relative px-4 pb-28 pt-5 md:px-8 md:pt-8 lg:ml-64 lg:pb-12">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
