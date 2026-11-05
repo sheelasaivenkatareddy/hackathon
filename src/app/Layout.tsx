@@ -90,23 +90,23 @@ export default function Layout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-[500] border-b border-line bg-white/95 backdrop-blur">
         <div className="wrap flex h-14 items-center justify-between gap-3 md:h-16">
           <Link to="/" className="flex min-h-[44px] items-center gap-2 font-heading text-lg font-extrabold text-forest">
-            <img src="/logo.svg" alt="" className="h-8 w-8" />Patra Lens
+            <img src="/logo.svg" alt="" className="h-8 w-8" /><span className="whitespace-nowrap">Patra Lens</span>
           </Link>
           <ConnectionPill className="lg:hidden" />
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
             {ITEMS.map((it) => (
-              <NavLink key={it.to} to={it.to} end={it.to === "/"} className={`relative flex min-h-[44px] items-center rounded-full px-4 text-[15px] font-semibold ${isActive(it.to) ? "text-forest" : "text-muted hover:text-forest"} ${!online && !worksOffline(it.to) ? "opacity-40" : ""}`}>
+              <NavLink key={it.to} to={it.to} end={it.to === "/"} className={`relative flex min-h-[44px] items-center whitespace-nowrap rounded-full px-3 text-[15px] font-semibold xl:px-4 ${isActive(it.to) ? "text-forest" : "text-muted hover:text-forest"} ${!online && !worksOffline(it.to) ? "opacity-40" : ""}`}>
                 {isActive(it.to) && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-full bg-green-tint" transition={{ type: "spring", stiffness: 400, damping: 32 }} />}
                 <span className="relative">{it.label ?? t(it.key)}</span>
               </NavLink>
             ))}
-            <button onClick={() => setMoreOpen(true)} className="flex min-h-[44px] items-center rounded-full px-4 text-[15px] font-semibold text-muted hover:text-forest">More</button>
+            <button onClick={() => setMoreOpen(true)} className="flex min-h-[44px] items-center rounded-full px-3 text-[15px] font-semibold text-muted hover:text-forest xl:px-4">More</button>
           </nav>
-          <div className="hidden items-center gap-3 lg:flex">
-            <ConnectionPill />
+          <div className="hidden items-center gap-2 lg:flex xl:gap-3">
+            <ConnectionPill className="whitespace-nowrap" />
             <LanguageSwitch />
-            <Link to="/hub/expert-login" className="flex min-h-[44px] items-center rounded-full px-3 text-[15px] font-semibold text-muted hover:text-forest">Lab login</Link>
-            <Button to="/hub" className="!text-[15px]"><Zap className="h-4 w-4" aria-hidden />Open Kisan Hub</Button>
+            <Link to="/hub/expert-login" className="hidden min-h-[44px] items-center whitespace-nowrap rounded-full px-3 text-[15px] font-semibold text-muted hover:text-forest 2xl:flex">Lab login</Link>
+            <Button to="/hub" className="whitespace-nowrap !text-[15px]"><Zap className="h-4 w-4" aria-hidden />Open Kisan Hub</Button>
           </div>
           <button onClick={() => setMoreOpen(true)} className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface lg:hidden" aria-label="More"><Menu className="h-6 w-6 text-forest" aria-hidden /></button>
         </div>
