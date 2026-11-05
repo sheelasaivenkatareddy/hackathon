@@ -107,7 +107,9 @@ How it is protected: the browser never writes to the table. Only the `analyze-le
 
 A dark, mobile-first app inside the same site for farmers and labs. Open it from the "Kisan Hub" button in the header.
 
-- **Login:** mobile number and OTP, with a Farmer or Expert/Lab role, then a one-time profile (state, district, village, acres, crops). The OTP is simulated for the demo: the code is shown on screen and no SMS is sent. Use an SMS provider before real use.
+- **Login:** farmers sign in with **email + mobile number**. Supabase emails a one-time link or 6-digit code (sent from the Gmail set in `.env.supabase`), then a one-time profile (state, district, village, acres, crops). The mobile number is saved with every scan, but **no SMS is sent**: an SMS OTP needs a paid gateway (MSG91, Fast2SMS, Twilio).
+- **Labs and scientists:** `/hub/expert-login` (name, organisation, email, phone). After the email check, an admin approves them in `/admin` → Experts. Approved experts see scans and lab requests in the same console; they cannot delete.
+- **Offline-first:** the AI model and OpenCV are saved on the phone (automatically on Wi-Fi, by button on mobile data). Scans and lab requests made offline upload by themselves when the phone is online again (`src/hub/sync.ts`); a badge shows the state. Mandi prices keep the last live rows for offline use.
 - **Dashboard:** weather advisories, the spray window, scan history, the best mandi price for each of the farmer's crops, and lab requests.
 - **Kisan Vani:** a voice assistant in Telugu, Hindi, English, Tamil, Kannada and Malayalam. It uses the browser's speech recognition and speech synthesis, and gets its answers from `ask-agent` in voice mode. Greetings, "My diagnosis", "Weather alert" and "Crop plan" also work offline.
 - **Crop Scanner:** tomato and paddy, by drag and drop or camera. It uses the same AI as `/scan`: red circles mark lesions, yellow circles mark dry or nutrient-starved tissue, and a table gives each box's coordinates. Every scan is saved with the farmer's name, phone, time and approximate location (about 1 km, or the district centre). Paddy needs the online AI; offline, only the colour circles are shown.
@@ -116,6 +118,8 @@ A dark, mobile-first app inside the same site for farmers and labs. Open it from
 - **Weather & Spray:** a 7-day Open-Meteo forecast, rain, humidity, heat and wind alerts, and a 48-hour spray timeline.
 - **Schemes:** a quick eligibility check for PM-KISAN, PMFBY, KCC, Soil Health Card, PM-KUSUM and state schemes (AP Annadata Sukhibhava, Telangana Rythu Bharosa, Karnataka Krishi Bhagya). It is a guide, with links to the official portals.
 - **NPK Calculator:** crop, acres and soil test level give kg of N, P and K, then bags of DAP, urea and MOP, the approximate cost, and the split schedule.
+
+**AI answers:** Claude (if `ANTHROPIC_API_KEY` is set), else Google Gemini through the `kisan-hub` function (`GEMINI_API_KEY`, free key), else a free open AI, else the app's own data (prices, weather, fertilizer, last scan) and Wikipedia. Offline, only the app's data is used.
 
 **Voice Agent:** a glowing microphone button on every page, on both the main site and Kisan Hub. Tap it and speak in Telugu, Hindi, English, Tamil, Kannada or Malayalam.
 - It answers aloud, using Claude through `ask-agent` in voice mode.
