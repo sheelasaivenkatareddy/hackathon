@@ -128,7 +128,7 @@ export default function AgentPanel() {
               <header className="flex items-center gap-3 bg-deep lit px-4 py-3 text-white">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-lime text-forest"><Bot className="h-6 w-6" aria-hidden /></span>
                 <div className="min-w-0 flex-1">
-                  <p className="font-heading font-bold leading-tight">Patra Chain Assistant</p>
+                  <p className="font-heading font-bold leading-tight">Patra Chain - Blockchain-based crop disease verification system Assistant</p>
                   <p className="truncate text-xs text-white/75">{offline ? "Offline: searching the disease library" : "AI crop doctor · diseases, fertilizer, watering"}</p>
                 </div>
                 <div className="flex rounded-full bg-white/10 p-0.5" role="group" aria-label="Answer language">

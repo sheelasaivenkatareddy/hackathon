@@ -64,7 +64,7 @@ export function outlookFor(name: string | undefined, level: AnswerLevel): { kind
   }
   return { kind: "spots", headline: "About 1–2 weeks to see it slowing, if it is being controlled", steps: [
     { when: "Today", what: "Remove badly affected lower leaves, and ask your KVK how to control this disease." },
-    { when: "In 2–3 days", what: "Photograph the same leaf. Patra Chain rings any new spots." },
+    { when: "In 2–3 days", what: "Photograph the same leaf. Patra Chain - Blockchain-based crop disease verification system rings any new spots." },
     { when: "In about 1–2 weeks", what: "If no new spots appear and new leaves stay clean, it is slowing." },
   ] };
 }

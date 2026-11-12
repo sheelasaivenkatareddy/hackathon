@@ -71,7 +71,7 @@ export const STOP_REPLY: Record<VoiceLang, string> = {
 /** Spoken when a screen opens (with "Narrate screens" on) and as the offline voice-over. */
 export const INTRO: Record<string, Record<VoiceLang, string>> = {
   "/": {
-    en: "Welcome to Patra Chain. Scan a leaf to find disease early, or open Kisan Hub for mandi prices, weather and expert help.",
+    en: "Welcome to Patra Chain - Blockchain-based crop disease verification system. Scan a leaf to find disease early, or open Kisan Hub for mandi prices, weather and expert help.",
     te: "పత్ర చైన్‌కు స్వాగతం. తెగులు ముందే తెలుసుకోవడానికి ఆకును స్కాన్ చేయండి, లేదా మండి ధరలు, వాతావరణం, నిపుణుల సహాయం కోసం కిసాన్ హబ్ తెరవండి.",
     hi: "पत्र चेन में स्वागत है। रोग जल्दी पकड़ने के लिए पत्ती स्कैन करें, या मंडी भाव, मौसम और विशेषज्ञ मदद के लिए किसान हब खोलें।",
     ta: "பத்ர லென்ஸுக்கு வரவேற்கிறோம். நோயை முன்கூட்டியே கண்டறிய இலையை ஸ்கேன் செய்யுங்கள், அல்லது சந்தை விலை, வானிலை, நிபுணர் உதவிக்கு கிசான் ஹப் திறக்கவும்.",

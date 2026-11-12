@@ -1,5 +1,5 @@
 // What to look for, and what can be done about it. Written as plain advice, from extension and research sources.
-// Patra Chain never names products or doses. Those depend on the crop, the disease, the stage and local rules.
+// Patra Chain - Blockchain-based crop disease verification system never names products or doses. Those depend on the crop, the disease, the stage and local rules.
 import type { AnswerLevel } from "./model";
 import type { Source } from "./nutrition";
 
@@ -59,7 +59,7 @@ const SAFE_USE = [
   "Wear gloves, a mask and long sleeves. Do not spray in wind or just before rain. Keep children and animals away.",
   "Do not keep using the same product. Resistance to some fungicide groups has already been found in India.",
 ];
-const NO_NAMES = "Patra Chain does not name products or doses. They depend on your crop, the stage and local rules.";
+const NO_NAMES = "Patra Chain - Blockchain-based crop disease verification system does not name products or doses. They depend on your crop, the stage and local rules.";
 
 const NO_ORGANIC: TreatmentBlock = { title: "Organic and biological options", items: ["We have no checked organic remedy for this one. The steps under Cultural are your best first move, and your KVK can advise on more."] };
 

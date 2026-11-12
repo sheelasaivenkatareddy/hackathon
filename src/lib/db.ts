@@ -1,4 +1,4 @@
-// Patra Chain storage (IndexedDB). Photos are JPEG blobs; compare results are stored without the overlay masks.
+// Patra Chain - Blockchain-based crop disease verification system storage (IndexedDB). Photos are JPEG blobs; compare results are stored without the overlay masks.
 import Dexie, { type Table, liveQuery } from "dexie";
 import { useEffect, useState } from "react";
 import type { AnswerLevel, Guess, Mode } from "./model";
@@ -106,9 +106,9 @@ export async function exportAll(): Promise<Blob> {
 
 export async function importAll(file: Blob): Promise<number> {
   let raw: unknown;
-  try { raw = JSON.parse(await file.text()); } catch { throw new Error("This is not a Patra Chain export file."); }
+  try { raw = JSON.parse(await file.text()); } catch { throw new Error("This is not a Patra Chain - Blockchain-based crop disease verification system export file."); }
   const checked = ExportFileSchema.safeParse(raw);
-  if (!checked.success) throw new Error("This is not a Patra Chain export file.");
+  if (!checked.success) throw new Error("This is not a Patra Chain - Blockchain-based crop disease verification system export file.");
   const json = checked.data;
   let n = 0;
   for (const t of TABLES) {

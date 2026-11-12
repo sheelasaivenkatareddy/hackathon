@@ -221,7 +221,7 @@ export default function Admin() {
       <div className="wrap max-w-xl py-14 text-center">
         <p className="eyebrow">Expert console</p>
         <h1 className="page-title">Waiting for approval</h1>
-        <p className="mt-3">Your email ({session.user.email}) is verified. The Patra Chain admin will approve your account, then this page shows farmers' scans and lab requests.</p>
+        <p className="mt-3">Your email ({session.user.email}) is verified. The Patra Chain - Blockchain-based crop disease verification system admin will approve your account, then this page shows farmers' scans and lab requests.</p>
         <div className="mt-5"><Button variant="ghost" onClick={() => supabase!.auth.signOut()}><LogOut className="h-4 w-4" aria-hidden />Sign out</Button></div>
       </div>
     );

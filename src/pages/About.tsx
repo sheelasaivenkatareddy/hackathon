@@ -11,11 +11,11 @@ const STEPS = [
   ["Warning neighbours", "With consent, confirmed cases are shared as a rounded 1 km area. An unusual rise in an area triggers an alert."],
 ];
 const HONEST = [
-  "Patra Chain never names pesticides or pesticide doses. It tells you what to check and who to ask.",
+  "Patra Chain - Blockchain-based crop disease verification system never names pesticides or pesticide doses. It tells you what to check and who to ask.",
   "Location is shared only if you turn it on, and only as an approximate 1 km area.",
   "Risk scores are estimates from weather and reports, not predictions.",
   "Sample, demo and synthetic items always carry a visible chip.",
-  "Patra Chain is still early. It has not been validated on local farms, so treat its answers as guidance and confirm them with an expert.",
+  "Patra Chain - Blockchain-based crop disease verification system is still early. It has not been validated on local farms, so treat its answers as guidance and confirm them with an expert.",
 ];
 const pct = (v: number | null) => (v === null ? null : `${Math.round(v * 100)}%`);
 const METRICS: [string, string | number | null][] = [
@@ -33,7 +33,7 @@ export default function About() {
   return (
       <div className="wrap max-w-3xl space-y-6 py-8 md:py-12">
         <h1 className="page-title">About Patra Chain - Blockchain-based crop disease verification system</h1>
-        <p>Patra Chain helps you catch crop problems early, from a photo on your phone. “Patra” means leaf.</p>
+        <p>Patra Chain - Blockchain-based crop disease verification system helps you catch crop problems early, from a photo on your phone. “Patra” means leaf.</p>
         <Card className="!bg-white">
           <h2 className="h3">How it works</h2>
           <ol className="mt-3 space-y-3">
@@ -58,7 +58,7 @@ export default function About() {
           <h2 className="h3">Credits</h2>
           <p className="mt-2 text-sm">{PHOTO_CREDIT}</p>
           <p className="mt-2 text-sm">Weather data by Open-Meteo.com (CC BY 4.0). Map data © OpenStreetMap contributors. Soil data by SoilGrids, ISRIC (CC BY 4.0). Place names by BigDataCloud. Disease descriptions from Wikipedia (CC BY-SA 4.0).</p>
-          <p className="mt-2 text-sm">AI model: <a className="text-green-dark underline" href="https://huggingface.co/rodynaemad/plant-disease-dinov2-small" target="_blank" rel="noreferrer">plant-disease-dinov2-small</a> by rodynaemad (CC BY-SA 4.0), built on DINOv2 by Meta. Its last layer was retrained for Patra Chain on the PlantDoc dataset. The retrained layer is shared under the same licence.</p>
+          <p className="mt-2 text-sm">AI model: <a className="text-green-dark underline" href="https://huggingface.co/rodynaemad/plant-disease-dinov2-small" target="_blank" rel="noreferrer">plant-disease-dinov2-small</a> by rodynaemad (CC BY-SA 4.0), built on DINOv2 by Meta. Its last layer was retrained for Patra Chain - Blockchain-based crop disease verification system on the PlantDoc dataset. The retrained layer is shared under the same licence.</p>
         </Card>
       </div>
   );

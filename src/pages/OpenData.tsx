@@ -142,7 +142,7 @@ export default function OpenData() {
         <div>
           <p className="eyebrow">Open data · for scientists and labs</p>
           <h1 className="page-title">Every leaf scan, in one place</h1>
-          <p className="mt-2 max-w-2xl text-muted">Live from the Patra Chain database. Farmers' names, phone numbers, villages, devices and photos are not shown; locations are rounded to about 1 km.</p>
+          <p className="mt-2 max-w-2xl text-muted">Live from the Patra Chain - Blockchain-based crop disease verification system database. Farmers' names, phone numbers, villages, devices and photos are not shown; locations are rounded to about 1 km.</p>
           {at && <p className="tiny mt-1">Updated {fmtDate(at.toISOString())}{stats.from ? ` · scans from ${fmtDate(stats.from)} to ${fmtDate(stats.to)}` : ""}</p>}
         </div>
         <div className="flex flex-wrap gap-2">

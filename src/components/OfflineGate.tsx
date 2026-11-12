@@ -64,7 +64,7 @@ export function ModeSwitch() {
     <section aria-label="Online or offline mode" className="lit border-b border-white/10 bg-[#060D1F]">
       <div className="wrap py-4 md:py-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">How do you want to use Patra Chain?</p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">How do you want to use Patra Chain - Blockchain-based crop disease verification system?</p>
           <ConnectionPill />
         </div>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row">

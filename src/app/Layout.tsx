@@ -71,7 +71,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           const vs = await plantVisits(p.id);
           const last = vs[vs.length - 1];
           if (last && daysUntil(nextCheckDate(last.date, every)) <= 0) {
-            new Notification("Patra Chain: check sentinel plants", { body: `${f.name} has plants due today.`, icon: "/logo.svg" });
+            new Notification("Patra Chain - Blockchain-based crop disease verification system: check sentinel plants", { body: `${f.name} has plants due today.`, icon: "/logo.svg" });
             await db.settings.put({ key: "remindedOn", value: today });
             return;
           }

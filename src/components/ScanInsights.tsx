@@ -36,7 +36,7 @@ export function SummaryBar({ text, report, feedback, onFeedback }: { text: strin
   };
   const share = async () => {
     if (navigator.share) {
-      try { await navigator.share({ title: "Patra Chain scan report", text: report }); return; } catch (e) { if ((e as Error).name === "AbortError") return; }
+      try { await navigator.share({ title: "Patra Chain - Blockchain-based crop disease verification system scan report", text: report }); return; } catch (e) { if ((e as Error).name === "AbortError") return; }
     }
     downloadBlob(new Blob([report], { type: "text/plain" }), "patra-lens-report.txt");
     toast("Report saved. Show it to your KVK or agriculture officer.");

@@ -8,7 +8,7 @@ export function buildIcs(firstCheck: Date, everyDays: number, count = 4): string
     const start = new Date(firstCheck); start.setDate(start.getDate() + i * everyDays);
     const end = new Date(start); end.setDate(end.getDate() + 1);
     lines.push("BEGIN:VEVENT", `UID:patra-${ymd(start)}-${i}@patra-lens`, `DTSTAMP:${stamp}`,
-      `DTSTART;VALUE=DATE:${ymd(start)}`, `DTEND;VALUE=DATE:${ymd(end)}`, "SUMMARY:Patra Chain: check sentinel plants", "END:VEVENT");
+      `DTSTART;VALUE=DATE:${ymd(start)}`, `DTEND;VALUE=DATE:${ymd(end)}`, "SUMMARY:Patra Chain - Blockchain-based crop disease verification system: check sentinel plants", "END:VEVENT");
   }
   lines.push("END:VCALENDAR");
   return lines.join("\r\n") + "\r\n";
