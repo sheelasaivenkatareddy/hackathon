@@ -90,7 +90,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-[500] border-b border-line bg-white/95 backdrop-blur">
         <div className="wrap flex h-14 items-center justify-between gap-3 md:h-16">
           <Link to="/" className="flex min-h-[44px] items-center gap-2 font-heading text-lg font-extrabold text-forest">
-            <img src="/logo.svg" alt="" className="h-8 w-8" /><span className="leading-tight">Patra Chain<span className="hidden text-[10px] font-semibold opacity-70 lg:block">Blockchain-based crop disease verification system</span></span>
+            <img src="/logo.svg" alt="" className="h-8 w-8" /><span className="max-w-[11rem] truncate sm:max-w-none"><span className="sm:hidden">Patra Chain</span><span className="hidden sm:inline">Patra Chain - Blockchain-based crop disease verification system</span></span>
           </Link>
           <ConnectionPill className="lg:hidden" />
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
