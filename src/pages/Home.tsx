@@ -322,7 +322,7 @@ export default function Home() {
         <div aria-hidden className="hero-dots pointer-events-none absolute inset-0 -z-[1]" />
         <div className="wrap grid min-h-[640px] items-center gap-10 pb-24 pt-12 md:pb-28 lg:min-h-[calc(100vh-4rem)] lg:grid-cols-[1.2fr_1fr]">
           <div>
-            <Chip tone="lime">Patra Chain · Blockchain-based crop disease verification system</Chip>
+            <Chip tone="lime">Patra Chain - Blockchain-based crop disease verification system</Chip>
             <h1 className="display mt-5" aria-label="Catch the first spot.">
               {["Catch", "the"].map((w, i) => <HeroWord key={w} delay={i * 0.12}>{w}</HeroWord>)}
               <HeroWord delay={0.24} className="text-glow">first</HeroWord>

@@ -32,7 +32,7 @@ const METRICS: [string, string | number | null][] = [
 export default function About() {
   return (
       <div className="wrap max-w-3xl space-y-6 py-8 md:py-12">
-        <h1 className="page-title">About Patra Chain</h1>
+        <h1 className="page-title">About Patra Chain - Blockchain-based crop disease verification system</h1>
         <p>Patra Chain helps you catch crop problems early, from a photo on your phone. “Patra” means leaf.</p>
         <Card className="!bg-white">
           <h2 className="h3">How it works</h2>
