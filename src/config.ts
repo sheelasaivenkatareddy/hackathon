@@ -1,4 +1,4 @@
-// Patra Lens: every threshold, weight and limit in one place.
+// Patra Chain: every threshold, weight and limit in one place.
 // The numbers match reference/patra_vision_reference.py and were checked on the sample photos.
 
 export const CONFIG = {

@@ -27,9 +27,9 @@ export default function Footer() {
       <div className="wrap grid gap-10 py-12 md:grid-cols-[1.6fr_1fr_1fr_1fr] md:py-16">
         <div>
           <Link to="/" className="inline-flex items-center gap-3 font-heading text-xl font-extrabold">
-            <img src="/logo-light.svg" alt="" className="h-9 w-9" />Patra Lens
+            <img src="/logo-light.svg" alt="" className="h-9 w-9" />Patra Chain
           </Link>
-          <p className="mt-3 max-w-sm text-white/75">Catch the first spot. Early detection of crop pests and diseases, on any smartphone.</p>
+          <p className="mt-3 max-w-sm text-white/75">Blockchain-based crop disease verification system. Catch the first spot. Early detection of crop pests and diseases, on any smartphone.</p>
         </div>
         {COLUMNS.map((c) => (
           <nav key={c.title} aria-label={c.title}>
@@ -44,7 +44,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="wrap flex flex-wrap items-center justify-between gap-2 py-5 text-sm text-white/65">
-          <p>© 2026 Patra Lens · <span data-testid="version">Version {__BUILD__}</span></p>
+          <p>© 2026 Patra Chain · <span data-testid="version">Version {__BUILD__}</span></p>
           {CONFIG.site.contactEmail ? <a href={`mailto:${CONFIG.site.contactEmail}`} className="inline-flex min-h-[36px] items-center underline-offset-4 hover:text-white hover:underline">Contact</a> : <span>Guidance only. Confirm with an agriculture expert.</span>}
         </div>
       </div>

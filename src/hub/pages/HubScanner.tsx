@@ -273,7 +273,7 @@ export default function HubScanner() {
 
                 {/* database sync */}
                 <Glass className={done.synced ? "!border-neon-lime/30" : "!border-neon-amber/30"}>
-                  <p className={`flex items-center gap-2 text-sm font-bold ${done.synced ? "text-neon-lime" : "text-neon-amber"}`}>{done.synced ? <Database className="h-4 w-4" aria-hidden /> : <CloudOff className="h-4 w-4" aria-hidden />}{done.synced ? "Saved to the Patra Lens database" : "Saved on this phone"}</p>
+                  <p className={`flex items-center gap-2 text-sm font-bold ${done.synced ? "text-neon-lime" : "text-neon-amber"}`}>{done.synced ? <Database className="h-4 w-4" aria-hidden /> : <CloudOff className="h-4 w-4" aria-hidden />}{done.synced ? "Saved to the Patra Chain database" : "Saved on this phone"}</p>
                   <dl className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs">
                     <dt className="text-slate-500">Farmer</dt><dd className="truncate text-slate-200">{user.name} · +91 {user.phone}</dd>
                     <dt className="text-slate-500">Time</dt><dd className="text-slate-200">{new Date(done.scan.date).toLocaleString("en-IN")}</dd>

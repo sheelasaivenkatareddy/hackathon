@@ -20,9 +20,9 @@ export function Privacy() {
     <Page title="Privacy">
       <p>There are no accounts for farmers, and nothing to sign up for.</p>
       <section><h2>What we save when you scan</h2>
-        <p>Each photo you scan on the Scan page is sent to the Patra Lens database (hosted on Supabase) with its result, a random ID for your phone, and the name, phone number and village you choose to enter. Our team uses it to check answers and follow up with farmers. Only Patra Lens admins can see it.</p>
+        <p>Each photo you scan on the Scan page is sent to the Patra Chain database (hosted on Supabase) with its result, a random ID for your phone, and the name, phone number and village you choose to enter. Our team uses it to check answers and follow up with farmers. Only Patra Chain admins can see it.</p>
         <p>To find and circle the problem spots, the photo is also sent to Anthropic's Claude AI. Anthropic does not use it to train its models.</p>
-        <p>To have your scans removed from the database, contact the Patra Lens team.</p>
+        <p>To have your scans removed from the database, contact the Patra Chain team.</p>
       </section>
       <section><h2>What stays on your device</h2>
         <p>Your fields, sentinel plants, Leaf Watch photos, notes and settings are saved in your browser's storage on your device. A copy of each scan is kept there too.</p>
@@ -54,8 +54,8 @@ export function Privacy() {
 export function Terms() {
   return (
     <Page title="Terms of use">
-      <section><h2>What Patra Lens is</h2>
-        <p>Patra Lens is a free tool that looks at photos of plant leaves and gives guidance. It is not a doctor for plants, and it does not replace an agriculture expert.</p>
+      <section><h2>What Patra Chain is</h2>
+        <p>Patra Chain is a free tool that looks at photos of plant leaves and gives guidance. It is not a doctor for plants, and it does not replace an agriculture expert.</p>
       </section>
       <section><h2>Use your own judgement</h2>
         <ul>
@@ -66,7 +66,7 @@ export function Terms() {
         </ul>
       </section>
       <section><h2>No warranty</h2>
-        <p>Patra Lens is provided "as is". We do not promise that it will always be available or free from errors. To the extent the law allows, we are not responsible for crop losses or other damage that follows from using it.</p>
+        <p>Patra Chain is provided "as is". We do not promise that it will always be available or free from errors. To the extent the law allows, we are not responsible for crop losses or other damage that follows from using it.</p>
       </section>
       <section><h2>Third-party data and licences</h2>
         <p>Weather, maps, soil data and descriptions come from other services, each under its own terms. The AI model and photos are used under open licences. See <Link to="/about">Credits and licences</Link>.</p>

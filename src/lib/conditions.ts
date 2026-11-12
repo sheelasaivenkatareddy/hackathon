@@ -76,7 +76,7 @@ export const loadWikiSummary = (name: string) => cached<{ text: string; url: str
   const title = WIKI_TITLES[name];
   if (!title) return null;
   const j = parse(WikiSchema, await getJson(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`), "The description");
-  // The first two sentences describe the disease. Later ones can name chemical treatments, which Patra Lens never shows.
+  // The first two sentences describe the disease. Later ones can name chemical treatments, which Patra Chain never shows.
   const text = (j.extract.match(/[^.!?]+[.!?]+(\s|$)/g) ?? []).slice(0, 2).join("").trim();
   return { text, url: j.content_urls?.desktop.page ?? `https://en.wikipedia.org/wiki/${title}` };
 });

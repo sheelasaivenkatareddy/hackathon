@@ -1,4 +1,4 @@
-// The home page: what Patra Lens is, how it works, and how well it does.
+// The home page: what Patra Chain is, how it works, and how well it does.
 import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Aperture, BookOpen, Building2, Calculator, Camera, ChevronDown, CloudSun, FlaskConical, Gift, HeartPulse, ImageOff, Languages, Mic, Microscope, RadioTower, ScanLine, Sprout, TrendingUp, TriangleAlert, UserCheck, Wheat, Zap } from "lucide-react";
 import { ReactNode, useRef, useState } from "react";
@@ -46,7 +46,7 @@ const COMPARE = [
   ["Neighbour risk", "Not shown", "Area-level early alert"],
 ];
 const HONEST = [
-  { title: "No pesticide advice", text: "Patra Lens never names pesticides or pesticide doses. It tells you what to check and who to ask." },
+  { title: "No pesticide advice", text: "Patra Chain never names pesticides or pesticide doses. It tells you what to check and who to ask." },
   { title: "Private by default", text: "Location is shared only if you turn it on, and only as an approximate 1 km area." },
   { title: "Estimates, not promises", text: "Risk scores are estimates from weather and reports, not predictions." },
   { title: "Measured, not claimed", text: "Accuracy is measured on held-out field photos, not lab photos. Anything we have not measured yet shows 'To be measured'." },
@@ -58,7 +58,7 @@ const ROADMAP = [
   { title: "Later", items: ["Field validation with local experts", "Extension-officer dashboard", "Pest trap photos"] },
 ];
 const FAQ = [
-  ["Does Patra Lens tell me which pesticide to use?", "No. It suggests what to check and who to ask. Treatment decisions stay with the farmer and local experts."],
+  ["Does Patra Chain tell me which pesticide to use?", "No. It suggests what to check and who to ask. Treatment decisions stay with the farmer and local experts."],
   ["Does it suggest fertilizer?", "Yes. After a diagnosis it shows what to use and what to avoid. For tomato, potato and corn, enter your field size to see approximate amounts from university recommendations. A soil test gives better numbers. Fertilizer supports the plant but does not cure disease."],
   ["How accurate is it?", `On ${CONFIG.measured.fieldTestPhotos} public field photos it had never seen, the top answer was right ${pct(CONFIG.measured.fieldAccuracy)} of the time, and the right answer was in the top 3 ${pct(CONFIG.measured.fieldTop3)} of the time. Tomato alone was lower, at ${pct(CONFIG.measured.tomatoFieldAccuracy)}. These are not local farm photos yet, so always confirm with an expert.`],
   ["Does it need internet?", "Photo checks, spot comparison and the on-device model run in the browser. Weather and the shared radar need internet."],
@@ -224,7 +224,7 @@ function FieldResults() {
             </div>
           ))}
         </div>
-        <p className="mt-6 max-w-3xl text-sm text-white/75">The limits: these are public photos (PlantDoc), not local farms. Tomato alone scored lower, at {pct(m.tomatoFieldAccuracy)}. That is why Patra Lens shows its top 3, says “not sure”, and sends unsure cases to an expert.</p>
+        <p className="mt-6 max-w-3xl text-sm text-white/75">The limits: these are public photos (PlantDoc), not local farms. Tomato alone scored lower, at {pct(m.tomatoFieldAccuracy)}. That is why Patra Chain shows its top 3, says “not sure”, and sends unsure cases to an expert.</p>
       </div>
     </section>
   );
@@ -322,13 +322,13 @@ export default function Home() {
         <div aria-hidden className="hero-dots pointer-events-none absolute inset-0 -z-[1]" />
         <div className="wrap grid min-h-[640px] items-center gap-10 pb-24 pt-12 md:pb-28 lg:min-h-[calc(100vh-4rem)] lg:grid-cols-[1.2fr_1fr]">
           <div>
-            <Chip tone="lime">Free · Voice AI in 6 languages · Tomato & paddy</Chip>
+            <Chip tone="lime">Patra Chain · Blockchain-based crop disease verification system</Chip>
             <h1 className="display mt-5" aria-label="Catch the first spot.">
               {["Catch", "the"].map((w, i) => <HeroWord key={w} delay={i * 0.12}>{w}</HeroWord>)}
               <HeroWord delay={0.24} className="text-glow">first</HeroWord>
               <HeroWord delay={0.36} className="text-glow">spot.</HeroWord>
             </h1>
-            <p className="mt-5 max-w-xl text-lg text-white/90 md:text-xl">Patra Lens is every farmer's AI crop doctor. Photograph a leaf to find disease early, ask Kisan Vani in Telugu or Hindi, check today's mandi price, and send the case to a lab or RBK, all from one phone.</p>
+            <p className="mt-5 max-w-xl text-lg text-white/90 md:text-xl">Patra Chain is every farmer's AI crop doctor. Photograph a leaf to find disease early, ask Kisan Vani in Telugu or Hindi, check today's mandi price, and send the case to a lab or RBK, all from one phone.</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button to="/hub" variant="lime">Open Kisan Hub</Button>
               <Button to="/hub/scan" variant="outline-light">Scan a leaf</Button>
@@ -377,10 +377,10 @@ export default function Home() {
       <Section tint>
         <p className="eyebrow mb-2">The idea</p>
         <h2 className="h2">A follow-up visit for every plant</h2>
-        <p className="mt-4 max-w-3xl text-muted">Like a doctor comparing today's scan with last week's, Patra Lens compares each sentinel leaf with its last photo. New spots, holes and feeding marks stand out, even when they are too small or faint for a one-photo diagnosis.</p>
+        <p className="mt-4 max-w-3xl text-muted">Like a doctor comparing today's scan with last week's, Patra Chain compares each sentinel leaf with its last photo. New spots, holes and feeding marks stand out, even when they are too small or faint for a one-photo diagnosis.</p>
         <div className="mt-8"><IdeaPanels /></div>
         <div className="mt-4 flex flex-col justify-between gap-2 text-sm font-semibold sm:flex-row">
-          <span className="text-tomato-dark">Patra Lens: alert at the first new spot</span>
+          <span className="text-tomato-dark">Patra Chain: alert at the first new spot</span>
           <span className="text-muted">One-photo apps: when symptoms are clear</span>
         </div>
       </Section>
@@ -418,7 +418,7 @@ export default function Home() {
         <div className="overflow-x-auto rounded-card border border-line">
           <table className="w-full min-w-[320px] text-left text-sm md:text-base">
             <thead className="bg-deep lit text-white">
-              <tr><th className="p-3 md:p-4"><span className="sr-only">Compared item</span></th><th scope="col" className="p-3 font-heading md:p-4">Basic photo-ID app</th><th scope="col" className="p-3 font-heading text-lime md:p-4">Patra Lens</th></tr>
+              <tr><th className="p-3 md:p-4"><span className="sr-only">Compared item</span></th><th scope="col" className="p-3 font-heading md:p-4">Basic photo-ID app</th><th scope="col" className="p-3 font-heading text-lime md:p-4">Patra Chain</th></tr>
             </thead>
             <tbody>
               {COMPARE.map(([k, a, b]) => (

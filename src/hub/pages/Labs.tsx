@@ -14,7 +14,7 @@ const TYPES: DirType[] = ["Helpline", "ICAR", "University", "Lab", "KVK", "RBK",
 const TYPE_TONE: Record<DirType, "cyan" | "lime" | "pink" | "amber" | "slate"> = { Helpline: "lime", ICAR: "cyan", University: "cyan", Lab: "pink", KVK: "amber", RBK: "lime", RSK: "lime", Officer: "slate" };
 
 const scanText = (s: HubScan | undefined, who: { name: string; phone: string; village: string; district: string }) => s
-  ? `Patra Lens leaf scan\nCrop: ${s.crop}\nResult: ${s.result.healthy ? "Healthy" : s.result.disease.name} (${s.result.disease.severity}, ${Math.round(s.result.disease.confidence * 100)}% sure)\nDate: ${new Date(s.date).toLocaleString("en-IN")}\nFarmer: ${who.name}, +91 ${who.phone}, ${who.village}, ${who.district}\nPlease advise.`
+  ? `Patra Chain leaf scan\nCrop: ${s.crop}\nResult: ${s.result.healthy ? "Healthy" : s.result.disease.name} (${s.result.disease.severity}, ${Math.round(s.result.disease.confidence * 100)}% sure)\nDate: ${new Date(s.date).toLocaleString("en-IN")}\nFarmer: ${who.name}, +91 ${who.phone}, ${who.village}, ${who.district}\nPlease advise.`
   : `Namaskaram, I am ${who.name} from ${who.village}, ${who.district}. I need advice on my crop. Phone +91 ${who.phone}.`;
 
 export default function Labs() {

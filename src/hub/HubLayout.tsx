@@ -29,7 +29,7 @@ const Logo = () => (
     </span>
     <span className="leading-tight">
       <span className="block font-heading text-lg font-extrabold text-white">Kisan Hub</span>
-      <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-neon-cyan/80">by Patra Lens</span>
+      <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-neon-cyan/80">by Patra Chain</span>
     </span>
   </Link>
 );
@@ -103,7 +103,7 @@ export default function HubLayout({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <SyncBadge className="mb-3 px-1" />
-        <Link to="/" className="mb-3 flex items-center gap-2 px-3 text-xs font-semibold text-slate-500 hover:text-slate-300"><ArrowLeft className="h-3.5 w-3.5" aria-hidden />Patra Lens website</Link>
+        <Link to="/" className="mb-3 flex items-center gap-2 px-3 text-xs font-semibold text-slate-500 hover:text-slate-300"><ArrowLeft className="h-3.5 w-3.5" aria-hidden />Patra Chain website</Link>
         <UserCard />
       </aside>
 
@@ -165,7 +165,7 @@ export default function HubLayout({ children }: { children: ReactNode }) {
                 ))}
               </div>
               <div className="mt-4"><UserCard /></div>
-              <Link to="/" className="mt-3 flex items-center gap-2 text-xs font-semibold text-slate-400"><ArrowLeft className="h-3.5 w-3.5" aria-hidden />Patra Lens website</Link>
+              <Link to="/" className="mt-3 flex items-center gap-2 text-xs font-semibold text-slate-400"><ArrowLeft className="h-3.5 w-3.5" aria-hidden />Patra Chain website</Link>
             </motion.div>
           </motion.div>
         )}

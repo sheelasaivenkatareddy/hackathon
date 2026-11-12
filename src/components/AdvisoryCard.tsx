@@ -35,7 +35,7 @@ export default function AdvisoryCard() {
           </label>
           <Button type="submit" loading={busy}>Search</Button>
         </form>
-        <p className="tiny mt-1">This searches the Patra Lens disease library. It is not an AI chatbot.</p>
+        <p className="tiny mt-1">This searches the Patra Chain disease library. It is not an AI chatbot.</p>
         {answers && (
           <ul className="mt-3 space-y-2" aria-live="polite" data-testid="ask-results">
             {answers.map((a, i) => (

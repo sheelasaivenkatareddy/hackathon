@@ -209,7 +209,7 @@ function groupOf(name: string | undefined): Group {
 
 const NOT_A_LEAF: Record<"flower" | "not_plant", { en: string; te: string; hi: string }> = {
   flower: {
-    en: "This looks like a flower, not a tomato leaf. Patra Lens checks leaves. Take a photo of one leaf.",
+    en: "This looks like a flower, not a tomato leaf. Patra Chain checks leaves. Take a photo of one leaf.",
     te: "ఇది పువ్వులా ఉంది, టమోటా ఆకు కాదు. ఒక ఆకు ఫోటో తీయండి.",
     hi: "यह फूल जैसा दिखता है, टमाटर की पत्ती नहीं। एक पत्ती की फोटो लें।",
   },

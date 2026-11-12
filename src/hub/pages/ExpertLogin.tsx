@@ -133,7 +133,7 @@ export default function ExpertLogin() {
             <p className="mt-3 font-heading text-xl font-bold text-white">Email verified</p>
             {status === "approved"
               ? <p className="hub-muted mt-1">Opening the expert console…</p>
-              : <p className="hub-muted mt-1">Your account is waiting for the Patra Lens admin to approve it. Once approved, sign in again here to open the expert console with farmers' scans and lab requests.</p>}
+              : <p className="hub-muted mt-1">Your account is waiting for the Patra Chain admin to approve it. Once approved, sign in again here to open the expert console with farmers' scans and lab requests.</p>}
             <Link to="/admin" className="hub-btn-primary mt-5"><ShieldCheck className="h-5 w-5" aria-hidden />Open expert console</Link>
           </div>
         )}

@@ -118,7 +118,7 @@ export default function PlantDetail() {
                 <textarea aria-label="Treatment note" className="field-input" rows={2} placeholder="What was done, in your own words" value={tNote} onChange={(e) => setTNote(e.target.value)} />
                 <Button type="submit" variant="secondary" disabled={!tNote.trim()}>Add treatment given</Button>
               </form>
-              <p className="tiny mt-2">Patra Lens never suggests treatments. Ask your agriculture officer or KVK.</p>
+              <p className="tiny mt-2">Patra Chain never suggests treatments. Ask your agriculture officer or KVK.</p>
             </Card>
           </div>
         </div>

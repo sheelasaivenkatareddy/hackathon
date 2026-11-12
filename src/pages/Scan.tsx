@@ -137,7 +137,7 @@ export default function Scan() {
     const top = diag.prediction.top3[0];
     const plan = fertilizerAdvice(top?.name, diag.level), outlook = outlookFor(top?.name, diag.level);
     return [
-      "Patra Lens scan report", new Date().toLocaleString("en-GB"), "", summary, "",
+      "Patra Chain scan report", new Date().toLocaleString("en-GB"), "", summary, "",
       ...diag.prediction.top3.map((g) => `${disease(g.name)}: ${Math.round(g.p * 100)}%`), "",
       `Photo checks: sharpness ${Math.round(accepted.coach.sharpness.value)}, light ${Math.round(accepted.coach.light.value)}, leaf in frame ${Math.round(accepted.coach.leafInFrame.value)}%`, "",
       `Use this: ${plan.useThis}`, plan.headline, `Avoid: ${plan.avoid.join("; ")}`, "",
@@ -166,7 +166,7 @@ export default function Scan() {
           </div>
           {cloudConfigured && <ProfileCard />}
           <div className="mt-5"><PhotoFlow key={flowKey} hint={t("scan.fillFrame")} showSamples acceptNonLeaf onAccepted={onAccepted} /></div>
-          {cloudConfigured && <p className="tiny mt-3">Your photo and its result are saved to the Patra Lens database, so our team can check answers and help farmers nearby.</p>}
+          {cloudConfigured && <p className="tiny mt-3">Your photo and its result are saved to the Patra Chain database, so our team can check answers and help farmers nearby.</p>}
         </>
       )}
 
